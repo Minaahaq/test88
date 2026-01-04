@@ -1,8 +1,34 @@
+import crypto from "crypto";
+
+const sessions = new Map();
+
 export default function handler(req, res) {
-  const secret = process.env.CLIENT_SECRET; // نفس السر في البروكسي
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "NOT_ALLOWED" });
+  }
 
-  const expires = Date.now() + 5 * 60 * 1000; // صالح 5 دقائق
-  const token = Buffer.from(`${secret}:${expires}`).toString("base64");
+  const { code, device } = req.body || {};
 
-  res.status(200).json({ token, expires });
+  if (!code || !device) {
+    return res.status(400).json({ error: "MISSING_DATA" });
+  }
+
+  // توليد توكن
+  const token = crypto.randomBytes(24).toString("hex");
+
+  sessions.set(token, {
+    code,
+    device,
+    ip:
+      req.headers["x-forwarded-for"] ||
+      req.socket.remoteAddress,
+    time: Date.now()
+  });
+
+  return res.json({ token });
+}
+
+// 👇 مهم: نحتاجها في proxy
+export function getSession(token) {
+  return sessions.get(token);
 }
