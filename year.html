@@ -161,12 +161,13 @@ h1 {
 const grid = document.getElementById("grid");
 
 async function fetchProtectedData() {
-  const tokenRes = await fetch("/api/get-token");
-  const { token } = await tokenRes.json();
+  const token = localStorage.getItem("session_token");
+  const device = localStorage.getItem("device_id");
 
   const res = await fetch("/api/proxy?type=years", {
     headers: {
-      "x-client-token": token
+      "x-client-token": token,
+      "x-device-id": device
     }
   });
 
