@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>نظام إدارة الصيدلية - المتكامل</title>
+  <title>نظام الصيدلية المتكامل - ERP</title>
   <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,511 +13,624 @@
         extend: {
           fontFamily: { almarai: ['Almarai', 'sans-serif'] },
           colors: {
-            primary: '#0E3A8A',
-            danger: '#DC2626',
+            primary: '#0A2647',
+            secondary: '#144272',
+            accent: '#FFC300',
             success: '#16A34A',
+            danger: '#DC2626',
             warning: '#D97706',
-            light: '#F8FAFC'
           }
         }
       }
     }
   </script>
   <style>
-    body { font-family: 'Almarai', sans-serif; background-color: #F8FAFC; }
-    .card { background: white; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 1.5rem; }
-    .fade-in { animation: fadeIn 0.6s ease-out; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Almarai', sans-serif; background: #F1F5F9; }
+    .sidebar { background: #0A2647; color: white; width: 240px; position: fixed; inset: 0; overflow-y: auto; transition: 0.3s; z-index: 40; }
+    .sidebar .active { background: #1E3A6F; border-right: 4px solid #FFC300; }
+    .main-content { margin-right: 240px; padding: 20px; min-height: 100vh; }
+    .card { background: white; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 1.5rem; transition: 0.2s; }
+    .card:hover { box-shadow: 0 15px 40px rgba(0,0,0,0.08); }
+    .fade-in { animation: fadeIn 0.5s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    /* حالات الأدوية */
-    .status-expired { background: #FEE2E2; color: #DC2626; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; }
-    .status-near-expiry { background: #FEF3C7; color: #D97706; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; }
-    .status-low { background: #FEF3C7; color: #D97706; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; }
-    .status-available { background: #DCFCE7; color: #16A34A; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; }
-
-    /* مودال عام */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; opacity: 0; visibility: hidden; transition: all 0.3s; }
+    .status-badge { padding: 0.2rem 0.8rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+    .status-expired { background: #FEE2E2; color: #DC2626; }
+    .status-near { background: #FEF3C7; color: #D97706; }
+    .status-low { background: #FEF3C7; color: #D97706; }
+    .status-ok { background: #DCFCE7; color: #16A34A; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .pos-cart { max-height: 450px; overflow-y: auto; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
     .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-box { background: white; border-radius: 1.5rem; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: transform 0.3s; }
+    .modal-box { background: white; border-radius: 1.5rem; padding: 2rem; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: 0.3s; }
     .modal-overlay.active .modal-box { transform: scale(1); }
-
-    .sort-btn { cursor: pointer; user-select: none; }
-    .sort-btn:hover { color: #0E3A8A; }
-
-    /* Toast notifications */
-    .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; direction: ltr; }
-    .toast { padding: 12px 20px; border-radius: 12px; color: white; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUp 0.4s ease; min-width: 200px; }
+    .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast { padding: 12px 20px; border-radius: 12px; color: white; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideUp 0.4s ease; }
     .toast-success { background: #16A34A; }
     .toast-error { background: #DC2626; }
     .toast-warning { background: #D97706; }
-    .toast-info { background: #0E3A8A; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* شاشة تسجيل الدخول */
-    .login-overlay { position: fixed; inset: 0; background: #0E3A8A; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
-    .login-box { background: white; padding: 40px; border-radius: 24px; min-width: 320px; text-align: center; }
-
-    /* الطباعة */
-    @media print {
-      .no-print { display: none !important; }
-      .card { box-shadow: none !important; border: 1px solid #ddd; }
-      body { background: white !important; padding: 20px !important; }
-      table { font-size: 12px !important; }
-      th, td { border-bottom: 1px solid #ddd !important; }
-    }
+    .toast-info { background: #0A2647; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .login-overlay { position: fixed; inset: 0; background: #0A2647; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
+    .login-box { background: white; padding: 40px; border-radius: 24px; min-width: 340px; text-align: center; }
+    @media print { .no-print { display: none !important; } .sidebar { display: none !important; } .main-content { margin: 0 !important; padding: 10px !important; } .card { box-shadow: none !important; border: 1px solid #ddd; } }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #E2E8F0; }
+    ::-webkit-scrollbar-thumb { background: #0A2647; border-radius: 8px; }
   </style>
 </head>
 <body>
 
-  <!-- شاشة تسجيل الدخول -->
+  <!-- شاشة الدخول -->
   <div class="login-overlay no-print" id="loginOverlay">
     <div class="login-box">
-      <div class="text-primary text-4xl mb-3"><i data-lucide="pill" class="w-12 h-12 mx-auto"></i></div>
-      <h2 class="text-2xl font-bold text-primary mb-2">نظام الصيدلية</h2>
-      <p class="text-gray-500 text-sm mb-6">أدخل كلمة المرور للمتابعة</p>
-      <input type="password" id="passwordInput" placeholder="كلمة المرور" class="w-full p-3 border border-gray-300 rounded-lg mb-4 text-center" onkeydown="if(event.key==='Enter') login()">
-      <button onclick="login()" class="w-full bg-primary text-white py-3 rounded-lg hover:bg-blue-800 transition">دخول</button>
-      <p class="text-xs text-gray-400 mt-3">كلمة المرور الافتراضية: admin123</p>
+      <div class="text-primary text-5xl mb-3"><i data-lucide="pill" class="w-16 h-16 mx-auto text-primary"></i></div>
+      <h2 class="text-3xl font-bold text-primary">نظام الصيدلية</h2>
+      <p class="text-gray-500 text-sm mb-6">الإدارة المتكاملة للمخزون والمبيعات</p>
+      <input type="password" id="passwordInput" placeholder="كلمة المرور" class="w-full p-3 border border-gray-300 rounded-xl mb-4 text-center text-lg" onkeydown="if(event.key==='Enter') login()">
+      <button onclick="login()" class="w-full bg-primary text-white py-3 rounded-xl hover:bg-secondary transition text-lg font-bold">دخول</button>
+      <p class="text-xs text-gray-400 mt-3">كلمة المرور الافتراضية: <span class="font-bold">admin123</span></p>
     </div>
   </div>
 
-  <!-- حاوية الإشعارات -->
+  <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- نافذة الأدوية المنتهية / على وشك الانتهاء -->
-  <div class="modal-overlay no-print" id="expiryModal">
-    <div class="modal-box">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-danger">⚠️ تنبيهات الصلاحية</h3>
-        <button onclick="closeExpiryModal()" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button>
-      </div>
-      <div id="expiryModalBody" class="text-sm"></div>
-      <button onclick="closeExpiryModal()" class="mt-4 w-full bg-primary text-white py-2 rounded-lg">تم الفهم</button>
+  <!-- الشريط الجانبي -->
+  <nav class="sidebar no-print" id="sidebar">
+    <div class="p-6 border-b border-white/10">
+      <h1 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="pill" class="w-7 h-7 text-accent"></i> صيدليتي</h1>
+      <p class="text-xs text-gray-400 mt-1" id="pharmacyNameDisplay">نظام متكامل</p>
     </div>
-  </div>
+    <ul class="p-4 space-y-2">
+      <li><button onclick="navigate('dashboard')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3 active" data-page="dashboard"><i data-lucide="layout-dashboard"></i> لوحة التحكم</button></li>
+      <li><button onclick="navigate('pos')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3" data-page="pos"><i data-lucide="shopping-cart"></i> نقطة البيع (POS)</button></li>
+      <li><button onclick="navigate('inventory')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3" data-page="inventory"><i data-lucide="package"></i> المخزون</button></li>
+      <li><button onclick="navigate('suppliers')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3" data-page="suppliers"><i data-lucide="truck"></i> الموردين</button></li>
+      <li><button onclick="navigate('customers')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3" data-page="customers"><i data-lucide="users"></i> العملاء</button></li>
+      <li><button onclick="navigate('reports')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3" data-page="reports"><i data-lucide="bar-chart-3"></i> التقارير</button></li>
+      <li><button onclick="navigate('settings')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3" data-page="settings"><i data-lucide="settings"></i> الإعدادات</button></li>
+      <li class="pt-4 border-t border-white/10"><button onclick="logout()" class="w-full text-right p-3 rounded-xl hover:bg-red-500/20 transition flex items-center gap-3 text-red-400"><i data-lucide="log-out"></i> تسجيل خروج</button></li>
+    </ul>
+  </nav>
 
-  <!-- المحتوى الرئيسي (يظهر بعد الدخول) -->
-  <div id="mainContent" style="display:none;">
+  <!-- المحتوى الرئيسي -->
+  <div class="main-content" id="mainContent" style="display:none;">
 
-    <!-- رأس الصفحة -->
+    <!-- رأس -->
     <header class="flex justify-between items-center mb-6 no-print">
-      <div class="flex items-center gap-3">
-        <div class="bg-primary text-white p-2 rounded-xl"><i data-lucide="pill" class="w-6 h-6"></i></div>
-        <h1 class="text-xl font-bold text-primary">نظام الصيدلية</h1>
-      </div>
-      <div class="flex items-center gap-3 text-sm">
-        <span class="text-gray-600">مرحباً، د. خالد</span>
-        <button onclick="logout()" class="text-red-600 hover:text-red-800 text-xs font-bold no-print">تسجيل خروج</button>
-        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center"><i data-lucide="user" class="w-4 h-4 text-primary"></i></div>
+      <div></div>
+      <div class="flex items-center gap-4 text-sm">
+        <span class="text-gray-600 font-bold" id="headerUsername">د. خالد</span>
+        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary"><i data-lucide="user" class="w-5 h-5 text-primary"></i></div>
       </div>
     </header>
 
-    <!-- الإحصائيات (ديناميكية) -->
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 fade-in" id="statsContainer">
-      <div class="card border-r-4 border-primary">
-        <p class="text-xs text-gray-500">إجمالي الأدوية</p>
-        <p class="text-2xl font-bold text-primary" id="totalMeds">0</p>
+    <!-- ========== صفحة DASHBOARD ========== -->
+    <div id="page-dashboard" class="page active">
+      <h2 class="text-2xl font-bold text-primary mb-4">📊 لوحة التحكم</h2>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <div class="card border-r-4 border-primary"><p class="text-xs text-gray-500">إجمالي الأدوية</p><p class="text-2xl font-bold text-primary" id="dashTotalProducts">0</p></div>
+        <div class="card border-r-4 border-success"><p class="text-xs text-gray-500">مبيعات اليوم</p><p class="text-2xl font-bold text-success" id="dashTodaySales">0 ج.م</p></div>
+        <div class="card border-r-4 border-accent"><p class="text-xs text-gray-500">مبيعات الشهر</p><p class="text-2xl font-bold text-warning" id="dashMonthSales">0 ج.م</p></div>
+        <div class="card border-r-4 border-danger"><p class="text-xs text-gray-500">منتهي الصلاحية</p><p class="text-2xl font-bold text-danger" id="dashExpired">0</p></div>
+        <div class="card border-r-4 border-orange-500"><p class="text-xs text-gray-500">كمية منخفضة</p><p class="text-2xl font-bold text-orange-600" id="dashLowStock">0</p></div>
       </div>
-      <div class="card border-r-4 border-success">
-        <p class="text-xs text-gray-500">إجمالي قيمة المخزون</p>
-        <p class="text-2xl font-bold text-success" id="totalValue">0 ج.م</p>
-      </div>
-      <div class="card border-r-4 border-danger">
-        <p class="text-xs text-gray-500">منتهية الصلاحية</p>
-        <p class="text-2xl font-bold text-danger" id="expiredCount">0</p>
-      </div>
-      <div class="card border-r-4 border-warning">
-        <p class="text-xs text-gray-500">كمية منخفضة</p>
-        <p class="text-2xl font-bold text-warning" id="lowStockCount">0</p>
-      </div>
-      <div class="card border-r-4 border-blue-500">
-        <p class="text-xs text-gray-500">مبيعات اليوم</p>
-        <p class="text-2xl font-bold text-blue-600" id="dailySales">0 ج.م</p>
-      </div>
+      <div class="card"><h3 class="font-bold text-gray-700 mb-2">📋 آخر الفواتير</h3><div id="dashRecentInvoices" class="text-sm"></div></div>
     </div>
 
-    <!-- جدول المخزون + البحث -->
-    <div class="card fade-in">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 no-print">
-        <h2 class="text-lg font-bold text-gray-700">قائمة الأدوية</h2>
-        <div class="flex flex-wrap gap-2 w-full md:w-auto">
-          <div class="relative w-full md:w-64">
-            <i data-lucide="search" class="absolute right-3 top-2.5 w-4 h-4 text-gray-400"></i>
-            <input type="text" id="searchInput" placeholder="بحث..." class="w-full pr-10 pl-9 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm" oninput="handleSearch()">
-            <button id="clearSearchBtn" class="absolute left-2 top-2.5 text-gray-400 hover:text-gray-600 hidden" onclick="clearSearch()" aria-label="مسح"><i data-lucide="x-circle" class="w-4 h-4"></i></button>
+    <!-- ========== صفحة POS ========== -->
+    <div id="page-pos" class="page">
+      <h2 class="text-2xl font-bold text-primary mb-4">🛒 نقطة البيع</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="md:col-span-2 card">
+          <div class="flex gap-2 mb-4"><input type="text" id="posSearch" placeholder="بحث بالاسم أو الباركود..." class="flex-1 p-2 border border-gray-300 rounded-xl" oninput="posSearch()"><button onclick="posSearch()" class="bg-primary text-white px-4 py-2 rounded-xl">بحث</button></div>
+          <div id="posResults" class="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-96 overflow-y-auto"></div>
+        </div>
+        <div class="card">
+          <h3 class="font-bold text-gray-700 mb-2">🛍️ السلة</h3>
+          <div id="cartItems" class="pos-cart text-sm space-y-2"></div>
+          <div class="border-t pt-2 mt-2"><p class="flex justify-between"><span>المجموع:</span><span class="font-bold text-primary text-xl" id="cartTotal">0 ج.م</span></p></div>
+          <div class="flex gap-2 mt-2 no-print">
+            <button onclick="checkout()" class="flex-1 bg-success text-white py-2 rounded-xl font-bold hover:bg-green-700">إتمام البيع</button>
+            <button onclick="clearCart()" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-xl hover:bg-gray-300">تفريغ</button>
           </div>
-          <button onclick="exportToExcel()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-1 text-sm"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel</button>
-          <button onclick="window.print()" class="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition flex items-center gap-1 text-sm"><i data-lucide="printer" class="w-4 h-4"></i> طباعة</button>
-          <button onclick="openAddModal()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition flex items-center gap-2 whitespace-nowrap text-sm"><i data-lucide="plus" class="w-4 h-4"></i> إضافة دواء</button>
         </div>
       </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm" id="medicineTable">
-          <thead class="bg-gray-50 text-gray-600 border-b">
-            <tr>
-              <th class="p-3 text-right sort-btn" data-sort="name" onclick="sortTable('name')">الاسم <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-              <th class="p-3 text-right sort-btn" data-sort="concentration" onclick="sortTable('concentration')">التركيز <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-              <th class="p-3 text-right sort-btn" data-sort="qty" onclick="sortTable('qty')">الكمية <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-              <th class="p-3 text-right sort-btn" data-sort="price" onclick="sortTable('price')">سعر البيع <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-              <th class="p-3 text-right sort-btn" data-sort="expiry" onclick="sortTable('expiry')">تاريخ الانتهاء <i data-lucide="arrow-up-down" class="w-3 h-3 inline"></i></th>
-              <th class="p-3 text-right">الحالة</th>
-              <th class="p-3 text-center no-print">إجراءات</th>
-            </tr>
-          </thead>
-          <tbody id="medicineTableBody"></tbody>
-        </table>
-      </div>
-      <p class="text-xs text-gray-400 mt-3 text-center" id="rowCount"></p>
     </div>
+
+    <!-- ========== صفحة INVENTORY ========== -->
+    <div id="page-inventory" class="page">
+      <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+        <h2 class="text-2xl font-bold text-primary">📦 المخزون</h2>
+        <div class="flex gap-2 flex-wrap">
+          <input type="text" id="invSearch" placeholder="بحث..." class="p-2 border border-gray-300 rounded-xl w-48" oninput="renderInventory()">
+          <button onclick="openProductModal()" class="bg-primary text-white px-4 py-2 rounded-xl flex items-center gap-2"><i data-lucide="plus"></i> إضافة دواء</button>
+          <button onclick="exportDB()" class="bg-green-600 text-white px-3 py-2 rounded-xl text-sm">تصدير CSV</button>
+          <button onclick="document.getElementById('importFile').click()" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-sm">استيراد CSV</button>
+          <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importCSV(event)">
+        </div>
+      </div>
+      <div class="card overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 border-b"><tr><th class="p-3 text-right">الاسم</th><th class="p-3 text-right">التركيز</th><th class="p-3 text-right">التصنيف</th><th class="p-3 text-right">الكمية</th><th class="p-3 text-right">السعر</th><th class="p-3 text-right">الصلاحية</th><th class="p-3 text-right">الحالة</th><th class="p-3 text-center no-print">إجراءات</th></tr></thead><tbody id="invTableBody"></tbody></table></div>
+    </div>
+
+    <!-- ========== صفحة SUPPLIERS ========== -->
+    <div id="page-suppliers" class="page">
+      <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-primary">🏢 الموردين</h2><button onclick="openSupplierModal()" class="bg-primary text-white px-4 py-2 rounded-xl">+ إضافة مورد</button></div>
+      <div class="card overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 border-b"><tr><th class="p-3 text-right">الاسم</th><th class="p-3 text-right">الهاتف</th><th class="p-3 text-right">العنوان</th><th class="p-3 text-center no-print">إجراءات</th></tr></thead><tbody id="supplierTableBody"></tbody></table></div>
+    </div>
+
+    <!-- ========== صفحة CUSTOMERS ========== -->
+    <div id="page-customers" class="page">
+      <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-primary">👤 العملاء</h2><button onclick="openCustomerModal()" class="bg-primary text-white px-4 py-2 rounded-xl">+ إضافة عميل</button></div>
+      <div class="card overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 border-b"><tr><th class="p-3 text-right">الاسم</th><th class="p-3 text-right">الهاتف</th><th class="p-3 text-right">نقاط الولاء</th><th class="p-3 text-center no-print">إجراءات</th></tr></thead><tbody id="customerTableBody"></tbody></table></div>
+    </div>
+
+    <!-- ========== صفحة REPORTS ========== -->
+    <div id="page-reports" class="page">
+      <h2 class="text-2xl font-bold text-primary mb-4">📈 التقارير</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card"><h3 class="font-bold mb-2">تقرير المبيعات</h3><input type="date" id="reportDate" class="p-2 border border-gray-300 rounded-xl w-full mb-2" onchange="renderReports()"><button onclick="renderReports()" class="bg-primary text-white px-4 py-2 rounded-xl w-full">عرض</button><div id="reportSalesResult" class="mt-2 text-sm"></div></div>
+        <div class="card"><h3 class="font-bold mb-2">تقرير الأدوية المنتهية</h3><button onclick="renderExpiredReport()" class="bg-danger text-white px-4 py-2 rounded-xl w-full">عرض المنتهي</button><div id="reportExpiredResult" class="mt-2 text-sm"></div></div>
+      </div>
+    </div>
+
+    <!-- ========== صفحة SETTINGS ========== -->
+    <div id="page-settings" class="page">
+      <h2 class="text-2xl font-bold text-primary mb-4">⚙️ الإعدادات</h2>
+      <div class="card max-w-lg">
+        <div class="mb-4"><label class="block text-sm font-medium">اسم الصيدلية</label><input type="text" id="setPharmacyName" class="w-full p-2 border border-gray-300 rounded-xl" onchange="saveSettings()"></div>
+        <div class="mb-4"><label class="block text-sm font-medium">كلمة المرور الجديدة</label><input type="text" id="setPassword" class="w-full p-2 border border-gray-300 rounded-xl" placeholder="اتركه فارغاً إذا لا تريد التغيير" onchange="saveSettings()"></div>
+        <div class="mb-4"><label class="block text-sm font-medium">نسبة الضريبة %</label><input type="number" id="setTax" class="w-full p-2 border border-gray-300 rounded-xl" step="0.01" onchange="saveSettings()"></div>
+        <button onclick="resetData()" class="bg-danger text-white px-4 py-2 rounded-xl">إعادة ضبط النظام</button>
+      </div>
+    </div>
+
   </div>
 
-  <!-- مودال الإضافة / التعديل -->
-  <div class="modal-overlay no-print" id="modalOverlay" onclick="if(event.target===this) closeModal()">
-    <div class="modal-box">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-800" id="modalTitle">إضافة دواء جديد</h3>
-        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700" aria-label="إغلاق"><i data-lucide="x" class="w-6 h-6"></i></button>
-      </div>
-      <form id="medicineForm" onsubmit="saveMedicine(event)">
-        <input type="hidden" id="editId" value="">
-        <div class="mb-3"><label class="block text-sm font-medium text-gray-700 mb-1">الاسم *</label><input type="text" id="formName" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"></div>
-        <div class="mb-3"><label class="block text-sm font-medium text-gray-700 mb-1">التركيز *</label><input type="text" id="formConcentration" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"></div>
-        <div class="mb-3"><label class="block text-sm font-medium text-gray-700 mb-1">الكمية *</label><input type="number" id="formQty" required min="0" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"></div>
-        <div class="mb-3"><label class="block text-sm font-medium text-gray-700 mb-1">سعر البيع (ج.م) *</label><input type="number" id="formPrice" required min="0" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"></div>
-        <div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الانتهاء *</label><input type="date" id="formExpiry" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"></div>
-        <div class="flex gap-2">
-          <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition flex-1">حفظ</button>
-          <button type="button" onclick="closeModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">إلغاء</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- مودال البيع -->
-  <div class="modal-overlay no-print" id="sellModal" onclick="if(event.target===this) closeSellModal()">
-    <div class="modal-box">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-800">تسجيل عملية بيع</h3>
-        <button onclick="closeSellModal()" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button>
-      </div>
-      <form id="sellForm" onsubmit="sellMedicine(event)">
-        <input type="hidden" id="sellId" value="">
-        <p class="text-sm text-gray-600 mb-2">الدواء: <span id="sellNameDisplay" class="font-bold text-primary"></span></p>
-        <div class="mb-3"><label class="block text-sm font-medium text-gray-700 mb-1">الكمية المباعة *</label><input type="number" id="sellQty" required min="1" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"></div>
-        <div class="flex gap-2">
-          <button type="submit" class="bg-success text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex-1">تأكيد البيع</button>
-          <button type="button" onclick="closeSellModal()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">إلغاء</button>
-        </div>
-      </form>
+  <!-- ===== مودالات عامة ===== -->
+  <div class="modal-overlay no-print" id="genericModal" onclick="if(event.target===this) closeModal('genericModal')">
+    <div class="modal-box" id="genericModalBox">
+      <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold" id="modalTitle">عنوان</h3><button onclick="closeModal('genericModal')" class="text-gray-400 hover:text-gray-700"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+      <div id="modalBody"></div>
     </div>
   </div>
 
   <script>
-    // ====== كلمة المرور ======
-    const PASSWORD = 'admin123'; // غيرها لما تحب
+    // ========================================================================
+    // 1. كلمة المرور والإعدادات
+    // ========================================================================
+    const DEFAULT_PASSWORD = 'admin123';
+    let settings = { pharmacyName: 'صيدلية المستقبل', password: DEFAULT_PASSWORD, tax: 0 };
 
-    // ====== المتغيرات العامة ======
-    let medicines = [];
-    let currentSort = { key: null, asc: true };
-    let searchQuery = '';
-    let currentSellId = null;
-
-    // ====== الصلاحية (Login) ======
-    function login() {
-      const input = document.getElementById('passwordInput').value;
-      if (input === PASSWORD) {
-        sessionStorage.setItem('pharmacyAuth', 'true');
-        document.getElementById('loginOverlay').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-        loadData();
-        render();
-        checkExpiryAlerts();
-        showToast('تم تسجيل الدخول بنجاح', 'success');
-      } else {
-        showToast('كلمة المرور غير صحيحة', 'error');
-        document.getElementById('passwordInput').value = '';
-        document.getElementById('passwordInput').focus();
-      }
+    function loadSettings() {
+      const s = localStorage.getItem('pharma_settings');
+      if (s) { try { settings = JSON.parse(s); } catch(e) {} }
+      if (!settings.password) settings.password = DEFAULT_PASSWORD;
+      document.getElementById('setPharmacyName').value = settings.pharmacyName || 'صيدلية المستقبل';
+      document.getElementById('setTax').value = settings.tax || 0;
+      document.getElementById('setPassword').value = '';
+      document.getElementById('pharmacyNameDisplay').textContent = settings.pharmacyName || 'نظام متكامل';
+    }
+    function saveSettings() {
+      settings.pharmacyName = document.getElementById('setPharmacyName').value.trim() || 'صيدلية المستقبل';
+      settings.tax = parseFloat(document.getElementById('setTax').value) || 0;
+      const newPass = document.getElementById('setPassword').value.trim();
+      if (newPass.length > 0) settings.password = newPass;
+      localStorage.setItem('pharma_settings', JSON.stringify(settings));
+      document.getElementById('pharmacyNameDisplay').textContent = settings.pharmacyName;
+      showToast('تم حفظ الإعدادات', 'success');
+    }
+    function resetData() {
+      if (!confirm('هل أنت متأكد من حذف كل البيانات؟')) return;
+      localStorage.clear();
+      initDefaultData();
+      loadSettings();
+      renderAll();
+      showToast('تم إعادة ضبط النظام', 'warning');
     }
 
+    // ========================================================================
+    // 2. البيانات الافتراضية
+    // ========================================================================
+    function getDefaultProducts() {
+      return [
+        { id: 1, name: 'أموكسيسيلين', concentration: '500 مجم', category: 'مضاد حيوي', qty: 150, price: 25, expiry: '2027-08-15' },
+        { id: 2, name: 'باراسيتامول', concentration: '500 مجم', category: 'مسكن', qty: 300, price: 10, expiry: '2028-01-20' },
+        { id: 3, name: 'أوميبرازول', concentration: '20 مجم', category: 'معدة', qty: 5, price: 45, expiry: '2026-06-10' },
+        { id: 4, name: 'ديازيبام', concentration: '5 مجم', category: 'مهدئ', qty: 20, price: 30, expiry: '2025-09-01' },
+        { id: 5, name: 'سيفاليكسين', concentration: '250 مجم', category: 'مضاد حيوي', qty: 80, price: 35, expiry: '2026-12-30' },
+        { id: 6, name: 'فيتامين سي', concentration: '1000 مجم', category: 'فيتامينات', qty: 200, price: 15, expiry: '2027-11-15' },
+        { id: 7, name: 'لوراتادين', concentration: '10 مجم', category: 'مضاد حساسية', qty: 60, price: 20, expiry: '2028-03-20' },
+      ];
+    }
+    function initDefaultData() {
+      if (!localStorage.getItem('pharma_products')) localStorage.setItem('pharma_products', JSON.stringify(getDefaultProducts()));
+      if (!localStorage.getItem('pharma_suppliers')) localStorage.setItem('pharma_suppliers', JSON.stringify([{ id: 1, name: 'شركة السلام', phone: '01001234567', address: 'القاهرة' }]));
+      if (!localStorage.getItem('pharma_customers')) localStorage.setItem('pharma_customers', JSON.stringify([{ id: 1, name: 'أحمد علي', phone: '01112345678', points: 100 }]));
+      if (!localStorage.getItem('pharma_invoices')) localStorage.setItem('pharma_invoices', JSON.stringify([]));
+      if (!localStorage.getItem('pharma_invoice_items')) localStorage.setItem('pharma_invoice_items', JSON.stringify([]));
+      loadSettings();
+    }
+
+    function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
+    function setData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+    // ========================================================================
+    // 3. دوال مساعدة
+    // ========================================================================
+    function getStatus(med) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const exp = new Date(med.expiry); exp.setHours(0,0,0,0);
+      const days = Math.ceil((exp - today) / (1000*60*60*24));
+      if (days < 0) return { label: 'منتهي', cls: 'status-expired' };
+      if (days <= 7) return { label: 'ينتهي قريباً', cls: 'status-near' };
+      if (med.qty < 10) return { label: 'كمية منخفضة', cls: 'status-low' };
+      return { label: 'متاح', cls: 'status-ok' };
+    }
+
+    function showToast(msg, type='info') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    // ========================================================================
+    // 4. الـ Cart (السلة) الخاصة بـ POS
+    // ========================================================================
+    let cart = [];
+
+    function addToCart(productId) {
+      const products = getData('pharma_products');
+      const p = products.find(x => x.id === productId);
+      if (!p) return showToast('غير موجود', 'error');
+      if (p.qty <= 0) return showToast('الكمية صفر', 'error');
+      const existing = cart.find(x => x.id === productId);
+      if (existing) { existing.qty += 1; }
+      else { cart.push({ ...p, qty: 1 }); }
+      renderCart();
+      showToast(`تم إضافة ${p.name}`, 'success');
+    }
+
+    function removeFromCart(index) { cart.splice(index,1); renderCart(); }
+    function updateCartQty(index, qty) { if(qty<=0){cart.splice(index,1);}else{cart[index].qty=qty;} renderCart(); }
+
+    function renderCart() {
+      const container = document.getElementById('cartItems');
+      let total = 0;
+      if (cart.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center">السلة فارغة</p>'; document.getElementById('cartTotal').textContent = '0 ج.م'; return; }
+      container.innerHTML = cart.map((item, i) => {
+        total += item.price * item.qty;
+        return `<div class="flex justify-between items-center border-b pb-1"><span>${item.name}</span><span>${item.price} ج.م</span><input type="number" value="${item.qty}" min="1" max="${item.qty}" class="w-12 border rounded p-1 text-center" onchange="updateCartQty(${i}, parseInt(this.value))"><button onclick="removeFromCart(${i})" class="text-danger"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`;
+      }).join('');
+      document.getElementById('cartTotal').textContent = total.toFixed(0) + ' ج.م';
+      lucide.createIcons();
+    }
+
+    function clearCart() { cart = []; renderCart(); }
+
+    function checkout() {
+      if (cart.length === 0) return showToast('السلة فارغة', 'error');
+      const products = getData('pharma_products');
+      const invoices = getData('pharma_invoices');
+      const invoiceItems = getData('pharma_invoice_items');
+      
+      // حساب المجموع
+      let subtotal = cart.reduce((s,i) => s + (i.price * i.qty), 0);
+      const tax = (settings.tax || 0) / 100;
+      const taxAmount = subtotal * tax;
+      const total = subtotal + taxAmount;
+
+      // إنشاء فاتورة
+      const inv = { id: Date.now(), date: new Date().toISOString().split('T')[0], subtotal, tax: taxAmount, total, customer: 'نقدي' };
+      invoices.push(inv);
+      setData('pharma_invoices', invoices);
+
+      // عناصر الفاتورة + خصم المخزون
+      cart.forEach(citem => {
+        const p = products.find(x => x.id === citem.id);
+        if (p) { p.qty -= citem.qty; }
+        invoiceItems.push({ invoiceId: inv.id, productId: citem.id, name: citem.name, qty: citem.qty, price: citem.price, total: citem.price * citem.qty });
+      });
+      setData('pharma_products', products);
+      setData('pharma_invoice_items', invoiceItems);
+
+      // طباعة الفاتورة (محاكاة)
+      printInvoice(inv, cart, taxAmount);
+      
+      cart = [];
+      renderAll();
+      showToast(`تمت عملية البيع بنجاح - ${total.toFixed(0)} ج.م`, 'success');
+    }
+
+    function printInvoice(inv, items, taxAmt) {
+      const win = window.open('', '_blank');
+      win.document.write(`<html dir="rtl"><head><title>فاتورة</title><style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:8px;text-align:right;} .total{font-size:20px;font-weight:bold;}</style></head><body>`);
+      win.document.write(`<h2>${settings.pharmacyName || 'صيدلية'}</h2><p>التاريخ: ${inv.date}</p><table><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>`);
+      items.forEach(i => { win.document.write(`<tr><td>${i.name}</td><td>${i.qty}</td><td>${i.price}</td><td>${(i.price*i.qty).toFixed(0)}</td></tr>`); });
+      win.document.write(`</table><p>المجموع: ${inv.subtotal.toFixed(0)} ج.م</p><p>الضريبة: ${taxAmt.toFixed(0)} ج.م</p><p class="total">الإجمالي: ${inv.total.toFixed(0)} ج.م</p></body></html>`);
+      win.document.close();
+      win.print();
+    }
+
+    // ========================================================================
+    // 5. التصفح بين الصفحات
+    // ========================================================================
+    function navigate(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+      document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.sidebar button[data-page="${page}"]`)?.classList.add('active');
+      if (page === 'dashboard') renderDashboard();
+      if (page === 'inventory') renderInventory();
+      if (page === 'suppliers') renderSuppliers();
+      if (page === 'customers') renderCustomers();
+      if (page === 'reports') renderReports();
+      if (page === 'pos') { posSearch(); renderCart(); }
+    }
+
+    // ========================================================================
+    // 6. وظائف العرض (Render)
+    // ========================================================================
+    function renderAll() {
+      renderDashboard();
+      renderInventory();
+      renderSuppliers();
+      renderCustomers();
+      renderReports();
+      posSearch();
+      renderCart();
+    }
+
+    function renderDashboard() {
+      const products = getData('pharma_products');
+      const invoices = getData('pharma_invoices');
+      const today = new Date().toISOString().split('T')[0];
+      const month = today.slice(0,7);
+      
+      const todaySales = invoices.filter(i => i.date === today).reduce((s,i) => s + i.total, 0);
+      const monthSales = invoices.filter(i => i.date.startsWith(month)).reduce((s,i) => s + i.total, 0);
+      const expired = products.filter(p => getStatus(p).cls === 'status-expired').length;
+      const low = products.filter(p => p.qty < 10 && getStatus(p).cls !== 'status-expired').length;
+      document.getElementById('dashTotalProducts').textContent = products.length;
+      document.getElementById('dashTodaySales').textContent = todaySales.toFixed(0) + ' ج.م';
+      document.getElementById('dashMonthSales').textContent = monthSales.toFixed(0) + ' ج.م';
+      document.getElementById('dashExpired').textContent = expired;
+      document.getElementById('dashLowStock').textContent = low;
+
+      // آخر 5 فواتير
+      const recent = invoices.slice(-5).reverse();
+      const container = document.getElementById('dashRecentInvoices');
+      if (recent.length === 0) { container.innerHTML = '<p class="text-gray-400">لا توجد فواتير</p>'; return; }
+      container.innerHTML = `<table class="w-full text-sm"><tr><th>#</th><th>التاريخ</th><th>الإجمالي</th></tr>${recent.map(i => `<tr><td>${i.id}</td><td>${i.date}</td><td>${i.total.toFixed(0)} ج.م</td></tr>`).join('')}</table>`;
+    }
+
+    function renderInventory() {
+      const products = getData('pharma_products');
+      const q = document.getElementById('invSearch')?.value?.trim().toLowerCase() || '';
+      const filtered = products.filter(p => p.name.includes(q) || p.concentration.includes(q) || p.category.includes(q));
+      const tbody = document.getElementById('invTableBody');
+      if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="text-center p-4 text-gray-400">لا توجد نتائج</td></tr>'; return; }
+      tbody.innerHTML = filtered.map(p => {
+        const s = getStatus(p);
+        return `<tr><td class="p-2 font-bold">${p.name}</td><td class="p-2">${p.concentration}</td><td class="p-2">${p.category}</td><td class="p-2 ${p.qty<10?'text-danger':''}">${p.qty}</td><td class="p-2">${p.price} ج.م</td><td class="p-2">${p.expiry}</td><td class="p-2"><span class="status-badge ${s.cls}">${s.label}</span></td><td class="p-2 text-center no-print"><button onclick="openProductModal(${p.id})" class="text-blue-600 mx-1"><i data-lucide="edit-2" class="w-4 h-4"></i></button><button onclick="deleteProduct(${p.id})" class="text-danger mx-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function renderSuppliers() {
+      const list = getData('pharma_suppliers');
+      const tbody = document.getElementById('supplierTableBody');
+      if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-gray-400">لا يوجد موردين</td></tr>'; return; }
+      tbody.innerHTML = list.map(s => `<tr><td class="p-2">${s.name}</td><td class="p-2">${s.phone}</td><td class="p-2">${s.address}</td><td class="p-2 text-center no-print"><button onclick="deleteSupplier(${s.id})" class="text-danger"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('');
+      lucide.createIcons();
+    }
+
+    function renderCustomers() {
+      const list = getData('pharma_customers');
+      const tbody = document.getElementById('customerTableBody');
+      if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-gray-400">لا يوجد عملاء</td></tr>'; return; }
+      tbody.innerHTML = list.map(c => `<tr><td class="p-2">${c.name}</td><td class="p-2">${c.phone}</td><td class="p-2">${c.points || 0}</td><td class="p-2 text-center no-print"><button onclick="deleteCustomer(${c.id})" class="text-danger"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('');
+      lucide.createIcons();
+    }
+
+    function renderReports() {
+      const date = document.getElementById('reportDate').value || new Date().toISOString().split('T')[0];
+      const invoices = getData('pharma_invoices');
+      const filtered = invoices.filter(i => i.date === date);
+      const total = filtered.reduce((s,i) => s + i.total, 0);
+      document.getElementById('reportSalesResult').innerHTML = `<p class="font-bold">إجمالي مبيعات ${date}: ${total.toFixed(0)} ج.م</p><p>عدد الفواتير: ${filtered.length}</p>`;
+    }
+
+    function renderExpiredReport() {
+      const products = getData('pharma_products');
+      const expired = products.filter(p => getStatus(p).cls === 'status-expired');
+      document.getElementById('reportExpiredResult').innerHTML = expired.length === 0 ? '✅ لا توجد أدوية منتهية' : expired.map(p => `<div>${p.name} - ${p.expiry}</div>`).join('');
+    }
+
+    // ========================================================================
+    // 7. POS Search
+    // ========================================================================
+    function posSearch() {
+      const q = document.getElementById('posSearch').value.trim().toLowerCase();
+      const products = getData('pharma_products');
+      const results = products.filter(p => p.name.includes(q) || p.concentration.includes(q) || (p.barcode && p.barcode.includes(q)));
+      const container = document.getElementById('posResults');
+      if (results.length === 0) { container.innerHTML = '<p class="text-gray-400 col-span-3 text-center">لا توجد نتائج</p>'; return; }
+      container.innerHTML = results.map(p => `<div class="card p-3 cursor-pointer hover:border-primary border-2 border-transparent" onclick="addToCart(${p.id})"><p class="font-bold">${p.name}</p><p class="text-xs text-gray-500">${p.concentration} | ${p.price} ج.م | متاح: ${p.qty}</p></div>`).join('');
+    }
+
+    // ========================================================================
+    // 8. إدارة المنتجات (مودال)
+    // ========================================================================
+    function openProductModal(id = null) {
+      const products = getData('pharma_products');
+      const p = id ? products.find(x => x.id === id) : null;
+      const title = p ? 'تعديل دواء' : 'إضافة دواء جديد';
+      let html = `<form id="productForm" onsubmit="saveProduct(event, ${id || 'null'})">`;
+      html += `<div class="mb-3"><label>الاسم</label><input type="text" id="pName" value="${p?.name||''}" required class="w-full p-2 border rounded-xl"></div>`;
+      html += `<div class="mb-3"><label>التركيز</label><input type="text" id="pConc" value="${p?.concentration||''}" required class="w-full p-2 border rounded-xl"></div>`;
+      html += `<div class="mb-3"><label>التصنيف</label><input type="text" id="pCat" value="${p?.category||''}" class="w-full p-2 border rounded-xl"></div>`;
+      html += `<div class="mb-3"><label>الكمية</label><input type="number" id="pQty" value="${p?.qty||0}" required min="0" class="w-full p-2 border rounded-xl"></div>`;
+      html += `<div class="mb-3"><label>السعر (ج.م)</label><input type="number" id="pPrice" value="${p?.price||0}" required min="0" step="0.01" class="w-full p-2 border rounded-xl"></div>`;
+      html += `<div class="mb-3"><label>تاريخ الانتهاء</label><input type="date" id="pExpiry" value="${p?.expiry||''}" required class="w-full p-2 border rounded-xl"></div>`;
+      html += `<button type="submit" class="bg-primary text-white w-full py-2 rounded-xl">حفظ</button></form>`;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('genericModal').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function saveProduct(e, id) {
+      e.preventDefault();
+      const products = getData('pharma_products');
+      const data = { name: document.getElementById('pName').value.trim(), concentration: document.getElementById('pConc').value.trim(), category: document.getElementById('pCat').value.trim(), qty: parseInt(document.getElementById('pQty').value), price: parseFloat(document.getElementById('pPrice').value), expiry: document.getElementById('pExpiry').value };
+      if (!data.name || !data.concentration || !data.expiry) return showToast('املأ الحقول المطلوبة', 'error');
+      if (id) {
+        const idx = products.findIndex(x => x.id === id);
+        if (idx !== -1) products[idx] = { ...products[idx], ...data };
+      } else {
+        data.id = Date.now() + Math.floor(Math.random()*1000);
+        products.push(data);
+      }
+      setData('pharma_products', products);
+      closeModal('genericModal');
+      renderInventory();
+      showToast(id ? 'تم التعديل' : 'تمت الإضافة', 'success');
+    }
+
+    function deleteProduct(id) {
+      if (!confirm('تأكيد الحذف؟')) return;
+      let products = getData('pharma_products');
+      products = products.filter(p => p.id !== id);
+      setData('pharma_products', products);
+      renderInventory();
+      showToast('تم الحذف', 'warning');
+    }
+
+    // ========================================================================
+    // 9. الموردين / العملاء (مودال بسيط)
+    // ========================================================================
+    function openSupplierModal() { openSimpleModal('supplier', 'إضافة مورد', 'pharma_suppliers', ['name','phone','address']); }
+    function openCustomerModal() { openSimpleModal('customer', 'إضافة عميل', 'pharma_customers', ['name','phone','points']); }
+
+    function openSimpleModal(type, title, key, fields) {
+      let html = `<form id="simpleForm" onsubmit="saveSimple(event, '${key}', '${type}')">`;
+      fields.forEach(f => {
+        const label = { name:'الاسم', phone:'الهاتف', address:'العنوان', points:'نقاط الولاء' }[f] || f;
+        const inputType = f === 'points' ? 'number' : 'text';
+        html += `<div class="mb-3"><label>${label}</label><input type="${inputType}" id="sf_${f}" required class="w-full p-2 border rounded-xl"></div>`;
+      });
+      html += `<button type="submit" class="bg-primary text-white w-full py-2 rounded-xl">حفظ</button></form>`;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = html;
+      document.getElementById('genericModal').classList.add('active');
+      lucide.createIcons();
+    }
+
+    function saveSimple(e, key, type) {
+      e.preventDefault();
+      const list = getData(key);
+      const data = {};
+      const form = document.getElementById('simpleForm');
+      const inputs = form.querySelectorAll('input');
+      inputs.forEach(inp => { data[inp.id.replace('sf_','')] = inp.value.trim(); });
+      data.id = Date.now() + Math.floor(Math.random()*1000);
+      list.push(data);
+      setData(key, list);
+      closeModal('genericModal');
+      if (type === 'supplier') renderSuppliers();
+      if (type === 'customer') renderCustomers();
+      showToast('تمت الإضافة', 'success');
+    }
+
+    function deleteSupplier(id) { if(!confirm('حذف؟')) return; let l=getData('pharma_suppliers'); l=l.filter(x=>x.id!==id); setData('pharma_suppliers',l); renderSuppliers(); }
+    function deleteCustomer(id) { if(!confirm('حذف؟')) return; let l=getData('pharma_customers'); l=l.filter(x=>x.id!==id); setData('pharma_customers',l); renderCustomers(); }
+
+    // ========================================================================
+    // 10. استيراد / تصدير CSV
+    // ========================================================================
+    function exportDB() {
+      const products = getData('pharma_products');
+      let csv = 'الاسم,التركيز,التصنيف,الكمية,السعر,تاريخ الانتهاء\n';
+      products.forEach(p => { csv += `${p.name},${p.concentration},${p.category},${p.qty},${p.price},${p.expiry}\n`; });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `مخزون_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      showToast('تم التصدير', 'success');
+    }
+
+    function importCSV(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const lines = ev.target.result.split('\n').filter(l => l.trim());
+        if (lines.length < 2) return showToast('ملف فارغ', 'error');
+        const products = getData('pharma_products');
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols.length < 6) continue;
+          products.push({ id: Date.now() + i + Math.random()*1000, name: cols[0].trim(), concentration: cols[1].trim(), category: cols[2].trim(), qty: parseInt(cols[3])||0, price: parseFloat(cols[4])||0, expiry: cols[5].trim() });
+        }
+        setData('pharma_products', products);
+        renderInventory();
+        showToast('تم الاستيراد بنجاح', 'success');
+        document.getElementById('importFile').value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    // ========================================================================
+    // 11. الدخول والخروج
+    // ========================================================================
+    function login() {
+      const pass = document.getElementById('passwordInput').value;
+      loadSettings();
+      if (pass === settings.password) {
+        sessionStorage.setItem('pharmaAuth', 'true');
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        initDefaultData();
+        renderAll();
+        showToast('مرحباً بك في النظام', 'success');
+      } else {
+        showToast('كلمة مرور خاطئة', 'error');
+        document.getElementById('passwordInput').value = '';
+      }
+    }
     function logout() {
-      sessionStorage.removeItem('pharmacyAuth');
+      sessionStorage.removeItem('pharmaAuth');
       document.getElementById('loginOverlay').style.display = 'flex';
       document.getElementById('mainContent').style.display = 'none';
-      document.getElementById('passwordInput').value = '';
       showToast('تم تسجيل الخروج', 'info');
     }
 
-    // التحقق عند التحميل
-    if (sessionStorage.getItem('pharmacyAuth') === 'true') {
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // ========================================================================
+    // 12. التحميل الأولي
+    // ========================================================================
+    if (sessionStorage.getItem('pharmaAuth') === 'true') {
       document.getElementById('loginOverlay').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
+      initDefaultData();
+      loadSettings();
+      renderAll();
+      navigate('dashboard');
     } else {
       document.getElementById('loginOverlay').style.display = 'flex';
       document.getElementById('mainContent').style.display = 'none';
     }
-
-    // ====== Toast Notifications ======
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      container.appendChild(toast);
-      setTimeout(() => { toast.remove(); }, 3000);
-    }
-
-    // ====== البيانات (localStorage) ======
-    const defaultMedicines = [
-      { id: 1, name: 'أموكسيسيلين', concentration: '500 مجم', qty: 150, price: 25, expiry: '2027-08-15' },
-      { id: 2, name: 'باراسيتامول', concentration: '500 مجم', qty: 300, price: 10, expiry: '2028-01-20' },
-      { id: 3, name: 'أوميبرازول', concentration: '20 مجم', qty: 5, price: 45, expiry: '2026-06-10' },
-      { id: 4, name: 'ديازيبام', concentration: '5 مجم', qty: 20, price: 30, expiry: '2025-09-01' },
-      { id: 5, name: 'سيفاليكسين', concentration: '250 مجم', qty: 80, price: 35, expiry: '2026-12-30' },
-    ];
-
-    function loadData() {
-      const stored = localStorage.getItem('pharmacyMedicines');
-      if (stored) {
-        try { medicines = JSON.parse(stored); } catch(e) { medicines = [...defaultMedicines]; }
-      } else {
-        medicines = [...defaultMedicines];
-      }
-      medicines.forEach((m, i) => { if (!m.id) m.id = Date.now() + i; });
-      saveData();
-    }
-
-    function saveData() {
-      localStorage.setItem('pharmacyMedicines', JSON.stringify(medicines));
-    }
-
-    // ====== المبيعات (localStorage) ======
-    function getTodaySales() {
-      const today = new Date().toISOString().split('T')[0];
-      const sales = JSON.parse(localStorage.getItem('pharmacySales') || '{}');
-      return sales[today] || 0;
-    }
-
-    function addTodaySales(amount) {
-      const today = new Date().toISOString().split('T')[0];
-      const sales = JSON.parse(localStorage.getItem('pharmacySales') || '{}');
-      sales[today] = (sales[today] || 0) + amount;
-      localStorage.setItem('pharmacySales', JSON.stringify(sales));
-    }
-
-    // ====== الحالة ======
-    function getStatus(med) {
-      const today = new Date(); today.setHours(0,0,0,0);
-      const expiryDate = new Date(med.expiry); expiryDate.setHours(0,0,0,0);
-      const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-      if (daysLeft < 0) return { label: 'منتهي', className: 'status-expired' };
-      if (daysLeft <= 7) return { label: 'ينتهي قريباً', className: 'status-near-expiry' };
-      if (med.qty < 10) return { label: 'كمية منخفضة', className: 'status-low' };
-      return { label: 'متاح', className: 'status-available' };
-    }
-
-    // ====== العرض ======
-    function render() {
-      const tbody = document.getElementById('medicineTableBody');
-      const search = searchQuery.trim().toLowerCase();
-      let filtered = medicines.filter(m => 
-        m.name.toLowerCase().includes(search) || 
-        m.concentration.toLowerCase().includes(search)
-      );
-      if (currentSort.key) {
-        filtered.sort((a, b) => {
-          let va = a[currentSort.key], vb = b[currentSort.key];
-          if (typeof va === 'string') va = va.toLowerCase();
-          if (typeof vb === 'string') vb = vb.toLowerCase();
-          if (va < vb) return currentSort.asc ? -1 : 1;
-          if (va > vb) return currentSort.asc ? 1 : -1;
-          return 0;
-        });
-      }
-      tbody.innerHTML = '';
-      filtered.forEach(med => {
-        const status = getStatus(med);
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-3 font-medium">${med.name}</td>
-            <td class="p-3 text-gray-600">${med.concentration}</td>
-            <td class="p-3 font-bold ${med.qty < 10 ? 'text-danger' : ''}">${med.qty}</td>
-            <td class="p-3 text-primary font-bold">${med.price} ج.م</td>
-            <td class="p-3">${med.expiry}</td>
-            <td class="p-3"><span class="${status.className}">${status.label}</span></td>
-            <td class="p-3 text-center no-print">
-              <button onclick="openSellModal(${med.id})" class="text-green-600 hover:text-green-800 mx-1" aria-label="بيع"><i data-lucide="shopping-cart" class="w-4 h-4"></i></button>
-              <button onclick="openEditModal(${med.id})" class="text-blue-600 hover:text-blue-800 mx-1" aria-label="تعديل"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-              <button onclick="deleteMedicine(${med.id})" class="text-red-600 hover:text-red-800 mx-1" aria-label="حذف"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            </td>
-          </tr>
-        `;
-      });
-
-      // إحصائيات
-      const total = medicines.length;
-      const totalVal = medicines.reduce((s, m) => s + (m.price * m.qty), 0);
-      const expired = medicines.filter(m => getStatus(m).className === 'status-expired').length;
-      const low = medicines.filter(m => getStatus(m).className === 'status-low').length;
-      const dailySales = getTodaySales();
-
-      document.getElementById('totalMeds').textContent = total;
-      document.getElementById('totalValue').textContent = totalVal.toFixed(0) + ' ج.م';
-      document.getElementById('expiredCount').textContent = expired;
-      document.getElementById('lowStockCount').textContent = low;
-      document.getElementById('dailySales').textContent = dailySales.toFixed(0) + ' ج.م';
-      document.getElementById('rowCount').textContent = `عرض ${filtered.length} من ${total} دواء`;
-
-      const clearBtn = document.getElementById('clearSearchBtn');
-      searchQuery.length > 0 ? clearBtn.classList.remove('hidden') : clearBtn.classList.add('hidden');
-      lucide.createIcons();
-    }
-
-    // ====== البحث ======
-    function handleSearch() { searchQuery = document.getElementById('searchInput').value; render(); }
-    function clearSearch() { document.getElementById('searchInput').value = ''; searchQuery = ''; render(); document.getElementById('searchInput').focus(); }
-
-    // ====== الترتيب ======
-    function sortTable(key) {
-      if (currentSort.key === key) currentSort.asc = !currentSort.asc;
-      else { currentSort.key = key; currentSort.asc = true; }
-      render();
-    }
-
-    // ====== مودال الإضافة / التعديل ======
-    function openModal(title, id = null) {
-      document.getElementById('modalTitle').textContent = title;
-      document.getElementById('editId').value = id || '';
-      document.getElementById('modalOverlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('active');
-      document.body.style.overflow = '';
-      document.getElementById('medicineForm').reset();
-      document.getElementById('editId').value = '';
-    }
-    function openAddModal() {
-      openModal('إضافة دواء جديد');
-      const future = new Date(); future.setFullYear(future.getFullYear() + 1);
-      document.getElementById('formExpiry').value = future.toISOString().split('T')[0];
-    }
-    function openEditModal(id) {
-      const med = medicines.find(m => m.id === id);
-      if (!med) return;
-      openModal('تعديل الدواء', id);
-      document.getElementById('formName').value = med.name;
-      document.getElementById('formConcentration').value = med.concentration;
-      document.getElementById('formQty').value = med.qty;
-      document.getElementById('formPrice').value = med.price;
-      document.getElementById('formExpiry').value = med.expiry;
-    }
-    function saveMedicine(e) {
-      e.preventDefault();
-      const id = document.getElementById('editId').value;
-      const name = document.getElementById('formName').value.trim();
-      const concentration = document.getElementById('formConcentration').value.trim();
-      const qty = parseInt(document.getElementById('formQty').value);
-      const price = parseFloat(document.getElementById('formPrice').value);
-      const expiry = document.getElementById('formExpiry').value;
-      if (!name || !concentration || isNaN(qty) || isNaN(price) || !expiry) return showToast('املأ جميع الحقول', 'error');
-      if (id) {
-        const idx = medicines.findIndex(m => m.id === parseInt(id));
-        if (idx !== -1) medicines[idx] = { ...medicines[idx], name, concentration, qty, price, expiry };
-        showToast('تم التعديل بنجاح', 'success');
-      } else {
-        medicines.push({ id: Date.now() + Math.floor(Math.random()*1000), name, concentration, qty, price, expiry });
-        showToast('تمت الإضافة بنجاح', 'success');
-      }
-      saveData(); closeModal(); render();
-    }
-    function deleteMedicine(id) {
-      if (!confirm('تأكيد الحذف؟')) return;
-      medicines = medicines.filter(m => m.id !== id);
-      saveData(); render();
-      showToast('تم الحذف', 'warning');
-    }
-
-    // ====== مودال البيع ======
-    function openSellModal(id) {
-      const med = medicines.find(m => m.id === id);
-      if (!med) return;
-      if (med.qty <= 0) return showToast('الكمية صفر، لا يمكن البيع', 'error');
-      document.getElementById('sellId').value = id;
-      document.getElementById('sellNameDisplay').textContent = `${med.name} (${med.concentration}) - المتاح: ${med.qty}`;
-      document.getElementById('sellQty').value = 1;
-      document.getElementById('sellQty').max = med.qty;
-      document.getElementById('sellModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSellModal() {
-      document.getElementById('sellModal').classList.remove('active');
-      document.body.style.overflow = '';
-      document.getElementById('sellForm').reset();
-    }
-    function sellMedicine(e) {
-      e.preventDefault();
-      const id = parseInt(document.getElementById('sellId').value);
-      const qtySold = parseInt(document.getElementById('sellQty').value);
-      const med = medicines.find(m => m.id === id);
-      if (!med) return showToast('الدواء غير موجود', 'error');
-      if (qtySold <= 0 || qtySold > med.qty) return showToast('كمية غير صالحة', 'error');
-      const revenue = qtySold * med.price;
-      med.qty -= qtySold;
-      addTodaySales(revenue);
-      saveData();
-      closeSellModal();
-      render();
-      showToast(`تم بيع ${qtySold} من ${med.name} بمبلغ ${revenue} ج.م`, 'success');
-    }
-
-    // ====== نافذة الصلاحية المنبثقة ======
-    function checkExpiryAlerts() {
-      const today = new Date(); today.setHours(0,0,0,0);
-      const alerts = medicines.filter(m => {
-        const exp = new Date(m.expiry); exp.setHours(0,0,0,0);
-        const days = Math.ceil((exp - today) / (1000*60*60*24));
-        return days < 0 || days <= 7;
-      });
-      if (alerts.length === 0) return;
-      const body = document.getElementById('expiryModalBody');
-      body.innerHTML = alerts.map(m => {
-        const exp = new Date(m.expiry); exp.setHours(0,0,0,0);
-        const days = Math.ceil((exp - today) / (1000*60*60*24));
-        const status = days < 0 ? 'منتهي ❌' : `ينتهي بعد ${days} أيام ⚠️`;
-        return `<div class="flex justify-between p-2 border-b"><span>${m.name} (${m.concentration})</span><span class="font-bold ${days<0?'text-danger':'text-warning'}">${status}</span></div>`;
-      }).join('');
-      document.getElementById('expiryModal').classList.add('active');
-    }
-    function closeExpiryModal() {
-      document.getElementById('expiryModal').classList.remove('active');
-    }
-
-    // ====== تصدير Excel ======
-    function exportToExcel() {
-      const search = searchQuery.trim().toLowerCase();
-      let filtered = medicines.filter(m => m.name.toLowerCase().includes(search) || m.concentration.toLowerCase().includes(search));
-      let html = `<table border="1"><tr><th>الاسم</th><th>التركيز</th><th>الكمية</th><th>السعر</th><th>تاريخ الانتهاء</th><th>الحالة</th></tr>`;
-      filtered.forEach(m => {
-        const status = getStatus(m).label;
-        html += `<tr><td>${m.name}</td><td>${m.concentration}</td><td>${m.qty}</td><td>${m.price}</td><td>${m.expiry}</td><td>${status}</td></tr>`;
-      });
-      html += `</table>`;
-      const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `تقرير_المخزون_${new Date().toISOString().split('T')[0]}.xls`;
-      link.click();
-      showToast('تم تصدير Excel', 'success');
-    }
-
-    // ====== التحميل الأولي ======
-    if (sessionStorage.getItem('pharmacyAuth') === 'true') {
-      loadData();
-      render();
-      setTimeout(checkExpiryAlerts, 300);
-    }
+    lucide.createIcons();
   </script>
 </body>
 </html>
