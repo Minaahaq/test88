@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>صيدليتي PRO — Pharmacy ERP</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:#f1f5f9;color:#0f172a}
+.sidebar{width:255px;background:#082b4c;color:#fff;position:fixed;right:0;top:0;bottom:0;z-index:40;overflow:auto}
+.main{margin-right:255px;min-height:100vh;padding:22px}.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 8px 28px #0f172a0b}
+.btn{border:0;border-radius:12px;padding:10px 15px;font-weight:700;cursor:pointer}
+.primary{background:#0a2647;color:#fff}.success{background:#16a34a;color:#fff}.danger{background:#dc2626;color:#fff}
+.warning{background:#d97706;color:#fff}.muted{background:#e2e8f0;color:#334155}
+input,select,textarea{outline:none}.input{width:100%;padding:11px 13px;border:1px solid #cbd5e1;border-radius:12px;background:#fff}
+.navbtn{width:100%;text-align:right;padding:12px;border-radius:12px;border:0;background:transparent;color:#fff;cursor:pointer;display:flex;align-items:center;gap:10px}
+.navbtn:hover,.navbtn.active{background:#1e4770}.navbtn.active{border-right:4px solid #ffc300}
+.badge{display:inline-block;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.ok{background:#dcfce7;color:#15803d}.low{background:#fef3c7;color:#b45309}.expired{background:#fee2e2;color:#b91c1c}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:100;padding:15px}
+.modal.show{display:flex}.modalbox{background:white;border-radius:22px;width:min(720px,96vw);max-height:92vh;overflow:auto;padding:22px}
+.toast{position:fixed;left:20px;bottom:20px;z-index:200;padding:13px 18px;border-radius:12px;color:#fff;font-weight:700}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:right;white-space:nowrap}
+@media(max-width:900px){.sidebar{width:76px}.sidebar .label,.sidebar h1 span,.sidebar p{display:none}.main{margin-right:76px;padding:12px}.navbtn{justify-content:center}.stats{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:560px){.sidebar{width:0;overflow:hidden}.main{margin-right:0}.mobilebar{display:flex!important}.stats{grid-template-columns:1fr!important}table{font-size:12px}}
+.mobilebar{display:none;position:sticky;top:0;z-index:30;background:#082b4c;color:#fff;padding:10px;border-radius:12px;margin-bottom:12px}
+.login{position:fixed;inset:0;background:#082b4c;display:flex;align-items:center;justify-content:center;z-index:999;padding:15px}
+.loginbox{background:#fff;border-radius:25px;width:min(420px,95vw);padding:30px;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="login" class="login">
+  <div class="loginbox">
+    <div class="text-5xl mb-3">💊</div><h1 class="text-3xl font-black text-slate-800">صيدليتي PRO</h1>
+    <p class="text-slate-500 mb-6">نظام إدارة الصيدلية المتكامل</p>
+    <input id="loginUser" class="input mb-3" placeholder="اسم المستخدم" value="admin">
+    <input id="loginPass" type="password" class="input mb-3" placeholder="كلمة المرور">
+    <button class="btn primary w-full" onclick="login()">دخول</button>
+    <p class="text-xs text-slate-400 mt-3">التجربة: admin / admin123</p>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="p-5 border-b border-white/10"><h1 class="text-xl font-black">💊 <span>صيدليتي PRO</span></h1><p class="text-xs text-slate-300 mt-1">Pharmacy ERP</p></div>
+  <div class="p-3 space-y-1">
+    <button class="navbtn active" data-page="dashboard" onclick="go('dashboard')">📊 <span class="label">لوحة التحكم</span></button>
+    <button class="navbtn" data-page="pos" onclick="go('pos')">🛒 <span class="label">نقطة البيع</span></button>
+    <button class="navbtn" data-page="inventory" onclick="go('inventory')">📦 <span class="label">المخزون</span></button>
+    <button class="navbtn" data-page="purchases" onclick="go('purchases')">🚚 <span class="label">المشتريات</span></button>
+    <button class="navbtn" data-page="suppliers" onclick="go('suppliers')">🏢 <span class="label">الموردين</span></button>
+    <button class="navbtn" data-page="customers" onclick="go('customers')">👥 <span class="label">العملاء</span></button>
+    <button class="navbtn" data-page="expenses" onclick="go('expenses')">💸 <span class="label">المصروفات</span></button>
+    <button class="navbtn" data-page="reports" onclick="go('reports')">📈 <span class="label">التقارير</span></button>
+    <button class="navbtn" data-page="users" onclick="go('users')">👤 <span class="label">المستخدمون</span></button>
+    <button class="navbtn" data-page="settings" onclick="go('settings')">⚙️ <span class="label">الإعدادات والنسخ</span></button>
+    <button class="navbtn mt-4 text-red-300" onclick="logout()">↪️ <span class="label">خروج</span></button>
+  </div>
+</aside>
+
+<main class="main">
+<div class="mobilebar">💊 <b>صيدليتي PRO</b></div>
+
+<section id="dashboard" class="page active">
+  <div class="flex justify-between items-center mb-5"><div><h2 class="text-2xl font-black">لوحة التحكم</h2><p class="text-slate-500 text-sm">ملخص سريع لحالة الصيدلية</p></div><button class="btn primary" onclick="renderAll()">↻ تحديث</button></div>
+  <div id="stats" class="stats grid grid-cols-5 gap-4 mb-5"></div>
+  <div class="grid lg:grid-cols-2 gap-5">
+    <div class="card"><h3 class="font-black mb-3">📈 المبيعات آخر 7 أيام</h3><canvas id="salesChart" height="130"></canvas></div>
+    <div class="card"><h3 class="font-black mb-3">⚠️ التنبيهات</h3><div id="alerts"></div></div>
+  </div>
+  <div class="card mt-5"><h3 class="font-black mb-3">🧾 آخر الفواتير</h3><div id="recentInvoices"></div></div>
+</section>
+
+<section id="pos" class="page">
+  <h2 class="text-2xl font-black mb-5">🛒 نقطة البيع POS</h2>
+  <div class="grid lg:grid-cols-3 gap-5">
+    <div class="card lg:col-span-2">
+      <div class="grid md:grid-cols-3 gap-2 mb-4">
+        <input id="posSearch" class="input md:col-span-2" placeholder="ابحث بالاسم أو الباركود..." oninput="renderPOS()">
+        <button class="btn primary" onclick="focusBarcode()">📷 باركود</button>
+      </div>
+      <div id="posProducts" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+    </div>
+    <div class="card">
+      <h3 class="font-black mb-3">🧺 السلة</h3>
+      <div id="cart"></div>
+      <hr class="my-3">
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span>الإجمالي</span><b id="subtotal">0</b></div>
+        <div><label>الخصم</label><input id="discount" type="number" min="0" value="0" class="input mt-1" oninput="renderCart()"></div>
+        <div><label>الضريبة %</label><input id="tax" type="number" min="0" value="0" class="input mt-1" oninput="renderCart()"></div>
+        <div><label>العميل</label><select id="posCustomer" class="input mt-1"></select></div>
+        <div><label>طريقة الدفع</label><select id="payment" class="input mt-1"><option>نقدي</option><option>بطاقة</option><option>تحويل</option></select></div>
+        <div class="text-xl font-black flex justify-between border-t pt-3"><span>الإجمالي</span><span id="grand">0 ج.م</span></div>
+        <input id="paid" type="number" min="0" class="input" placeholder="المبلغ المدفوع" oninput="renderCart()">
+        <div class="flex justify-between"><span>الباقي</span><b id="change">0 ج.م</b></div>
+        <button class="btn success w-full mt-2" onclick="checkout()">إتمام البيع وطباعة الفاتورة</button>
+        <button class="btn muted w-full mt-2" onclick="cart=[];renderCart()">تفريغ السلة</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="inventory" class="page">
+  <div class="flex justify-between items-center flex-wrap gap-2 mb-4"><h2 class="text-2xl font-black">📦 المخزون</h2><div class="flex gap-2"><input id="invSearch" class="input" placeholder="بحث..." oninput="renderInventory()"><button class="btn primary" onclick="productModal()">+ دواء</button><button class="btn success" onclick="exportCSV()">CSV</button></div></div>
+  <div class="card overflow-auto"><table><thead><tr><th>الباركود</th><th>الاسم</th><th>التركيز</th><th>التصنيف</th><th>الكمية</th><th>شراء</th><th>بيع</th><th>الصلاحية</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="inventoryTable"></tbody></table></div>
+</section>
+
+<section id="purchases" class="page">
+  <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-black">🚚 المشتريات</h2><button class="btn primary" onclick="purchaseModal()">+ فاتورة شراء</button></div>
+  <div class="card overflow-auto"><table><thead><tr><th>رقم</th><th>التاريخ</th><th>المورد</th><th>الإجمالي</th><th>الدفع</th></tr></thead><tbody id="purchaseTable"></tbody></table></div>
+</section>
+
+<section id="suppliers" class="page">
+  <div class="flex justify-between mb-4"><h2 class="text-2xl font-black">🏢 الموردين</h2><button class="btn primary" onclick="supplierModal()">+ مورد</button></div>
+  <div class="card overflow-auto"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>العنوان</th><th>إجراء</th></tr></thead><tbody id="supplierTable"></tbody></table></div>
+</section>
+
+<section id="customers" class="page">
+  <div class="flex justify-between mb-4"><h2 class="text-2xl font-black">👥 العملاء</h2><button class="btn primary" onclick="customerModal()">+ عميل</button></div>
+  <div class="card overflow-auto"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>النقاط</th><th>إجمالي المشتريات</th><th>إجراء</th></tr></thead><tbody id="customerTable"></tbody></table></div>
+</section>
+
+<section id="expenses" class="page">
+  <div class="flex justify-between mb-4"><h2 class="text-2xl font-black">💸 المصروفات</h2><button class="btn primary" onclick="expenseModal()">+ مصروف</button></div>
+  <div class="card overflow-auto"><table><thead><tr><th>التاريخ</th><th>التصنيف</th><th>الوصف</th><th>القيمة</th><th>إجراء</th></tr></thead><tbody id="expenseTable"></tbody></table></div>
+</section>
+
+<section id="reports" class="page">
+  <h2 class="text-2xl font-black mb-5">📈 التقارير والأرباح</h2>
+  <div class="grid md:grid-cols-3 gap-4 mb-5" id="reportCards"></div>
+  <div class="card overflow-auto"><h3 class="font-black mb-3">تقرير المبيعات</h3><div id="salesReport"></div></div>
+</section>
+
+<section id="users" class="page">
+  <div class="flex justify-between mb-4"><h2 class="text-2xl font-black">👤 المستخدمون والصلاحيات</h2><button class="btn primary" onclick="userModal()">+ مستخدم</button></div>
+  <div class="card overflow-auto"><table><thead><tr><th>الاسم</th><th>الدور</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="userTable"></tbody></table></div>
+</section>
+
+<section id="settings" class="page">
+  <h2 class="text-2xl font-black mb-5">⚙️ الإعدادات والنسخ الاحتياطي</h2>
+  <div class="grid lg:grid-cols-2 gap-5">
+    <div class="card">
+      <h3 class="font-black mb-4">بيانات الصيدلية</h3>
+      <label>اسم الصيدلية</label><input id="pharmacyName" class="input my-2">
+      <label>الضريبة الافتراضية %</label><input id="defaultTax" type="number" class="input my-2">
+      <button class="btn primary" onclick="saveSettings()">حفظ الإعدادات</button>
+    </div>
+    <div class="card">
+      <h3 class="font-black mb-4">النسخ الاحتياطي</h3>
+      <p class="text-sm text-slate-500 mb-4">يحفظ جميع بيانات النظام في ملف JSON واحد.</p>
+      <div class="flex gap-2 flex-wrap"><button class="btn success" onclick="backup()">⬇️ تصدير Backup</button><button class="btn primary" onclick="document.getElementById('restore').click()">⬆️ استعادة</button><input id="restore" type="file" accept=".json" hidden onchange="restore(event)"></div>
+      <button class="btn danger mt-4" onclick="resetAll()">⚠️ حذف كل البيانات</button>
+    </div>
+  </div>
+</section>
+
+</main>
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox" id="modalbox"></div></div>
+<div id="toast" style="display:none"></div>
+
+<script>
+const KEY='pharmacy_pro_v1';
+let db=JSON.parse(localStorage.getItem(KEY)||'null');
+let cart=[];
+let chart;
+
+const seed={
+ settings:{name:'صيدلية المستقبل',tax:0},
+ products:[
+  {id:1,barcode:'622100000001',name:'أموكسيسيلين',conc:'500 مجم',cat:'مضاد حيوي',qty:150,buy:16,sell:25,expiry:'2027-08-15',min:10},
+  {id:2,barcode:'622100000002',name:'باراسيتامول',conc:'500 مجم',cat:'مسكن',qty:300,buy:6,sell:10,expiry:'2028-01-20',min:20},
+  {id:3,barcode:'622100000003',name:'أوميبرازول',conc:'20 مجم',cat:'معدة',qty:5,buy:30,sell:45,expiry:'2026-06-10',min:10},
+  {id:4,barcode:'622100000004',name:'ديازيبام',conc:'5 مجم',cat:'مهدئ',qty:20,buy:20,sell:30,expiry:'2025-09-01',min:5},
+  {id:5,barcode:'622100000005',name:'سيفاليكسين',conc:'250 مجم',cat:'مضاد حيوي',qty:80,buy:22,sell:35,expiry:'2026-12-30',min:10}
+ ],
+ suppliers:[{id:1,name:'شركة السلام',phone:'01001234567',address:'القاهرة'}],
+ customers:[{id:1,name:'أحمد علي',phone:'01112345678',points:100,total:0}],
+ invoices:[],purchases:[],expenses:[],
+ users:[{id:1,name:'admin',role:'مدير',active:true}]
+};
+if(!db){db=seed;save();}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));}
+function id(){return Date.now()+Math.floor(Math.random()*999)}
+function money(n){return Number(n||0).toLocaleString('ar-EG',{maximumFractionDigits:2})+' ج.م'}
+function today(){return new Date().toISOString().slice(0,10)}
+function daysTo(s){return Math.ceil((new Date(s)-new Date(today()))/86400000)}
+function status(p){let d=daysTo(p.expiry);if(d<0)return ['منتهي','expired'];if(d<=30)return ['ينتهي قريباً','low'];if(p.qty<=p.min)return ['كمية منخفضة','low'];return ['متاح','ok']}
+function toast(m,type='success'){let t=document.getElementById('toast');t.className='toast '+(type==='error'?'danger':'success');t.style.display='block';t.textContent=m;setTimeout(()=>t.style.display='none',2500)}
+function go(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(page).classList.add('active');document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));renderAll()}
+function login(){if(document.getElementById('loginUser').value==='admin'&&document.getElementById('loginPass').value==='admin123'){sessionStorage.auth='1';document.getElementById('login').style.display='none'}else toast('بيانات الدخول غير صحيحة','error')}
+function logout(){sessionStorage.removeItem('auth');location.reload()}
+if(sessionStorage.auth==='1')document.getElementById('login').style.display='none';
+
+function renderAll(){
+ renderDashboard();renderPOS();renderInventory();renderPurchases();renderSuppliers();renderCustomers();renderExpenses();renderReports();renderUsers();loadSettings();
+ if(window.lucide)lucide.createIcons();
+}
+function renderDashboard(){
+ let sales=db.invoices.reduce((a,x)=>a+x.total,0), todaySales=db.invoices.filter(x=>x.date===today()).reduce((a,x)=>a+x.total,0);
+ let purchases=db.purchases.reduce((a,x)=>a+x.total,0), expenses=db.expenses.reduce((a,x)=>a+x.value,0);
+ let expired=db.products.filter(p=>daysTo(p.expiry)<0).length,low=db.products.filter(p=>p.qty<=p.min&&daysTo(p.expiry)>=0).length;
+ document.getElementById('stats').innerHTML=[
+ ['💰','مبيعات اليوم',money(todaySales)],['📦','الأدوية',db.products.length],['🧾','الفواتير',db.invoices.length],['⚠️','نقص المخزون',low],['☠️','منتهي',expired]
+ ].map(x=>`<div class="card"><div class="text-2xl">${x[0]}</div><p class="text-xs text-slate-500">${x[1]}</p><b class="text-xl">${x[2]}</b></div>`).join('');
+ let alerts=db.products.filter(p=>daysTo(p.expiry)<=30||p.qty<=p.min).slice(0,10);
+ document.getElementById('alerts').innerHTML=alerts.length?alerts.map(p=>{let s=status(p);return `<div class="flex justify-between border-b py-2"><span>${p.name}</span><span class="badge ${s[1]}">${s[0]}</span></div>`}).join(''):'<p class="text-green-600">لا توجد تنبيهات 🎉</p>';
+ document.getElementById('recentInvoices').innerHTML=db.invoices.slice(-8).reverse().map(i=>`<div class="flex justify-between border-b py-2"><span>#${i.id} — ${i.customerName||'نقدي'}</span><b>${money(i.total)}</b></div>`).join('')||'<p>لا توجد فواتير</p>';
+ let labels=[],vals=[];for(let n=6;n>=0;n--){let d=new Date();d.setDate(d.getDate()-n);let ds=d.toISOString().slice(0,10);labels.push(ds.slice(5));vals.push(db.invoices.filter(x=>x.date===ds).reduce((a,x)=>a+x.total,0))}
+ if(chart)chart.destroy();chart=new Chart(document.getElementById('salesChart'),{type:'line',data:{labels,datasets:[{label:'المبيعات',data:vals,tension:.35}]},options:{responsive:true}});
+}
+function renderPOS(){
+ let q=(document.getElementById('posSearch')?.value||'').toLowerCase().trim();
+ let arr=db.products.filter(p=>p.name.toLowerCase().includes(q)||p.barcode.includes(q)||p.conc.toLowerCase().includes(q));
+ document.getElementById('posProducts').innerHTML=arr.map(p=>`<button class="card text-right hover:ring-2 hover:ring-blue-400" onclick="addCart(${p.id})"><b>${p.name}</b><div class="text-xs text-slate-500">${p.conc} • ${p.barcode}</div><div class="mt-2 font-black">${money(p.sell)}</div><div class="text-xs">المتاح: ${p.qty}</div></button>`).join('')||'<p>لا توجد نتائج</p>';
+ let sel=document.getElementById('posCustomer');if(sel)sel.innerHTML='<option value="">نقدي</option>'+db.customers.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+ renderCart();
+}
+function addCart(pid){let p=db.products.find(x=>x.id===pid);if(!p||p.qty<1)return toast('المنتج غير متاح','error');let x=cart.find(x=>x.id===pid);if(x){if(x.qty>=p.qty)return toast('الكمية المتاحة غير كافية','error');x.qty++}else cart.push({...p,qty:1});renderCart()}
+function renderCart(){
+ let box=document.getElementById('cart'),sub=cart.reduce((a,x)=>a+x.sell*x.qty,0),disc=+document.getElementById('discount')?.value||0,tax=+document.getElementById('tax')?.value||db.settings.tax||0;
+ let after=Math.max(0,sub-disc),total=after+(after*tax/100),paid=+document.getElementById('paid')?.value||0;
+ document.getElementById('cart').innerHTML=cart.map((x,i)=>`<div class="flex items-center gap-2 border-b py-2"><div class="flex-1"><b>${x.name}</b><div class="text-xs">${money(x.sell)}</div></div><input class="input !w-16" type="number" min="1" max="${x.qty>0?(db.products.find(p=>p.id===x.id)?.qty||1):1}" value="${x.qty}" onchange="setQty(${i},this.value)"><button class="text-red-600" onclick="cart.splice(${i},1);renderCart()">✕</button></div>`).join('')||'<p class="text-slate-400 text-center py-5">السلة فارغة</p>';
+ document.getElementById('subtotal').textContent=money(sub);document.getElementById('grand').textContent=money(total);document.getElementById('change').textContent=money(Math.max(0,paid-total));
+}
+function setQty(i,v){v=Math.max(1,+v||1);let p=db.products.find(x=>x.id===cart[i].id);cart[i].qty=Math.min(v,p.qty);renderCart()}
+function checkout(){
+ if(!cart.length)return toast('السلة فارغة','error');
+ let sub=cart.reduce((a,x)=>a+x.sell*x.qty,0),disc=+document.getElementById('discount').value||0,tax=+document.getElementById('tax').value||db.settings.tax||0,after=Math.max(0,sub-disc),total=after*(1+tax/100);
+ let cid=+document.getElementById('posCustomer').value||null,c=db.customers.find(x=>x.id===cid);
+ cart.forEach(x=>{let p=db.products.find(p=>p.id===x.id);p.qty-=x.qty});
+ let inv={id:id(),date:today(),items:cart.map(x=>({id:x.id,name:x.name,qty:x.qty,price:x.sell,buy:x.buy})),subtotal:sub,discount:disc,tax, total,customerId:cid,customerName:c?.name||'نقدي',payment:document.getElementById('payment').value};
+ db.invoices.push(inv);if(c){c.total=(c.total||0)+total;c.points=(c.points||0)+Math.floor(total/10)}save();printInvoice(inv);cart=[];renderAll();toast('تم البيع بنجاح')}
+function printInvoice(i){let w=open('','_blank');w.document.write(`<html dir="rtl"><head><title>فاتورة ${i.id}</title><style>body{font-family:Arial;padding:25px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ddd;padding:8px}.t{font-size:20px;font-weight:bold}</style></head><body><h2>${db.settings.name}</h2><p>فاتورة رقم: ${i.id}<br>التاريخ: ${i.date}<br>العميل: ${i.customerName}</p><table><tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>${i.items.map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${x.price}</td><td>${x.qty*x.price}</td></tr>`).join('')}</table><p>قبل الخصم: ${i.subtotal}</p><p>الخصم: ${i.discount}</p><p>الضريبة: ${i.tax}%</p><p class="t">الإجمالي: ${i.total.toFixed(2)} ج.م</p></body></html>`);w.document.close();w.print()}
+function renderInventory(){
+ let q=(document.getElementById('invSearch')?.value||'').toLowerCase();let a=db.products.filter(p=>[p.name,p.barcode,p.conc,p.cat].some(v=>String(v).toLowerCase().includes(q)));
+ document.getElementById('inventoryTable').innerHTML=a.map(p=>{let s=status(p);return `<tr><td>${p.barcode}</td><td><b>${p.name}</b></td><td>${p.conc}</td><td>${p.cat}</td><td>${p.qty}</td><td>${money(p.buy)}</td><td>${money(p.sell)}</td><td>${p.expiry}</td><td><span class="badge ${s[1]}">${s[0]}</span></td><td><button class="text-blue-600" onclick="productModal(${p.id})">✎</button> <button class="text-red-600" onclick="delProduct(${p.id})">🗑</button></td></tr>`}).join('');
+}
+function productModal(pid=null){
+ let p=db.products.find(x=>x.id===pid)||{barcode:'',name:'',conc:'',cat:'',qty:0,buy:0,sell:0,expiry:today(),min:10};
+ showModal(`<h3 class="text-xl font-black mb-4">${pid?'تعديل دواء':'إضافة دواء'}</h3><div class="grid md:grid-cols-2 gap-3">${field('barcode','الباركود',p.barcode)}${field('name','الاسم',p.name)}${field('conc','التركيز',p.conc)}${field('cat','التصنيف',p.cat)}${field('qty','الكمية',p.qty,'number')} ${field('min','الحد الأدنى',p.min,'number')} ${field('buy','سعر الشراء',p.buy,'number')} ${field('sell','سعر البيع',p.sell,'number')} ${field('expiry','تاريخ الانتهاء',p.expiry,'date')}</div><button class="btn primary w-full mt-4" onclick="saveProduct(${pid||0})">حفظ</button>`);
+}
+function field(id,l,v='',type='text'){return `<div><label>${l}</label><input id="m_${id}" type="${type}" class="input mt-1" value="${String(v).replaceAll('"','&quot;')}"></div>`}
+function saveProduct(pid){let p={id:pid||id(),barcode:gv('barcode'),name:gv('name'),conc:gv('conc'),cat:gv('cat'),qty:+gv('qty'),min:+gv('min'),buy:+gv('buy'),sell:+gv('sell'),expiry:gv('expiry')};if(!p.name)return toast('الاسم مطلوب','error');let i=db.products.findIndex(x=>x.id===pid);if(i>=0)db.products[i]=p;else db.products.push(p);save();closeModal();renderAll();toast('تم حفظ الدواء')}
+function gv(x){return document.getElementById('m_'+x).value.trim()}
+function delProduct(pid){if(confirm('حذف المنتج؟')){db.products=db.products.filter(x=>x.id!==pid);save();renderAll()}}
+function renderPurchases(){document.getElementById('purchaseTable').innerHTML=db.purchases.slice().reverse().map(x=>`<tr><td>${x.id}</td><td>${x.date}</td><td>${x.supplierName}</td><td>${money(x.total)}</td><td>${x.payment}</td></tr>`).join('')||'<tr><td colspan="5">لا توجد مشتريات</td></tr>'}
+function purchaseModal(){showModal(`<h3 class="text-xl font-black mb-4">فاتورة شراء</h3><div class="grid md:grid-cols-2 gap-3"><div><label>المورد</label><select id="pm_supplier" class="input">${db.suppliers.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>${field('pname','اسم الدواء')} ${field('pbarcode','الباركود')} ${field('pqty','الكمية',1,'number')} ${field('pbuy','سعر الشراء',0,'number')} ${field('psell','سعر البيع',0,'number')} ${field('pexp','الصلاحية',today(),'date')}</div><button class="btn primary w-full mt-4" onclick="savePurchase()">حفظ وإضافة للمخزون</button>`)}
+function savePurchase(){let s=db.suppliers.find(x=>x.id==+document.getElementById('pm_supplier').value),name=document.getElementById('m_pname').value.trim(),barcode=document.getElementById('m_pbarcode').value.trim(),qty=+document.getElementById('m_pqty').value,buy=+document.getElementById('m_pbuy').value,sell=+document.getElementById('m_psell').value,exp=document.getElementById('m_pexp').value;if(!name||!qty)return toast('أكمل البيانات','error');let p=db.products.find(x=>x.barcode===barcode||x.name===name);if(p){p.qty+=qty;p.buy=buy||p.buy;p.sell=sell||p.sell;p.expiry=exp||p.expiry}else db.products.push({id:id(),barcode:barcode||String(id()),name,conc:'',cat:'',qty,min:10,buy,sell,expiry:exp});db.purchases.push({id:id(),date:today(),supplierName:s?.name||'',total:qty*buy,payment:'نقدي'});save();closeModal();renderAll();toast('تمت إضافة المشتريات')}
+function renderSuppliers(){document.getElementById('supplierTable').innerHTML=db.suppliers.map(s=>`<tr><td>${s.name}</td><td>${s.phone}</td><td>${s.address}</td><td><button class="text-red-600" onclick="db.suppliers=db.suppliers.filter(x=>x.id!==${s.id});save();renderAll()">🗑</button></td></tr>`).join('')}
+function supplierModal(){showModal(`<h3 class="text-xl font-black mb-4">إضافة مورد</h3>${field('name','الاسم')}${field('phone','الهاتف')}${field('address','العنوان')}<button class="btn primary w-full mt-4" onclick="let x={id:id(),name:gv('name'),phone:gv('phone'),address:gv('address')};db.suppliers.push(x);save();closeModal();renderAll()">حفظ</button>`)}
+function renderCustomers(){document.getElementById('customerTable').innerHTML=db.customers.map(c=>`<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.points||0}</td><td>${money(c.total)}</td><td><button class="text-red-600" onclick="db.customers=db.customers.filter(x=>x.id!==${c.id});save();renderAll()">🗑</button></td></tr>`).join('')}
+function customerModal(){showModal(`<h3 class="text-xl font-black mb-4">إضافة عميل</h3>${field('name','الاسم')}${field('phone','الهاتف')}<button class="btn primary w-full mt-4" onclick="let x={id:id(),name:gv('name'),phone:gv('phone'),points:0,total:0};db.customers.push(x);save();closeModal();renderAll()">حفظ</button>`)}
+function renderExpenses(){document.getElementById('expenseTable').innerHTML=db.expenses.slice().reverse().map(e=>`<tr><td>${e.date}</td><td>${e.cat}</td><td>${e.desc}</td><td>${money(e.value)}</td><td><button class="text-red-600" onclick="db.expenses=db.expenses.filter(x=>x.id!==${e.id});save();renderAll()">🗑</button></td></tr>`).join('')||'<tr><td colspan="5">لا توجد مصروفات</td></tr>'}
+function expenseModal(){showModal(`<h3 class="text-xl font-black mb-4">إضافة مصروف</h3>${field('cat','التصنيف','تشغيل')}${field('desc','الوصف')}${field('value','القيمة',0,'number')}<button class="btn primary w-full mt-4" onclick="db.expenses.push({id:id(),date:today(),cat:gv('cat'),desc:gv('desc'),value:+gv('value')});save();closeModal();renderAll()">حفظ</button>`)}
+function renderReports(){let sales=db.invoices.reduce((a,x)=>a+x.total,0),cost=db.invoices.flatMap(x=>x.items).reduce((a,x)=>a+x.buy*x.qty,0),purch=db.purchases.reduce((a,x)=>a+x.total,0),exp=db.expenses.reduce((a,x)=>a+x.value,0),profit=sales-cost-exp;document.getElementById('reportCards').innerHTML=[['المبيعات',sales],['المشتريات',purch],['المصروفات',exp],['تكلفة البضاعة',cost],['صافي الربح',profit],['عدد الفواتير',db.invoices.length]].map(x=>`<div class="card"><p class="text-sm text-slate-500">${x[0]}</p><b class="text-2xl">${typeof x[1]==='number'?money(x[1]):x[1]}</b></div>`).join('');document.getElementById('salesReport').innerHTML=db.invoices.slice().reverse().map(i=>`<div class="flex justify-between border-b py-2"><span>#${i.id} — ${i.date} — ${i.customerName}</span><b>${money(i.total)}</b></div>`).join('')||'لا توجد بيانات'}
+function renderUsers(){document.getElementById('userTable').innerHTML=db.users.map(u=>`<tr><td>${u.name}</td><td>${u.role}</td><td>${u.active?'نشط':'متوقف'}</td><td><button class="text-red-600" onclick="db.users=db.users.filter(x=>x.id!==${u.id});save();renderAll()">🗑</button></td></tr>`).join('')}
+function userModal(){showModal(`<h3 class="text-xl font-black mb-4">مستخدم جديد</h3>${field('name','اسم المستخدم')}${field('role','الدور','كاشير')}<button class="btn primary w-full mt-4" onclick="db.users.push({id:id(),name:gv('name'),role:gv('role'),active:true});save();closeModal();renderAll()">حفظ</button>`)}
+function loadSettings(){document.getElementById('pharmacyName').value=db.settings.name;document.getElementById('defaultTax').value=db.settings.tax}
+function saveSettings(){db.settings.name=document.getElementById('pharmacyName').value.trim()||'صيدلية المستقبل';db.settings.tax=+document.getElementById('defaultTax').value||0;save();toast('تم حفظ الإعدادات')}
+function backup(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='pharmacy-backup-'+today()+'.json';a.click()}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();renderAll();toast('تمت الاستعادة')}catch{toast('ملف غير صالح','error')}};r.readAsText(f)}
+function exportCSV(){let csv='barcode,name,concentration,category,quantity,buy,sell,expiry,min\\n'+db.products.map(p=>[p.barcode,p.name,p.conc,p.cat,p.qty,p.buy,p.sell,p.expiry,p.min].join(',')).join('\\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='inventory.csv';a.click()}
+function resetAll(){if(confirm('سيتم حذف كل البيانات والعودة للبيانات التجريبية. متأكد؟')){localStorage.removeItem(KEY);db=JSON.parse(JSON.stringify(seed));save();renderAll();toast('تمت إعادة الضبط','warning')}}
+function showModal(html){document.getElementById('modalbox').innerHTML=html;document.getElementById('modal').classList.add('show');if(window.lucide)lucide.createIcons()}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function focusBarcode(){document.getElementById('posSearch').focus();toast('ضع المؤشر أمام قارئ الباركود ثم امسح الكود')}
+renderAll();
+</script>
+</body>
+</html>
