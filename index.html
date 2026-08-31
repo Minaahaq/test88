@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>المواد - منصة THE BEST</title>
+  <title>السنوات - منصة THE BEST</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
   <style>
+    /* نفس تنسيقات الصفحات السابقة مع تعديلات بسيطة */
     :root {
       --bg-primary: #121212;
       --bg-secondary: #1e1e1e;
@@ -41,103 +42,51 @@
       background: var(--topbar-bg);
       padding: 10px 15px;
       position: fixed;
-      top: 0;
-      right: 0;
-      left: 0;
+      top: 0; right: 0; left: 0;
       z-index: 1000;
       transition: background 0.3s;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
-    .menu-btn { font-size: 22px; cursor: pointer; user-select: none; }
     .title { font-size: 14px; color: #f36; font-weight: 700; }
     .icons { display: flex; align-items: center; gap: 12px; }
     .icons img { width: 22px; height: 22px; cursor: pointer; transition: transform 0.2s; }
     .icons img:hover { transform: scale(1.1); }
     .toggle-dark {
-      background: #fff; border-radius: 12px; width: 40px; height: 20px; position: relative; cursor: pointer;
+      background: #fff; border-radius: 12px; width: 40px; height: 20px;
+      position: relative; cursor: pointer;
     }
     .toggle-dark::after {
-      content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
-      background: #111; border-radius: 50%; transition: 0.3s;
+      content: ""; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; background: #111; border-radius: 50%;
+      transition: 0.3s;
     }
     .toggle-dark.active::after { left: 22px; background: #ff0; }
     h1 {
-      color: var(--text-secondary);
-      text-align: center;
-      font-size: 2.8rem;
-      margin-bottom: 40px;
-      text-shadow: 0 0 8px var(--text-secondary);
+      color: var(--text-secondary); text-align: center; font-size: 2.8rem;
+      margin-bottom: 40px; text-shadow: 0 0 8px var(--text-secondary);
     }
-    ul {
-      list-style: none;
-      padding: 0;
-      max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 30px;
-    }
+    ul { list-style: none; padding: 0; max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 30px; }
     li {
-      background: var(--bg-secondary);
-      border-radius: 16px;
-      padding: 20px 15px 30px;
-      cursor: pointer;
-      box-shadow: 0 2px 10px var(--shadow-gold);
-      transition: background-color 0.3s, transform 0.25s, box-shadow 0.3s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
+      background: var(--bg-secondary); border-radius: 16px; padding: 20px 15px;
+      cursor: pointer; box-shadow: 0 2px 10px var(--shadow-gold);
+      transition: 0.3s; display: flex; flex-direction: column; align-items: center;
+      user-select: none; font-weight: 700; font-size: 1.2rem; text-align: center;
     }
-    li:hover {
-      background: var(--text-secondary);
-      color: var(--bg-primary);
-      transform: translateY(-8px);
-      box-shadow: 0 10px 30px rgba(255, 215, 0, 0.7);
-    }
-    li:active { transform: translateY(-3px); }
-    .circle {
-      width: 100px; height: 100px; border-radius: 50%; background: #333; overflow: hidden;
-      margin-bottom: 18px; box-shadow: 0 0 10px var(--shadow-gold);
-      display: flex; justify-content: center; align-items: center;
-    }
-    .circle img { width: 80%; height: 80%; object-fit: contain; }
-    li span { font-weight: 700; font-size: 1.2rem; text-align: center; }
-    li.loading {
-      cursor: default; color: #aaa; background: transparent; box-shadow: none;
-      font-weight: 400; font-size: 1rem; grid-column: 1 / -1; text-align: center;
-    }
-    li.loading::after {
-      content: ""; width: 28px; height: 28px; border: 3px solid var(--text-secondary);
-      border-top: 3px solid transparent; border-radius: 50%; display: inline-block;
-      animation: spin 1s linear infinite; margin-right: 10px;
-    }
+    li:hover { background: var(--text-secondary); color: var(--bg-primary); transform: translateY(-8px); box-shadow: 0 10px 30px rgba(255,215,0,0.7); }
+    li.loading { cursor: default; color: #aaa; background: transparent; box-shadow: none; font-weight: 400; font-size: 1rem; grid-column: 1 / -1; flex-direction: row; gap: 10px; }
+    li.loading::after { content: ""; width: 28px; height: 28px; border: 3px solid var(--text-secondary); border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .custom-toast {
-      position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px;
-      font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 15px; color: #fff;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
-      z-index: 9999; max-width: 90%;
-    }
-    .custom-toast.info { background: linear-gradient(135deg, #3498db, #2980b9); }
-    .custom-toast.success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-    .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
     .profile-float-btn {
-      position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; border-radius: 50%;
-      background: var(--profile-btn-bg); border: 2px solid var(--profile-btn-border);
+      position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px;
+      border-radius: 50%; background: var(--profile-btn-bg); border: 2px solid var(--profile-btn-border);
       display: flex; justify-content: center; align-items: center; cursor: pointer;
       box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.3s; z-index: 1200;
     }
-    .profile-float-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255,215,0,0.6); background: var(--text-secondary); }
+    .profile-float-btn:hover { transform: scale(1.1); background: var(--text-secondary); }
     .profile-float-btn img { width: 28px; height: 28px; }
     @media (max-width: 480px) {
-      h1 { font-size: 2rem; margin-bottom: 30px; }
+      h1 { font-size: 2rem; }
       ul { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
-      .circle { width: 80px; height: 80px; margin-bottom: 14px; }
-      li span { font-size: 1rem; }
+      li { font-size: 1rem; padding: 15px; }
       .profile-float-btn { width: 45px; height: 45px; bottom: 15px; left: 15px; }
       .profile-float-btn img { width: 22px; height: 22px; }
     }
@@ -145,7 +94,6 @@
 </head>
 <body>
   <div class="topbar">
-    <div class="menu-btn">☰</div>
     <div class="title">𝑷𝒍𝒂𝒕𝒇𝒐𝒓𝒎 𝑻𝒉𝒆 𝑩𝒆𝒔𝒕 𝟐𝟎𝟐𝟕</div>
     <div class="icons">
       <div class="toggle-dark" id="darkToggle"></div>
@@ -154,16 +102,22 @@
       <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png" alt="إشعارات" />
     </div>
   </div>
-  <h1>𝑺𝒖𝒃𝒋𝒆𝒄𝒕𝒔 𝒄𝒍𝒂𝒔𝒔 𝒐𝒇 𝟐𝟎𝟐𝟕</h1>
-  <ul id="subjects-list"><li class="loading">⏳ جاري تحميل المواد ...</li></ul>
+  <h1>📚 اختر السنة الدراسية</h1>
+  <ul id="years-list"><li class="loading">⏳ جاري التحميل...</li></ul>
   <a href="profile.html" class="profile-float-btn"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل" /></a>
 
   <script type="importmap">
-    { "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js", "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js" } }
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
+      }
+    }
   </script>
   <script type="module">
     import { initializeApp } from 'firebase/app';
     import { getDatabase, ref, get, child } from 'firebase/database';
+
     const firebaseConfig = {
       apiKey: "AIzaSyB0p0us6BuzD2ngzjhRnmUIhlOcBeRp0vQ",
       authDomain: "tok-tak-d6e17.firebaseapp.com",
@@ -174,67 +128,71 @@
       appId: "1:547062578826:web:aa285cf798341be07cb773",
       measurementId: "G-7EMKEQKPVV"
     };
+
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
-    function showToast(msg, type='info') {
-      const t = document.createElement('div');
-      t.className = `custom-toast ${type}`;
-      t.innerHTML = `<span>${msg}</span>`;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3000);
+    const yearsList = document.getElementById('years-list');
+
+    function showToast(msg, type='info') { /* نفس الدالة السابقة */ 
+      const toast = document.createElement('div');
+      toast.className = `custom-toast ${type}`;
+      toast.innerHTML = `<span>${msg}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000);
     }
-    const toggle = document.getElementById('darkToggle');
-    toggle.addEventListener('click', () => { toggle.classList.toggle('active'); document.body.classList.toggle('light-mode'); });
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      if(navigator.share) { try { await navigator.share({ title: 'منصة THE BEST', text: 'دروس أون لاين 2027', url: window.location.href }); } catch { showToast('تم الإلغاء', 'error'); } }
-      else showToast('المشاركة غير مدعومة', 'error');
-    });
-    document.getElementById('notifyBtn').addEventListener('click', () => showToast('🔔 الإشعارات قريباً', 'info'));
+    // نضيف تنسيق بسيط للتوست
+    const style = document.createElement('style');
+    style.textContent = `
+      .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 15px; color: #fff; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards; z-index: 9999; max-width: 90%; }
+      .custom-toast.info { background: linear-gradient(135deg, #3498db, #2980b9); }
+      .custom-toast.success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+      .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+      @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
+    `;
+    document.head.appendChild(style);
 
-    const list = document.getElementById('subjects-list');
-    const subjectImages = {
-      'اللغة العربية': 'https://www2.0zz0.com/2025/11/06/06/128992456.jpg',
-      'اللغة الإنجليزية': 'https://www2.0zz0.com/2025/11/03/16/386429473.jpg',
-      'الأحياء': 'https://www2.0zz0.com/2025/11/03/16/425588580.jpg',
-      'الكيمياء': 'https://www2.0zz0.com/2025/11/03/16/286845048.jpg',
-      'الفيزياء': 'https://www2.0zz0.com/2025/11/03/16/155373686.jpg',
-      'الرياضيات': 'https://www2.0zz0.com/2025/11/03/22/428968592.jpg',
-      'التاريخ': 'https://www2.0zz0.com/2025/10/01/19/580067879.jpeg',
-      'الجغرافيا': 'https://www2.0zz0.com/2025/11/03/22/343667596.jpg'
-    };
-
-    async function loadSubjects() {
+    async function loadYears() {
       try {
-        const snapshot = await get(child(ref(database), 'years'));
-        if (!snapshot.exists()) throw new Error('لا توجد سنوات');
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, 'years'));
+        if (!snapshot.exists()) {
+          yearsList.innerHTML = '<li>⚠️ لا توجد سنوات، أضفها من لوحة التحكم</li>';
+          return;
+        }
         const data = snapshot.val();
-        const years = Object.keys(data);
-        // نأخذ أول سنة كافتراضية (أو يمكن إظهار جميع السنوات)
-        const firstYear = years[0];
-        const subjects = data[firstYear]?.subjects || {};
-        const subjectNames = Object.keys(subjects);
-        if (subjectNames.length === 0) { list.innerHTML = '<li>⚠️ لا توجد مواد في هذه السنة</li>'; return; }
-        list.innerHTML = '';
-        subjectNames.sort().forEach(name => {
+        const yearNames = Object.keys(data).sort();
+        yearsList.innerHTML = '';
+        if (yearNames.length === 0) {
+          yearsList.innerHTML = '<li>⚠️ لا توجد سنوات، أضفها من لوحة التحكم</li>';
+          return;
+        }
+        yearNames.forEach(year => {
           const li = document.createElement('li');
-          const circle = document.createElement('div'); circle.className = 'circle';
-          const img = document.createElement('img');
-          img.src = subjectImages[name] || 'https://img.icons8.com/ios-filled/100/ffd700/book.png';
-          circle.appendChild(img);
-          const span = document.createElement('span'); span.textContent = name;
-          li.appendChild(circle); li.appendChild(span);
-          li.onclick = () => window.location.href = `teachers.html?subject=${encodeURIComponent(name)}&year=${encodeURIComponent(firstYear)}`;
-          list.appendChild(li);
+          li.textContent = year;
+          li.onclick = () => window.location.href = `subjects.html?year=${encodeURIComponent(year)}`;
+          yearsList.appendChild(li);
         });
-        showToast('✅ تم تحميل المواد', 'success');
-      } catch(e) {
-        console.error(e);
-        list.innerHTML = `<li class="loading">❌ ${e.message}</li>`;
-        showToast('⚠️ فشل التحميل', 'error');
+      } catch (err) {
+        console.error(err);
+        yearsList.innerHTML = '<li>❌ فشل تحميل البيانات</li>';
       }
     }
-    loadSubjects();
+    loadYears();
+
+    // التحكم في الوضع الليلي/النهاري
+    document.getElementById('darkToggle').addEventListener('click', function() {
+      this.classList.toggle('active');
+      document.body.classList.toggle('light-mode');
+    });
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      if (navigator.share) {
+        try { await navigator.share({ title: 'منصة THE BEST', text: 'منصة تعليمية متكاملة', url: window.location.href }); }
+        catch { showToast('❌ تم إلغاء المشاركة', 'error'); }
+      } else showToast('المشاركة غير مدعومة', 'error');
+    });
+    document.getElementById('notifyBtn').addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!', 'info'));
   </script>
 </body>
 </html>
