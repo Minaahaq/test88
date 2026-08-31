@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>المواد - منصة THE BEST</title>
+  <title>المدرسون - منصة THE BEST</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    /* ===== RESET & ROOT (نفس تصميم index.html) ===== */
+    /* نفس التصميم السابق مع تغيير بسيط في الأسماء */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
       --bg: #f2f2f7;
@@ -50,7 +50,6 @@
       position: relative;
       transition: background 0.3s;
     }
-    /* ===== شريط الحالة الحقيقي ===== */
     .status-bar {
       display: flex;
       justify-content: space-between;
@@ -75,7 +74,6 @@
       gap: 4px;
     }
     .battery-level { font-size: 14px; font-weight: 700; }
-    /* ===== شريط التنقل ===== */
     .topbar {
       display: flex;
       align-items: center;
@@ -105,7 +103,6 @@
     .topbar .brand {
       font-size: 18px;
       font-weight: 700;
-      color: var(--text);
       background: linear-gradient(135deg, #d4a017, #f5d742);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -137,7 +134,6 @@
       opacity: 1;
       background: rgba(0,0,0,0.08);
     }
-    /* ===== مفتاح الوضع ===== */
     .toggle-dark {
       width: 52px;
       height: 30px;
@@ -162,7 +158,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .toggle-dark.active .thumb { transform: translateX(22px); }
-    /* ===== العنوان ===== */
     .page-title {
       font-size: 28px;
       font-weight: 800;
@@ -181,13 +176,12 @@
       border-radius: 40px;
       font-weight: 600;
     }
-    /* ===== شبكة المواد ===== */
-    .subjects-grid {
+    .teachers-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 16px;
     }
-    .subject-card {
+    .teacher-card {
       background: var(--card-bg);
       border-radius: 24px;
       padding: 22px 12px;
@@ -203,13 +197,13 @@
       position: relative;
       overflow: hidden;
     }
-    .subject-card:active {
+    .teacher-card:active {
       transform: scale(0.94);
       box-shadow: 0 0 0 2px var(--gold), 0 4px 16px rgba(212,160,23,0.3);
     }
-    .subject-card .icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
-    .subject-card .label { font-size: 1.1rem; font-weight: 700; }
-    .subject-card.loading {
+    .teacher-card .icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+    .teacher-card .label { font-size: 1.1rem; font-weight: 700; }
+    .teacher-card.loading {
       grid-column: 1 / -1;
       display: flex;
       justify-content: center;
@@ -224,7 +218,7 @@
       cursor: default;
       padding: 40px 0;
     }
-    .subject-card.loading::after {
+    .teacher-card.loading::after {
       content: "";
       width: 28px;
       height: 28px;
@@ -234,7 +228,6 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    /* ===== زر البروفايل العائم ===== */
     .profile-float {
       position: fixed;
       bottom: 30px;
@@ -256,7 +249,6 @@
       font-size: 28px;
     }
     .profile-float:hover { transform: scale(1.05); background: var(--gold); color: white; border-color: white; }
-    /* ===== Toast ===== */
     .custom-toast {
       position: fixed;
       bottom: 100px;
@@ -280,8 +272,8 @@
     @media (max-width: 480px) {
       .app-container { padding: 0 16px 80px; }
       .page-title { font-size: 24px; }
-      .subjects-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-      .subject-card { padding: 18px 10px; font-size: 1rem; }
+      .teachers-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+      .teacher-card { padding: 18px 10px; font-size: 1rem; }
       .profile-float { width: 50px; height: 50px; bottom: 20px; left: 20px; font-size: 22px; }
       .status-bar { font-size: 12px; }
     }
@@ -315,12 +307,12 @@
 
   <!-- ===== العنوان ===== -->
   <div class="page-title" id="pageTitle">
-    📚 المواد <span class="highlight">اختر</span>
+    👨‍🏫 المدرسون <span class="highlight">اختر</span>
   </div>
 
-  <!-- ===== شبكة المواد ===== -->
-  <div class="subjects-grid" id="subjectsList">
-    <div class="subject-card loading">جاري التحميل...</div>
+  <!-- ===== شبكة المدرسين ===== -->
+  <div class="teachers-grid" id="teachersList">
+    <div class="teacher-card loading">جاري التحميل...</div>
   </div>
 
   <!-- ===== زر البروفايل ===== -->
@@ -354,28 +346,28 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 // ===== عناصر DOM =====
-const subjectsList = document.getElementById('subjectsList');
+const teachersList = document.getElementById('teachersList');
 const pageTitle = document.getElementById('pageTitle');
 const darkToggle = document.getElementById('darkToggle');
 const shareBtn = document.getElementById('shareBtn');
 const notifyBtn = document.getElementById('notifyBtn');
 const backBtn = document.getElementById('backBtn');
 
-// عناصر الحالة
 const statusTime = document.getElementById('statusTime');
 const statusNetwork = document.getElementById('statusNetwork');
 const batteryIcon = document.getElementById('batteryIcon');
 const batteryLevel = document.getElementById('batteryLevel');
 
-// ===== قراءة المعاملات =====
+// ===== معاملات =====
 const urlParams = new URLSearchParams(window.location.search);
 const year = urlParams.get('year');
-if (year) pageTitle.textContent = `📚 مواد ${year}`;
+const subject = urlParams.get('subject');
+if (subject && year) pageTitle.textContent = `👨‍🏫 مدرسون ${subject} - ${year}`;
 
 // ===== العودة =====
-backBtn.addEventListener('click', () => window.location.href = 'index.html');
+backBtn.addEventListener('click', () => window.location.href = `subjects.html?year=${encodeURIComponent(year || '')}`);
 
-// ===== الوقت الحقيقي =====
+// ===== الوقت =====
 function updateTime() {
   const now = new Date();
   statusTime.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
@@ -388,13 +380,7 @@ function updateNetwork() {
   const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   if (!conn) { statusNetwork.textContent = '📶'; return; }
   const type = conn.effectiveType;
-  let icon = '📶';
-  if (type === 'wifi') icon = '📶';
-  else if (type === '4g') icon = '📶';
-  else if (type === '5g') icon = '📶';
-  else if (type === '3g') icon = '📶';
-  else icon = '📶';
-  statusNetwork.textContent = icon;
+  statusNetwork.textContent = '📶';
   statusNetwork.title = type || 'شبكة';
 }
 updateNetwork();
@@ -425,46 +411,46 @@ function showToast(msg) {
   setTimeout(() => toast.remove(), 3000);
 }
 
-// ===== تحميل المواد =====
-async function loadSubjects() {
-  if (!year) {
-    subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لم يتم تحديد السنة</div>`;
+// ===== تحميل المدرسين =====
+async function loadTeachers() {
+  if (!year || !subject) {
+    teachersList.innerHTML = `<div class="teacher-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لم يتم تحديد السنة أو المادة</div>`;
     return;
   }
   try {
     const dbRef = ref(database);
-    const snapshot = await get(child(dbRef, `years/${year}/subjects`));
+    const snapshot = await get(child(dbRef, `years/${year}/subjects/${subject}/teachers`));
     if (!snapshot.exists()) {
-      subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لا توجد مواد في هذه السنة</div>`;
+      teachersList.innerHTML = `<div class="teacher-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لا يوجد مدرسون لهذه المادة</div>`;
       return;
     }
     const data = snapshot.val();
-    let subjectNames = [];
+    let teachers = [];
     if (Array.isArray(data)) {
-      subjectNames = data.map(s => s.subject_name || s.name || s).filter(Boolean);
+      teachers = data.map(t => t.teacher_name || t.name || t).filter(Boolean);
     } else {
-      subjectNames = Object.keys(data);
+      teachers = Object.keys(data);
     }
-    subjectsList.innerHTML = '';
-    if (subjectNames.length === 0) {
-      subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لا توجد مواد</div>`;
+    teachersList.innerHTML = '';
+    if (teachers.length === 0) {
+      teachersList.innerHTML = `<div class="teacher-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لا يوجد مدرسون</div>`;
       return;
     }
-    subjectNames.sort().forEach(sub => {
+    teachers.sort().forEach(t => {
       const card = document.createElement('div');
-      card.className = 'subject-card';
-      card.innerHTML = `<span class="icon">📖</span><span class="label">${sub}</span>`;
+      card.className = 'teacher-card';
+      card.innerHTML = `<span class="icon">👨‍🏫</span><span class="label">${t}</span>`;
       card.addEventListener('click', () => {
-        window.location.href = `teachers.html?year=${encodeURIComponent(year)}&subject=${encodeURIComponent(sub)}`;
+        window.location.href = `chapters.html?year=${encodeURIComponent(year)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(t)}`;
       });
-      subjectsList.appendChild(card);
+      teachersList.appendChild(card);
     });
   } catch (err) {
     console.error(err);
-    subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;color:#ff3b30;">❌ فشل التحميل</div>`;
+    teachersList.innerHTML = `<div class="teacher-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;color:#ff3b30;">❌ فشل التحميل</div>`;
   }
 }
-loadSubjects();
+loadTeachers();
 
 // ===== تبديل الوضع =====
 function toggleTheme() {
@@ -502,9 +488,9 @@ shareBtn.addEventListener('click', async () => {
 // ===== إشعارات =====
 notifyBtn.addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!'));
 
-// ===== تأثير نقر على البطاقات =====
+// ===== تأثير نقر =====
 document.addEventListener('click', (e) => {
-  const card = e.target.closest('.subject-card');
+  const card = e.target.closest('.teacher-card');
   if (card && !card.classList.contains('loading')) {
     card.style.transition = 'background 0.15s';
     card.style.background = 'var(--gold)';
