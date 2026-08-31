@@ -1,285 +1,679 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>الملف الشخصي | الثانوية بلس بريميوم</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>الملف الشخصي - iOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & ROOT ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    :root {
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --text: #1c1c1e;
+      --subtext: #8e8e93;
+      --gold: #d4a017;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      --radius: 24px;
+      --gradient-start: #6A11CB;
+      --gradient-end: #2575FC;
+    }
 
-<style>
-  :root {
-    --primary: #6A11CB;
-    --secondary: #2575FC;
-    --accent: #00F5C4;
-    --error: #FF4F4F;
-    --success: #00C896;
-    --dark: #0F0F1B;
-    --darker: #1A1A2E;
-    --light: #FFFFFF;
-    --gray: #A0A0B0;
-  }
+    body.light-mode {
+      --bg: #f2f2f7;
+      --card: #ffffff;
+      --text: #1c1c1e;
+      --subtext: #8e8e93;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.dark-mode {
+      --bg: #0e0e0e;
+      --card: #1c1c1e;
+      --text: #f5f5f7;
+      --subtext: #98989e;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
 
-  body {
-    font-family: 'Tajawal', sans-serif;
-    background: linear-gradient(135deg, var(--darker), var(--dark));
-    color: var(--light);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
-  }
+    body {
+      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
 
-  .profile-container {
-    background: rgba(26, 26, 46, 0.95);
-    border-radius: 20px;
-    padding: 25px 20px;
-    width: 100%;
-    max-width: 380px;
-    box-shadow: 0 12px 25px rgba(0,0,0,0.4);
-    text-align: center;
-  }
+    .app-container {
+      max-width: 430px;
+      width: 100%;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 0 20px 80px;
+      position: relative;
+      transition: background 0.3s;
+    }
 
-  .profile-avatar {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    margin: auto;
-    border: 2px solid var(--accent);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.6rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    font-weight: bold;
-    margin-bottom: 12px;
-  }
+    /* ===== شريط الحالة ===== */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 2px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      opacity: 0.7;
+      letter-spacing: 0.2px;
+      min-height: 36px;
+    }
 
-  .profile-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--accent);
-  }
+    .status-left,
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-  .profile-phone {
-    font-size: 0.9rem;
-    color: var(--gray);
-    margin-bottom: 15px;
-  }
+    /* ===== شريط التنقل ===== */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0 14px;
+      border-bottom: 1px solid rgba(60, 60, 67, 0.08);
+      margin-bottom: 20px;
+      background: var(--bg);
+      transition: background 0.3s;
+    }
 
-  .info-card {
-    background: rgba(255,255,255,0.05);
-    padding: 12px;
-    border-radius: 12px;
-    margin: 8px 0;
-    text-align: right;
-    font-size: 0.95rem;
-  }
+    .topbar .back-btn {
+      font-size: 22px;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      border: none;
+      color: var(--text);
+      font-weight: 600;
+    }
 
-  .info-item {
-    display: flex;
-    justify-content: space-between;
-    margin: 6px 0;
-  }
+    .topbar .back-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
 
-  .info-label { color: var(--gray); font-weight: 500; }
-  .info-value { font-weight: 600; color: var(--light); }
+    .topbar .brand {
+      font-size: 17px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #d4a017, #f5d742);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-  .status-value.active { color: var(--success); font-weight: 700; }
-  .status-value.expired { color: var(--error); font-weight: 700; }
+    .topbar .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-  .timer {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--light);
-    margin-bottom: 4px;
-    letter-spacing: 2px;
-  }
+    .topbar .actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--text);
+      opacity: 0.7;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.04);
+    }
 
-  .timer-labels {
-    font-size: 0.7rem;
-    color: var(--gray);
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
-  }
+    .topbar .actions button:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.08);
+    }
 
-  .progress-container {
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    overflow: hidden;
-    height: 10px;
-    margin: 8px 0;
-  }
+    .toggle-dark {
+      width: 48px;
+      height: 28px;
+      background: #e9e9ed;
+      border-radius: 28px;
+      position: relative;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+    }
 
-  .progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #00ff99, #ffcc00, #ff4444);
-    transition: width 1s linear;
-  }
+    .toggle-dark.active {
+      background: #34c759;
+    }
 
-  .logout-btn {
-    margin-top: 15px;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--error), #FF6B6B);
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    width: 100%;
-    font-weight: 600;
-    transition: 0.3s;
-  }
+    .toggle-dark .thumb {
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: 0.3s cubic-bezier(0.3, 1.2, 0.4, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
 
-  .logout-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255,79,79,0.4);
-  }
+    .toggle-dark.active .thumb {
+      transform: translateX(20px);
+    }
 
-</style>
+    /* ===== المحتوى ===== */
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 8px 30px rgba(106, 17, 203, 0.3);
+      margin-bottom: 12px;
+      user-select: none;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .profile-bio {
+      font-size: 15px;
+      color: var(--subtext);
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    /* ===== بطاقة اللمحة (الجملة الملهمة) ===== */
+    .quote-card {
+      background: linear-gradient(135deg, rgba(106, 17, 203, 0.08), rgba(37, 117, 252, 0.08));
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(106, 17, 203, 0.1);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-card::before {
+      content: '"';
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      font-size: 60px;
+      color: rgba(106, 17, 203, 0.1);
+      font-family: Georgia, serif;
+    }
+
+    .quote-card .quote-icon {
+      font-size: 28px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .quote-card .quote-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.6;
+      letter-spacing: 0.3px;
+      font-style: italic;
+    }
+
+    .quote-card .quote-author {
+      font-size: 14px;
+      color: var(--subtext);
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* ===== بطاقات المعلومات ===== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .info-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(60, 60, 67, 0.04);
+      transition: 0.2s;
+      text-align: center;
+    }
+
+    .info-card .info-icon {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .info-card .info-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-card .info-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    /* ===== أزرار ===== */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 14px 0;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: white;
+      box-shadow: 0 4px 16px rgba(106, 17, 203, 0.25);
+    }
+
+    .action-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(106, 17, 203, 0.35);
+    }
+
+    .action-btn.primary:active {
+      transform: scale(0.96);
+    }
+
+    .action-btn.outline {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid rgba(60, 60, 67, 0.12);
+    }
+
+    .action-btn.outline:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .action-btn.outline:active {
+      transform: scale(0.96);
+    }
+
+    /* ===== زر البروفايل (تذييل) ===== */
+    .profile-float {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--gold);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      z-index: 999;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 26px;
+    }
+
+    .profile-float:hover {
+      transform: scale(1.05);
+      background: var(--gold);
+      color: white;
+      border-color: white;
+    }
+
+    /* ===== Toast ===== */
+    .custom-toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      z-index: 9999;
+      animation: toastIn 0.4s ease, toastOut 0.4s ease 2.8s forwards;
+      max-width: 85%;
+      white-space: nowrap;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+    @keyframes toastOut {
+      to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(30px);
+      }
+    }
+
+    /* ===== استجابة ===== */
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 0 16px 70px;
+      }
+      .profile-avatar {
+        width: 74px;
+        height: 74px;
+        font-size: 30px;
+      }
+      .profile-name {
+        font-size: 20px;
+      }
+      .quote-card .quote-text {
+        font-size: 16px;
+      }
+      .info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .action-btn {
+        font-size: 13px;
+        padding: 12px 0;
+      }
+      .profile-float {
+        width: 48px;
+        height: 48px;
+        bottom: 20px;
+        left: 20px;
+        font-size: 22px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
+<div class="app-container">
 
-<div class="profile-container">
-  <div class="profile-avatar" id="avatar">👤</div>
-  <h2 class="profile-name" id="name">-</h2>
-  <p class="profile-phone" id="section">-</p>
-
-  <div class="info-card">
-    <div class="info-item">
-      <span class="info-label">الكود:</span>
-      <span class="info-value" id="code">-</span>
-    </div>
-
-    <div class="info-item">
-      <span class="info-label">الحالة:</span>
-      <span id="status" class="status-value">-</span>
-    </div>
-
-    <div class="info-item">
-      <span class="info-label">تاريخ الانتهاء:</span>
-      <span class="info-value" id="end_date">-</span>
+  <!-- ===== شريط الحالة ===== -->
+  <div class="status-bar">
+    <div class="status-left"><span id="statusTime">00:00</span></div>
+    <div class="status-right">
+      <span>📶</span>
+      <span>🔋</span>
     </div>
   </div>
 
-  <div class="timer" id="timer">00:00:00:00</div>
-  <div class="timer-labels">
-    <span>أيام</span><span>ساعات</span><span>دقائق</span><span>ثواني</span>
+  <!-- ===== شريط التنقل ===== -->
+  <div class="topbar">
+    <button class="back-btn" id="backBtn">←</button>
+    <div class="brand">PROFILE</div>
+    <div class="actions">
+      <div class="toggle-dark" id="darkToggle"><div class="thumb"></div></div>
+      <button id="shareBtn">📤</button>
+      <button id="notifyBtn">🔔</button>
+    </div>
   </div>
 
-  <div class="progress-container">
-    <div class="progress-bar" id="progress"></div>
+  <!-- ===== الصورة والاسم ===== -->
+  <div class="profile-header">
+    <div class="profile-avatar" id="avatar">أ</div>
+    <div class="profile-name" id="profileName">أحمد السيد</div>
+    <div class="profile-bio" id="profileBio">🇪🇬 القاهرة • مصمم ومطور</div>
   </div>
 
-  <button class="logout-btn" onclick="logout()">🚪 الرجوع للمواد</button>
+  <!-- ===== اللمحة / الجملة الملهمة ===== -->
+  <div class="quote-card">
+    <span class="quote-icon">✨</span>
+    <div class="quote-text" id="quoteText">
+      "كن التغيير الذي تريد رؤيته في العالم"
+    </div>
+    <div class="quote-author" id="quoteAuthor">— غاندي</div>
+  </div>
+
+  <!-- ===== بطاقات المعلومات ===== -->
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="info-icon">📍</span>
+      <div class="info-label">المدينة</div>
+      <div class="info-value" id="city">القاهرة</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">🎂</span>
+      <div class="info-label">العمر</div>
+      <div class="info-value" id="age">٢٤ سنة</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">💼</span>
+      <div class="info-label">المهنة</div>
+      <div class="info-value" id="job">مطور ويب</div>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">❤️</span>
+      <div class="info-label">الاهتمامات</div>
+      <div class="info-value" id="interests">التصميم • البرمجة</div>
+    </div>
+  </div>
+
+  <!-- ===== أزرار ===== -->
+  <div class="action-buttons">
+    <button class="action-btn primary" id="editBtn">✏️ تعديل</button>
+    <button class="action-btn outline" id="msgBtn">💬 تواصل</button>
+  </div>
+
+  <!-- ===== زر البروفايل (تذييل) ===== -->
+  <a href="#" class="profile-float">👤</a>
 </div>
 
 <script>
-  // حماية الصفحة
-  let user = JSON.parse(localStorage.getItem("user_data") || "{}");
-  const code = localStorage.getItem("user_code");
-
-  if (!user || !code) {
-    window.location.href = "index.html";
+  // ===== الوقت في شريط الحالة =====
+  function updateTime() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('statusTime').textContent = `${h}:${m}`;
   }
+  updateTime();
+  setInterval(updateTime, 1000);
 
-  // تحميل البيانات
-  document.getElementById("name").textContent = user.name || "-";
-  document.getElementById("section").textContent = user.section || "-";
-  document.getElementById("code").textContent = code;
-  document.getElementById("end_date").textContent = user.end_date || "-";
-  document.getElementById("avatar").textContent = user.name ? user.name[0] : "👤";
+  // ===== تبديل الوضع =====
+  const darkToggle = document.getElementById('darkToggle');
+  const body = document.body;
 
-  const statusEl = document.getElementById("status");
-  const timerEl = document.getElementById("timer");
-  const progress = document.getElementById("progress");
-
-  let expiry = new Date(user.end_date).getTime();
-  let start = expiry - 30 * 24 * 60 * 60 * 1000;
-
-  function updateTimer() {
-    const now = Date.now();
-    const distance = expiry - now;
-
-    if (distance <= 0) {
-      timerEl.textContent = "00:00:00:00";
-      statusEl.textContent = "❌ منتهي";
-      statusEl.className = "status-value expired";
-      progress.style.width = "0%";
-      return;
+  function toggleTheme() {
+    const isDark = body.classList.contains('dark-mode');
+    if (isDark) {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
+      darkToggle.classList.remove('active');
+      localStorage.setItem('theme', 'light');
+    } else {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+      darkToggle.classList.add('active');
+      localStorage.setItem('theme', 'dark');
     }
-
-    const d = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const s = Math.floor((distance % (1000 * 60)) / 1000);
-
-    timerEl.textContent =
-      `${String(d).padStart(2,'0')} : ${String(h).padStart(2,'0')} : ${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
-
-    statusEl.textContent = "✅ نشط";
-    statusEl.className = "status-value active";
-
-    const percent = ((now - start) / (expiry - start)) * 100;
-    progress.style.width = Math.max(0, Math.min(100, 100 - percent)) + "%";
   }
 
-  updateTimer();
-  setInterval(updateTimer, 1000);
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  if (savedTheme === 'dark') {
+    body.classList.add('dark-mode');
+    darkToggle.classList.add('active');
+  } else {
+    body.classList.add('light-mode');
+  }
+  darkToggle.addEventListener('click', toggleTheme);
 
-  // =====================================================
-  // 🔥 تحديث البيانات تلقائياً من السيرفر كل 20 ثانية
-  // =====================================================
-  async function refreshUserData() {
-    try {
-      const response = await fetch(
-        `https://script.google.com/macros/s/AKfycbxvLzKTlm_X51PGatqyiv1CPVm7W6uhKGeeCTKsSqOa3Dn9Rh9x5LU8t6zneTkCwRVz/exec?code=${code}`
-      );
+  // ===== زر العودة =====
+  document.getElementById('backBtn').addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
 
-      const data = await response.json();
+  // ===== أزرار تفاعلية =====
+  function showToast(msg) {
+    const existing = document.querySelector('.custom-toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
 
-      if (!data.success) return;
-
-      // لو البيانات اتغيرت فعلاً
-      if (
-        data.end_date !== user.end_date ||
-        data.name !== user.name ||
-        data.section !== user.section
-      ) {
-        // تحديث لوكال
-        localStorage.setItem("user_data", JSON.stringify(data));
-        user = data;
-
-        // تحديث العناصر
-        document.getElementById("name").textContent = user.name;
-        document.getElementById("section").textContent = user.section;
-        document.getElementById("end_date").textContent = user.end_date;
-        document.getElementById("avatar").textContent = user.name[0];
-
-        // تحديث الوقت
-        expiry = new Date(user.end_date).getTime();
-        start = expiry - 30 * 24 * 60 * 60 * 1000;
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'ملفي الشخصي',
+          text: 'مرحباً، هذا ملفي الشخصي على منصة THE BEST',
+          url: window.location.href
+        });
+      } catch {
+        showToast('❌ تم إلغاء المشاركة');
       }
-    } catch (err) {
-      console.error("خطأ في تحديث البيانات:", err);
+    } else {
+      showToast('المشاركة غير مدعومة');
     }
-  }
+  });
 
-  // تشغيل التحديث
-  setInterval(refreshUserData, 20000);
+  document.getElementById('notifyBtn').addEventListener('click', () => {
+    showToast('🔔 تم تفعيل الإشعارات!');
+  });
 
-  function logout() {
-    window.location.href = "subjects.html";
-  }
+  document.getElementById('editBtn').addEventListener('click', () => {
+    showToast('✏️ جارٍ فتح التعديل...');
+  });
 
+  document.getElementById('msgBtn').addEventListener('click', () => {
+    showToast('💬 سيتم فتح الدردشة قريباً');
+  });
+
+  // ===== تأثير عند النقر على البطاقات =====
+  document.querySelectorAll('.info-card').forEach(card => {
+    card.addEventListener('click', function() {
+      this.style.transition = 'background 0.15s';
+      this.style.background = 'rgba(106,17,203,0.08)';
+      setTimeout(() => {
+        this.style.background = '';
+      }, 200);
+    });
+  });
+
+  // ===== تغيير الجملة الملهمة بشكل دوري (تأثير حيوي) =====
+  const quotes = [
+    { text: '"كن التغيير الذي تريد رؤيته في العالم"', author: '— غاندي' },
+    { text: '"النجاح ليس نهائياً، والفشل ليس قاتلاً"', author: '— ونستون تشرشل' },
+    { text: '"المستقبل يبدأ اليوم، وليس غداً"', author: '— جون ف. كينيدي' },
+    { text: '"الإبداع هو الذكاء الذي يمرح"', author: '— ألبرت أينشتاين' },
+  ];
+
+  let quoteIndex = 0;
+  setInterval(() => {
+    quoteIndex = (quoteIndex + 1) % quotes.length;
+    const q = quotes[quoteIndex];
+    document.getElementById('quoteText').textContent = q.text;
+    document.getElementById('quoteAuthor').textContent = q.author;
+  }, 6000);
+
+  // ===== تغيير البيانات الوهمية عند النقر على الصورة (تأثير ترفيهي) =====
+  const names = ['أحمد السيد', 'نورا خالد', 'يوسف حسن', 'سارة محمود'];
+  const cities = ['القاهرة', 'الإسكندرية', 'الجيزة', 'الدوحة'];
+  const ages = ['٢٤ سنة', '٢٧ سنة', '٢١ سنة', '٣٠ سنة'];
+  const jobs = ['مطور ويب', 'مصممة جرافيك', 'مهندس برمجيات', 'محللة بيانات'];
+  const interests = ['التصميم • البرمجة', 'الفن • الموسيقى', 'القراءة • السفر', 'التسويق • التكنولوجيا'];
+
+  document.getElementById('avatar').addEventListener('click', function() {
+    const random = Math.floor(Math.random() * names.length);
+    document.getElementById('profileName').textContent = names[random];
+    document.getElementById('profileBio').textContent = `🇪🇬 ${cities[random]} • ${jobs[random]}`;
+    document.getElementById('city').textContent = cities[random];
+    document.getElementById('age').textContent = ages[random];
+    document.getElementById('job').textContent = jobs[random];
+    document.getElementById('interests').textContent = interests[random];
+    this.textContent = names[random][0];
+    showToast(`🔄 تم التحديث إلى ${names[random]}`);
+  });
+
+  // تغيير الصورة الرمزية عند النقر عليها أيضاً
+  document.getElementById('avatar').style.cursor = 'pointer';
 </script>
-
 </body>
 </html>
