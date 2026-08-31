@@ -1,341 +1,120 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>المدرسون - منصة THE BEST</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo&display=swap');
-
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: #121212;
-    color: #fff;
-    padding: 80px 15px 30px;
-    margin: 0;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  /* ===== الشريط العلوي ===== */
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #111;
-    padding: 10px 15px;
-    color: white;
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 1000;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  .menu-btn {
-    font-size: 22px;
-    cursor: pointer;
-  }
-
-  .title {
-    font-size: 14px;
-    color: #f36;
-  }
-
-  .icons {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .icons img {
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-  }
-
-  .toggle-dark {
-    background: #fff;
-    border-radius: 12px;
-    width: 40px;
-    height: 20px;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .toggle-dark::after {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    background: #111;
-    border-radius: 50%;
-    transition: 0.3s;
-  }
-
-  .toggle-dark.active::after {
-    left: 22px;
-    background: #ff0;
-  }
-
-  /* ===== باقي التنسيقات ===== */
-  h1 {
-    color: #ffd700;
-    text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 0 0 8px #ffd700;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-  li {
-    background:#1a1a1a;
-    margin:15px 0;
-    padding:15px;
-    border-radius:12px;
-    cursor:pointer;
-    text-align:center;
-    font-weight:bold;
-    color:#ffd700;
-    transition: background 0.3s, transform 0.3s;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    overflow:hidden;
-  }
-
-  li:hover {
-    background:#333;
-    transform: translateY(-5px);
-  }
-
-  .subject-img {
-    width:100%;
-    height:150px;
-    object-fit:cover;
-    border-radius:10px;
-    margin-bottom:12px;
-  }
-
-  .teacher-circle {
-    width:90px;
-    height:90px;
-    border-radius:50%;
-    background:#222;
-    border:3px solid #ffd700;
-    overflow:hidden;
-    margin-bottom:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .teacher-circle img {
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    border-radius:50%;
-  }
-
-  li span {
-    font-size:1.1rem;
-    color:#ffd700;
-  }
-
-  /* ===== Toast إشعار ===== */
-  #toast {
-    visibility: hidden;
-    min-width: 260px;
-    background: #1e1e1e;
-    color: #ffd700;
-    text-align: center;
-    border-radius: 12px;
-    padding: 14px;
-    position: fixed;
-    z-index: 2000;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    font-size: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    opacity: 0;
-    transition: opacity 0.5s, bottom 0.5s;
-  }
-  #toast.show {
-    visibility: visible;
-    opacity: 1;
-    bottom: 50px;
-  }
-
-  /* ===== الوضع الفاتح ===== */
-  body.light-mode {
-    background: #f5f5f5;
-    color: #000;
-  }
-  body.light-mode .topbar {
-    background: #fff;
-    color: #000;
-  }
-  body.light-mode li {
-    background: #fff;
-    color: #000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  }
-  body.light-mode #toast {
-    background: #fff;
-    color: #333;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>المدرسون - منصة THE BEST</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* نفس تنسيق subjects.html مع تعديل طفيف */
+    :root { --bg-primary: #121212; --bg-secondary: #1e1e1e; --text-primary: #ffffff; --text-secondary: #ffd700; --shadow-gold: rgba(255,215,0,0.3); --topbar-bg: #111111; --profile-btn-bg: #222; --profile-btn-border: #ffd700; }
+    body.light-mode { --bg-primary: #f5f5f5; --bg-secondary: #ffffff; --text-primary: #000000; --text-secondary: #b8860b; --shadow-gold: rgba(0,0,0,0.15); --topbar-bg: #ffffff; --profile-btn-bg: #ffffff; --profile-btn-border: #333; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Cairo', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 80px 15px 30px; transition: background 0.3s, color 0.3s; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; background: var(--topbar-bg); padding: 10px 15px; position: fixed; top:0; right:0; left:0; z-index:1000; }
+    .menu-btn { font-size: 22px; cursor: pointer; user-select: none; background: rgba(255,215,0,0.1); border: 1px solid var(--text-secondary); color: var(--text-secondary); padding: 5px 9px; border-radius: 8px; }
+    .title { font-size: 14px; color: #f36; font-weight: 700; }
+    .icons { display: flex; align-items: center; gap: 12px; }
+    .icons img { width: 22px; height: 22px; cursor: pointer; transition: transform 0.2s; }
+    .icons img:hover { transform: scale(1.1); }
+    .toggle-dark { background: #fff; border-radius: 12px; width: 40px; height: 20px; position: relative; cursor: pointer; }
+    .toggle-dark::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #111; border-radius: 50%; transition: 0.3s; }
+    .toggle-dark.active::after { left: 22px; background: #ff0; }
+    h1 { color: var(--text-secondary); text-align: center; font-size: 2.8rem; margin-bottom: 40px; text-shadow: 0 0 8px var(--text-secondary); }
+    ul { list-style: none; padding: 0; max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
+    li { background: var(--bg-secondary); border-radius: 16px; padding: 20px 15px; cursor: pointer; box-shadow: 0 2px 10px var(--shadow-gold); transition: 0.3s; display: flex; flex-direction: column; align-items: center; user-select: none; font-weight: 700; font-size: 1.2rem; text-align: center; }
+    li:hover { background: var(--text-secondary); color: var(--bg-primary); transform: translateY(-8px); box-shadow: 0 10px 30px rgba(255,215,0,0.7); }
+    li.loading { cursor: default; color: #aaa; background: transparent; box-shadow: none; font-weight: 400; font-size: 1rem; grid-column: 1 / -1; flex-direction: row; gap: 10px; }
+    li.loading::after { content: ""; width: 28px; height: 28px; border: 3px solid var(--text-secondary); border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .profile-float-btn { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--profile-btn-bg); border: 2px solid var(--profile-btn-border); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.3s; z-index: 1200; }
+    .profile-float-btn:hover { transform: scale(1.1); background: var(--text-secondary); }
+    .profile-float-btn img { width: 28px; height: 28px; }
+    @media (max-width: 480px) { h1 { font-size: 2rem; } ul { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; } li { font-size: 1rem; padding: 15px; } .profile-float-btn { width: 45px; height: 45px; bottom: 15px; left: 15px; } .profile-float-btn img { width: 22px; height: 22px; } }
+  </style>
 </head>
 <body>
-
-  <!-- ✅ الشريط العلوي -->
   <div class="topbar">
-    <div class="menu-btn" onclick="window.location.href='subjects.html'">⬅</div>
-    <div class="title">𝑺𝒖𝒃𝒋𝒆𝒄𝒕 𝑻𝒆𝒂𝒄𝒉𝒆𝒓𝒔</div>
+    <div class="menu-btn" id="backBtn">⬅</div>
+    <div class="title">𝑻𝒆𝒂𝒄𝒉𝒆𝒓𝒔</div>
     <div class="icons">
       <div class="toggle-dark" id="darkToggle"></div>
-      <a href="" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
-      </a>
-      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
-      <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png" alt="Notification">
+      <a href="https://wa.me/" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" /></a>
+      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="مشاركة" />
+      <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png" alt="إشعارات" />
     </div>
   </div>
+  <h1 id="pageTitle">👨‍🏫 المدرسون</h1>
+  <ul id="teachers-list"><li class="loading">⏳ جاري التحميل...</li></ul>
+  <a href="profile.html" class="profile-float-btn"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل" /></a>
 
-  <!-- ✅ Toast -->
-  <div id="toast">الإشعارات هتتفعل قريبًا 🔔✨</div>
-
-  <h1>𝑺𝒖𝒃𝒋𝒆𝒄𝒕 𝑻𝒆𝒂𝒄𝒉𝒆𝒓𝒔</h1>
-  <ul id="teachers-list">
-    <li>⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
-  </ul>
-  
-   <script src="app.js"></script>  <!-- أو المسار المناسب للملف -->
-
-  <script src="check_code.js"></script>
-
-  
-<script type="module">
-const teachersList = document.getElementById('teachers-list');
-
-// 🧩 صور المواد
-const subjectImages = {
-  "أحياء": "https://www2.0zz0.com/2025/11/03/16/425588580.jpg",
-  "فيزياء": "https://www2.0zz0.com/2025/11/03/16/155373686.jpg",
-  "كيمياء": "https://www2.0zz0.com/2025/11/03/16/286845048.jpg",
-  "لغة عربية": "https://www2.0zz0.com/2025/11/06/06/128992456.jpg",
-  "English": "https://www2.0zz0.com/2025/11/03/16/386429473.jpg",
-  "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
-  "الرياضيات": "https://www2.0zz0.com/2025/11/03/22/428968592.jpg",
-  "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg"
-};
-
-// جلب المادة المختارة من LocalStorage
-const selectedSubject = JSON.parse(localStorage.getItem("selected_subject"));
-const selectedYear = JSON.parse(localStorage.getItem("selected_year"));
-
-if (!selectedSubject || !selectedYear) {
-  teachersList.innerHTML = '<li>⚠️ لم يتم اختيار السنة أو المادة</li>';
-} else {
-  loadTeachers(selectedYear.id, selectedSubject.id);
-}
-
-// تحميل المدرسين
-async function loadTeachers(yearId, subjectId) {
-  try {
-    if (!yearId || !subjectId) return;
-
-    // 1️⃣ جلب التوكن
-    const tokenRes = await fetch("/api/get-token");
-    const { token } = await tokenRes.json();
-
-    // 2️⃣ الطلب المحمي عبر Proxy (زي السنين)
-    const res = await fetch(
-      `/api/proxy?type=teachers&yearId=${yearId}&subjectId=${subjectId}`,
-      {
-        headers: {
-          "x-client-token": token
-        }
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
       }
-    );
+    }
+  </script>
+  <script type="module">
+    import { initializeApp } from 'firebase/app';
+    import { getDatabase, ref, get, child } from 'firebase/database';
 
-    if (!res.ok) throw new Error("Failed to fetch teachers");
+    const firebaseConfig = { /* نفس الكونفيغ */ apiKey: "AIzaSyB0p0us6BuzD2ngzjhRnmUIhlOcBeRp0vQ", authDomain: "tok-tak-d6e17.firebaseapp.com", databaseURL: "https://tok-tak-d6e17-default-rtdb.firebaseio.com", projectId: "tok-tak-d6e17", storageBucket: "tok-tak-d6e17.appspot.com", messagingSenderId: "547062578826", appId: "1:547062578826:web:aa285cf798341be07cb773", measurementId: "G-7EMKEQKPVV" };
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-    const teachers = await res.json();
+    const urlParams = new URLSearchParams(window.location.search);
+    const year = urlParams.get('year');
+    const subject = urlParams.get('subject');
+    const teachersList = document.getElementById('teachers-list');
+    const pageTitle = document.getElementById('pageTitle');
+    if (subject && year) pageTitle.textContent = `👨‍🏫 مدرسون ${subject} - ${year}`;
 
-    if (!teachers?.length) {
-      teachersList.innerHTML = '<li>لا يوجد مدرسون لهذه المادة.</li>';
-      return;
-  }
+    function showToast(msg, type='info') { /* نفس الدالة */ const toast = document.createElement('div'); toast.className = `custom-toast ${type}`; toast.innerHTML = `<span>${msg}</span>`; document.body.appendChild(toast); setTimeout(() => { if(toast.parentNode) toast.remove(); }, 3000); }
+    const style = document.createElement('style');
+    style.textContent = `.custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 15px; color: #fff; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards; z-index: 9999; max-width: 90%; } .custom-toast.info { background: linear-gradient(135deg, #3498db, #2980b9); } .custom-toast.success { background: linear-gradient(135deg, #2ecc71, #27ae60); } .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); } @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }`;
+    document.head.appendChild(style);
 
-    teachersList.innerHTML = '';
+    document.getElementById('backBtn').onclick = () => window.location.href = `subjects.html?year=${encodeURIComponent(year || '')}`;
 
-    teachers.forEach(teacher => {
-      const li = document.createElement('li');
+    async function loadTeachers() {
+      if (!year || !subject) { teachersList.innerHTML = '<li>⚠️ لم يتم تحديد السنة أو المادة</li>'; return; }
+      try {
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, `years/${year}/subjects/${subject}/teachers`));
+        if (!snapshot.exists()) {
+          teachersList.innerHTML = '<li>⚠️ لا يوجد مدرسون لهذه المادة</li>';
+          return;
+        }
+        const data = snapshot.val();
+        let teachers = [];
+        if (Array.isArray(data)) {
+          teachers = data.map(t => t.teacher_name || t.name || t).filter(Boolean);
+        } else {
+          teachers = Object.keys(data);
+        }
+        teachersList.innerHTML = '';
+        if (teachers.length === 0) {
+          teachersList.innerHTML = '<li>⚠️ لا يوجد مدرسون لهذه المادة</li>';
+          return;
+        }
+        teachers.sort().forEach(t => {
+          const li = document.createElement('li');
+          li.textContent = t;
+          li.onclick = () => window.location.href = `chapters.html?year=${encodeURIComponent(year)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(t)}`;
+          teachersList.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        teachersList.innerHTML = '<li>❌ حدث خطأ أثناء التحميل</li>';
+      }
+    }
+    loadTeachers();
 
-      // صورة المادة
-      const subjectImg = document.createElement('img');
-      subjectImg.className = 'subject-img';
-      subjectImg.src = selectedSubject.image_url || "https://www2.0zz0.com/2025/12/30/00/795134816.jpg";
-      subjectImg.alt = selectedSubject.name;
-
-      // صورة المدرس داخل دائرة
-      const circle = document.createElement('div');
-      circle.className = 'teacher-circle';
-      const teacherImg = document.createElement('img');
-      teacherImg.src = teacher.image_url || "https://img.icons8.com/ios-filled/100/ffd700/user-male-circle.png";
-      teacherImg.alt = teacher.name;
-      circle.appendChild(teacherImg);
-
-      // اسم المدرس
-      const nameSpan = document.createElement('span');
-      nameSpan.textContent = teacher.name;
-
-      // عدد الفصول
-      const chaptersCount = document.createElement('div');
-      chaptersCount.style.fontSize = '0.85rem';
-      chaptersCount.style.color = '#ffd700';
-      chaptersCount.textContent = `${teacher.chapters_count || 0} Chapter`;
-
-      li.append(subjectImg, circle, nameSpan, chaptersCount);
-
-      // الضغط على المدرس يحفظه في LocalStorage وينتقل للفصول
-      li.onclick = () => {
-        localStorage.setItem('selected_teacher', JSON.stringify(teacher));
-        window.location.href = 'chapters.html';
-      };
-
-      teachersList.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error(err);
-    teachersList.innerHTML = '<li>❌ حدث خطأ أثناء تحميل البيانات.</li>';
-  }
-}
-
-// 🌙 الوضع الليلي والإشعارات
-const toast = document.getElementById('toast');
-const notifyBtn = document.getElementById('notifyBtn');
-const darkToggle = document.getElementById('darkToggle');
-
-notifyBtn?.addEventListener('click', () => {
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-});
-
-darkToggle?.addEventListener('click', () => {
-  document.body.classList.toggle('light-mode');
-  darkToggle.classList.toggle('active');
-});
-</script>
+    document.getElementById('darkToggle').addEventListener('click', function() { this.classList.toggle('active'); document.body.classList.toggle('light-mode'); });
+    document.getElementById('shareBtn').addEventListener('click', async () => { if (navigator.share) { try { await navigator.share({ title: 'منصة THE BEST', text: 'منصة تعليمية متكاملة', url: window.location.href }); } catch { showToast('❌ تم إلغاء المشاركة', 'error'); } } else showToast('المشاركة غير مدعومة', 'error'); });
+    document.getElementById('notifyBtn').addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!', 'info'));
+  </script>
 </body>
 </html>
