@@ -53,16 +53,35 @@
       position: relative;
       transition: background 0.3s;
     }
-    /* ===== شريط الحالة الوهمي ===== */
+    /* ===== شريط الحالة الحقيقي ===== */
     .status-bar {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: 12px 6px 6px;
       font-size: 14px;
       font-weight: 600;
       color: var(--text);
-      opacity: 0.7;
+      opacity: 0.8;
       letter-spacing: 0.2px;
+      min-height: 40px;
+    }
+    .status-left, .status-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-right span {
+      font-size: 15px;
+    }
+    .status-battery {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .battery-level {
+      font-size: 14px;
+      font-weight: 700;
     }
     /* ===== شريط التنقل ===== */
     .topbar {
@@ -104,6 +123,7 @@
       height: 36px;
       border-radius: 50%;
       background: rgba(0,0,0,0.04);
+      text-decoration: none;
     }
     .topbar .actions button:hover, .topbar .actions a:hover {
       opacity: 1;
@@ -256,16 +276,25 @@
       .years-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
       .year-card { padding: 18px 10px; font-size: 1rem; }
       .profile-float { width: 50px; height: 50px; bottom: 20px; left: 20px; font-size: 22px; }
+      .status-bar { font-size: 12px; }
     }
   </style>
 </head>
 <body>
 <div class="app-container" id="app">
 
-  <!-- شريط الحالة الوهمي -->
+  <!-- ===== شريط الحالة الحقيقي ===== -->
   <div class="status-bar">
-    <span id="statusTime">9:41</span>
-    <span>📶 📶 🔋</span>
+    <div class="status-left">
+      <span id="statusTime">00:00</span>
+    </div>
+    <div class="status-right">
+      <span id="statusNetwork">📶</span>
+      <span class="status-battery">
+        <span id="batteryIcon">🔋</span>
+        <span class="battery-level" id="batteryLevel">--%</span>
+      </span>
+    </div>
   </div>
 
   <!-- شريط التنقل -->
@@ -327,7 +356,85 @@ const yearsList = document.getElementById('yearsList');
 const darkToggle = document.getElementById('darkToggle');
 const shareBtn = document.getElementById('shareBtn');
 const notifyBtn = document.getElementById('notifyBtn');
+
+// عناصر شريط الحالة
 const statusTime = document.getElementById('statusTime');
+const statusNetwork = document.getElementById('statusNetwork');
+const batteryIcon = document.getElementById('batteryIcon');
+const batteryLevel = document.getElementById('batteryLevel');
+
+// ===== 1. الوقت الحقيقي (كل ثانية) =====
+function updateTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  statusTime.textContent = `${h}:${m}`;
+}
+updateTime();
+setInterval(updateTime, 1000);
+
+// ===== 2. الشبكة الحقيقية (نوع الاتصال) =====
+function updateNetwork() {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!connection) {
+    statusNetwork.textContent = '📶'; // احتياطي
+    return;
+  }
+  const type = connection.effectiveType; // '4g', '3g', '2g', 'slow-2g', 'wifi'
+  const downlink = connection.downlink; // سرعة بالميغابت/ثانية (تقريبية)
+  
+  let icon = '📶';
+  let label = '';
+  switch(type) {
+    case 'wifi': icon = '📶'; label = 'Wi-Fi'; break;
+    case '4g': icon = '📶'; label = '4G'; break;
+    case '5g': icon = '📶'; label = '5G'; break;
+    case '3g': icon = '📶'; label = '3G'; break;
+    case '2g': icon = '📶'; label = '2G'; break;
+    default: icon = '📶'; label = type || 'شبكة';
+  }
+  // عرض النوع بجانب الأيقونة (اختياري) أو نعرض الأيقونة فقط
+  statusNetwork.textContent = icon; 
+  // ممكن تضيف label كـ title
+  statusNetwork.title = label + (downlink ? ` (${downlink} Mbps)` : '');
+}
+updateNetwork();
+// الاستماع لتغير الشبكة
+if (navigator.connection) {
+  navigator.connection.addEventListener('change', updateNetwork);
+}
+
+// ===== 3. البطارية الحقيقية =====
+async function updateBattery() {
+  try {
+    // التحقق من توفر API البطارية
+    if (!navigator.getBattery) {
+      batteryLevel.textContent = '--%';
+      batteryIcon.textContent = '🔋';
+      return;
+    }
+    const battery = await navigator.getBattery();
+    const level = Math.round(battery.level * 100);
+    batteryLevel.textContent = `${level}%`;
+    
+    // تغيير الأيقونة حسب الشحن
+    if (battery.charging) {
+      batteryIcon.textContent = '⚡️';
+    } else {
+      if (level > 60) batteryIcon.textContent = '🔋';
+      else if (level > 20) batteryIcon.textContent = '🪫';
+      else batteryIcon.textContent = '🪫'; // نفس الأيقونة لكن ممكن نضيف لون أحمر عبر CSS
+    }
+    // الاستماع لتغيرات البطارية (شحن/فصل، تغير النسبة)
+    battery.addEventListener('levelchange', updateBattery);
+    battery.addEventListener('chargingchange', updateBattery);
+  } catch (err) {
+    console.warn('Battery API not supported:', err);
+    batteryLevel.textContent = '--%';
+    batteryIcon.textContent = '🔋';
+  }
+}
+updateBattery();
 
 // ===== Toast =====
 function showToast(msg) {
@@ -372,16 +479,6 @@ async function loadYears() {
 }
 loadYears();
 
-// ===== تحديث الوقت في شريط الحالة =====
-function updateTime() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
-  statusTime.textContent = `${h}:${m}`;
-}
-updateTime();
-setInterval(updateTime, 30000);
-
 // ===== تبديل الوضع (داكن / فاتح) =====
 function toggleTheme() {
   const isDark = document.body.classList.contains('dark-mode');
@@ -397,7 +494,6 @@ function toggleTheme() {
     localStorage.setItem('theme', 'dark');
   }
 }
-// استعادة الوضع المحفوظ
 const savedTheme = localStorage.getItem('theme') || 'light';
 if (savedTheme === 'dark') {
   document.body.classList.add('dark-mode');
@@ -429,7 +525,7 @@ notifyBtn.addEventListener('click', () => {
   showToast('🔔 الإشعارات ستُفعل قريباً!');
 });
 
-// ===== تأثير إضافي: عند النقر على أي سنة يظهر تغيير لون خفيف =====
+// ===== تأثير إضافي على بطاقات السنوات =====
 document.addEventListener('click', (e) => {
   const card = e.target.closest('.year-card');
   if (card && !card.classList.contains('loading')) {
