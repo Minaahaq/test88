@@ -4,64 +4,294 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>لوحة التحكم - منصة THE BEST</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-primary: #0d0d0d; --bg-secondary: #1a1a1a; --bg-card: #222; --bg-input: #2a2a2a;
-      --text-primary: #ffffff; --text-secondary: #ffd700; --shadow-gold: rgba(255,215,0,0.15);
-      --topbar-bg: #0a0a0a; --border-color: rgba(255,215,0,0.2); --profile-btn-bg: #222; --profile-btn-border: #ffd700;
+      --bg-primary: #0d0d0d;
+      --bg-secondary: #1a1a1a;
+      --bg-card: #222;
+      --bg-input: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #ffd700;
+      --border-color: rgba(255,215,0,0.2);
+      --topbar-bg: #0a0a0a;
+      --profile-btn-bg: #222;
+      --profile-btn-border: #ffd700;
     }
-    body.light-mode { --bg-primary: #f5f5f5; --bg-secondary: #ffffff; --bg-card: #f0f0f0; --bg-input: #e8e8e8; --text-primary: #000000; --text-secondary: #b8860b; --shadow-gold: rgba(0,0,0,0.1); --topbar-bg: #ffffff; --border-color: rgba(0,0,0,0.15); --profile-btn-bg: #ffffff; --profile-btn-border: #333; }
+    body.light-mode {
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ffffff;
+      --bg-card: #f0f0f0;
+      --bg-input: #e8e8e8;
+      --text-primary: #000000;
+      --text-secondary: #b8860b;
+      --border-color: rgba(0,0,0,0.15);
+      --topbar-bg: #ffffff;
+      --profile-btn-bg: #ffffff;
+      --profile-btn-border: #333;
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: 'Cairo', sans-serif; background: var(--bg-primary); color: var(--text-primary); padding: 80px 15px 30px; transition: background 0.3s, color 0.3s; min-height: 100vh; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; background: var(--topbar-bg); padding: 10px 15px; position: fixed; top: 0; right: 0; left: 0; z-index: 1000; transition: background 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-    .menu-btn { font-size: 18px; cursor: pointer; background: rgba(255,215,0,0.1); border: 1px solid var(--text-secondary); color: var(--text-secondary); padding: 5px 9px; border-radius: 8px; transition: 0.3s; user-select: none; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 80px 15px 30px;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--topbar-bg);
+      padding: 10px 15px;
+      position: fixed;
+      top:0; right:0; left:0;
+      z-index:1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .menu-btn {
+      font-size: 18px;
+      cursor: pointer;
+      background: rgba(255,215,0,0.1);
+      border: 1px solid var(--text-secondary);
+      color: var(--text-secondary);
+      padding: 5px 9px;
+      border-radius: 8px;
+      transition: 0.3s;
+      user-select: none;
+    }
     .menu-btn:hover { background: rgba(255,215,0,0.2); transform: translateY(-1px); }
     .title { font-size: 15px; font-weight: bold; color: var(--text-secondary); letter-spacing: 1px; }
     .icons { display: flex; align-items: center; gap: 12px; }
     .icons img { width: 22px; height: 22px; cursor: pointer; transition: transform 0.2s; }
     .icons img:hover { transform: scale(1.1); }
-    .toggle-dark { background: #fff; border-radius: 12px; width: 40px; height: 20px; position: relative; cursor: pointer; }
-    .toggle-dark::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #111; border-radius: 50%; transition: 0.3s; }
+    .toggle-dark {
+      background: #fff;
+      border-radius: 12px;
+      width: 40px;
+      height: 20px;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle-dark::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #111;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
     .toggle-dark.active::after { left: 22px; background: #ff0; }
     .container { max-width: 1100px; margin: 0 auto; }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px; }
-    .admin-header h1 { color: var(--text-secondary); font-size: 2rem; font-weight: 800; text-shadow: 0 0 15px rgba(255,215,0,0.2); }
-    .admin-header .badge { background: var(--text-secondary); color: #000; padding: 4px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
-    .add-section { background: var(--bg-secondary); border-radius: 16px; padding: 25px; margin-bottom: 30px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-    .add-section h2 { color: var(--text-secondary); font-size: 1.4rem; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .admin-header h1 {
+      color: var(--text-secondary);
+      font-size: 2rem;
+      font-weight: 800;
+      text-shadow: 0 0 15px rgba(255,215,0,0.2);
+    }
+    .admin-header .badge {
+      background: var(--text-secondary);
+      color: #000;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .add-section {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .add-section h2 {
+      color: var(--text-secondary);
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
     @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-group label { font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; }
-    .form-group select, .form-group input { background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: 'Cairo', sans-serif; font-size: 0.95rem; transition: 0.3s; outline: none; }
-    .form-group select:focus, .form-group input:focus { border-color: var(--text-secondary); box-shadow: 0 0 0 3px rgba(255,215,0,0.15); }
-    .form-group select option { background: var(--bg-secondary); color: var(--text-primary); }
-    .btn-primary { background: var(--text-secondary); color: #000; border: none; padding: 12px 25px; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; font-family: 'Cairo', sans-serif; grid-column: 1 / -1; justify-self: center; min-width: 200px; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,215,0,0.3); }
-    .btn-danger { background: #dc3545; color: #fff; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 0.85rem; }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .form-group select, .form-group input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.95rem;
+      transition: 0.3s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group select:focus, .form-group input:focus {
+      border-color: var(--text-secondary);
+      box-shadow: 0 0 0 3px rgba(255,215,0,0.15);
+    }
+    .form-group select option {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .btn-primary {
+      background: var(--text-secondary);
+      color: #000;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,215,0,0.3);
+    }
+    .btn-success {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn-success:hover { background: #218838; transform: scale(1.05); }
+    .btn-secondary {
+      background: #6c757d;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn-secondary:hover { background: #5a6268; transform: scale(1.05); }
+    .btn-danger {
+      background: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
     .btn-danger:hover { background: #c82333; transform: scale(1.05); }
-    .btn-edit { background: #28a745; color: #fff; border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: 600; font-size: 0.85rem; margin-left: 6px; }
-    .btn-edit:hover { background: #218838; transform: scale(1.05); }
-    .videos-section { background: var(--bg-secondary); border-radius: 16px; padding: 25px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-    .videos-section h2 { color: var(--text-secondary); font-size: 1.4rem; margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .video-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 12px 16px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--text-secondary); transition: 0.3s; }
+    .btn-edit {
+      background: #17a2b8;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-left: 6px;
+    }
+    .btn-edit:hover { background: #138496; transform: scale(1.05); }
+    .videos-section {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .videos-section h2 {
+      color: var(--text-secondary);
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .video-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--text-secondary);
+      transition: 0.3s;
+    }
     .video-item:hover { transform: translateX(4px); background: rgba(255,215,0,0.05); }
-    .video-item .info { display: flex; flex-direction: column; gap: 2px; }
+    .video-item .info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
     .video-item .info .name { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
-    .video-item .info .url { font-size: 0.8rem; color: #888; direction: ltr; unicode-bidi: embed; }
-    .video-item .actions { display: flex; gap: 6px; }
+    .video-item .info .url { font-size: 0.8rem; color: #888; direction: ltr; }
+    .video-item .actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .empty-msg { text-align: center; color: #888; padding: 30px 0; font-size: 1.1rem; }
-    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 15px; color: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.3); animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards; z-index: 9999; max-width: 90%; }
-    .custom-toast.info { background: linear-gradient(135deg, #3498db, #2980b9); }
-    .custom-toast.success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-    .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
-    .profile-float-btn { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--profile-btn-bg); border: 2px solid var(--profile-btn-border); display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: 0.3s; z-index: 1200; }
-    .profile-float-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255,215,0,0.6); background: var(--text-secondary); }
+    .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .mt-10 { margin-top: 10px; }
+    .w-100 { width: 100%; }
+    .profile-float-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: var(--profile-btn-bg);
+      border: 2px solid var(--profile-btn-border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: 0.3s;
+      z-index: 1200;
+    }
+    .profile-float-btn:hover { transform: scale(1.1); background: var(--text-secondary); }
     .profile-float-btn img { width: 28px; height: 28px; }
-    @media (max-width: 600px) { body { padding: 70px 10px 20px; } .admin-header h1 { font-size: 1.5rem; } .form-grid { grid-template-columns: 1fr; } .btn-primary { width: 100%; } .video-item { flex-wrap: wrap; gap: 8px; } .video-item .actions { width: 100%; justify-content: flex-start; } .profile-float-btn { width: 45px; height: 45px; bottom: 15px; left: 15px; } .profile-float-btn img { width: 22px; height: 22px; } }
+    @media (max-width: 600px) {
+      body { padding: 70px 10px 20px; }
+      .admin-header h1 { font-size: 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .video-item { flex-wrap: wrap; }
+      .video-item .actions { width: 100%; justify-content: flex-start; }
+      .profile-float-btn { width: 45px; height: 45px; bottom: 15px; left: 15px; }
+      .profile-float-btn img { width: 22px; height: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -76,33 +306,69 @@
     </div>
   </div>
   <div class="container">
-    <div class="admin-header"><h1>📹 إدارة المحتوى</h1><span class="badge">Admin</span></div>
+    <div class="admin-header">
+      <h1>📹 إدارة المنصة</h1>
+      <span class="badge">Admin</span>
+    </div>
     <div class="add-section">
-      <h2>➕ إضافة فيديو جديد</h2>
-      <form id="addForm" class="form-grid">
-        <div class="form-group"><label for="yearSelect">السنة</label><select id="yearSelect" required><option value="">-- اختر السنة --</option></select></div>
-        <div class="form-group"><label for="subjectSelect">المادة</label><select id="subjectSelect" required disabled><option value="">-- اختر المادة --</option></select></div>
-        <div class="form-group"><label for="teacherSelect">المدرس</label><select id="teacherSelect" required disabled><option value="">-- اختر المدرس --</option></select></div>
-        <div class="form-group"><label for="chapterSelect">الباب</label><select id="chapterSelect" required disabled><option value="">-- اختر الباب --</option></select></div>
-        <div class="form-group"><label for="lectureSelect">المحاضرة</label><select id="lectureSelect" required disabled><option value="">-- اختر المحاضرة --</option></select></div>
-        <div class="form-group"><label for="videoName">اسم الفيديو</label><input type="text" id="videoName" placeholder="مثال: الدرس الأول" required /></div>
-        <div class="form-group"><label for="videoUrl">رابط الفيديو (YouTube)</label><input type="url" id="videoUrl" placeholder="https://youtu.be/..." required /></div>
-        <button type="submit" class="btn-primary">📤 إضافة الفيديو</button>
+      <h2>➕ إدارة البيانات</h2>
+      <form id="adminForm" class="form-grid">
+        <div class="form-group">
+          <label for="adminYear">السنة الدراسية</label>
+          <select id="adminYear"><option value="">-- اختر السنة --</option></select>
+        </div>
+        <div class="form-group">
+          <label for="adminSubject">المادة</label>
+          <select id="adminSubject" disabled><option value="">-- اختر المادة --</option></select>
+        </div>
+        <div class="form-group">
+          <label for="adminTeacher">المدرس</label>
+          <select id="adminTeacher" disabled><option value="">-- اختر المدرس --</option></select>
+        </div>
+        <div class="form-group" id="chapterGroup">
+          <label for="adminChapter">الباب</label>
+          <div id="chapterContainer"></div>
+        </div>
+        <div class="form-group" id="lectureGroup">
+          <label for="adminLecture">المحاضرة</label>
+          <div id="lectureContainer"></div>
+        </div>
+        <div class="form-group">
+          <label for="adminVideoName">اسم الفيديو</label>
+          <input type="text" id="adminVideoName" placeholder="مثال: شرح الدرس الأول" />
+        </div>
+        <div class="form-group">
+          <label for="adminVideoUrl">رابط الفيديو (YouTube)</label>
+          <input type="url" id="adminVideoUrl" placeholder="https://youtu.be/..." />
+        </div>
+        <div style="display: flex; gap: 10px; grid-column: 1 / -1; justify-content: center; flex-wrap: wrap;">
+          <button type="submit" class="btn-primary">📤 إضافة فيديو</button>
+          <button type="button" class="btn-primary" style="background: #28a745;" id="addYearBtn">➕ سنة جديدة</button>
+          <button type="button" class="btn-primary" style="background: #17a2b8;" id="addSubjectBtn">➕ مادة جديدة</button>
+          <button type="button" class="btn-primary" style="background: #ffc107; color:#000;" id="addTeacherBtn">➕ مدرس جديد</button>
+        </div>
       </form>
     </div>
     <div class="videos-section">
-      <h2><span>📋 قائمة الفيديوهات</span><span id="videoCount">0</span></h2>
-      <div id="videosList"><div class="empty-msg">⚠️ لا توجد فيديوهات</div></div>
+      <h2><span>📋 الفيديوهات</span><span id="videoCount">0</span></h2>
+      <div id="videosList"><div class="empty-msg">اختر البيانات لعرض الفيديوهات</div></div>
     </div>
   </div>
   <a href="profile.html" class="profile-float-btn"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل" /></a>
 
   <script type="importmap">
-    { "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js", "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js" } }
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
+      }
+    }
   </script>
   <script type="module">
     import { initializeApp } from 'firebase/app';
     import { getDatabase, ref, get, set, push, update, remove, child } from 'firebase/database';
+
+    // ----- تهيئة Firebase -----
     const firebaseConfig = {
       apiKey: "AIzaSyB0p0us6BuzD2ngzjhRnmUIhlOcBeRp0vQ",
       authDomain: "tok-tak-d6e17.firebaseapp.com",
@@ -114,394 +380,1135 @@
       measurementId: "G-7EMKEQKPVV"
     };
     const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+    const db = getDatabase(app);
 
-    function showToast(msg, type='info') {
-      const t = document.createElement('div');
-      t.className = `custom-toast ${type}`;
-      t.innerHTML = `<span>${msg}</span>`;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3000);
-    }
-    const toggle = document.getElementById('darkToggle');
-    toggle.addEventListener('click', () => { toggle.classList.toggle('active'); document.body.classList.toggle('light-mode'); });
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      if(navigator.share) { try { await navigator.share({ title: 'منصة THE BEST - إدارة', text: 'لوحة تحكم', url: window.location.href }); } catch { showToast('تم الإلغاء', 'error'); } }
-      else showToast('المشاركة غير مدعومة', 'error');
-    });
-    document.getElementById('notifyBtn').addEventListener('click', () => showToast('🔔 الإشعارات قريباً', 'info'));
-    document.getElementById('backBtn').onclick = () => window.location.href = 'index.html';
-
-    const yearSelect = document.getElementById('yearSelect');
-    const subjectSelect = document.getElementById('subjectSelect');
-    const teacherSelect = document.getElementById('teacherSelect');
-    const chapterSelect = document.getElementById('chapterSelect');
-    const lectureSelect = document.getElementById('lectureSelect');
-    const videoName = document.getElementById('videoName');
-    const videoUrl = document.getElementById('videoUrl');
-    const addForm = document.getElementById('addForm');
+    // ----- عناصر DOM -----
+    const adminYear = document.getElementById('adminYear');
+    const adminSubject = document.getElementById('adminSubject');
+    const adminTeacher = document.getElementById('adminTeacher');
+    const chapterContainer = document.getElementById('chapterContainer');
+    const lectureContainer = document.getElementById('lectureContainer');
+    const adminVideoName = document.getElementById('adminVideoName');
+    const adminVideoUrl = document.getElementById('adminVideoUrl');
+    const adminForm = document.getElementById('adminForm');
     const videosList = document.getElementById('videosList');
     const videoCount = document.getElementById('videoCount');
 
-    let yearsData = {};
-    let currentYear = '', currentSubject = '', currentTeacher = '', currentChapter = '', currentLecture = '';
+    // ----- متغيرات الحالة -----
+    let currentSelection = {
+      year: '',
+      subject: '',
+      teacher: '',
+      chapter: '',
+      lecture: ''
+    };
     let allVideos = [];
+    let chapterNames = [];
+    let lectureNames = [];
 
+    // ----- دوال مساعدة -----
+    function showToast(msg, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `custom-toast ${type}`;
+      toast.innerHTML = `<span>${msg}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+    }
+    if (!document.querySelector('#toastStyle')) {
+      const style = document.createElement('style');
+      style.id = 'toastStyle';
+      style.textContent = `
+        .custom-toast {
+          position: fixed; bottom: 20px; right: 20px; padding: 14px 22px;
+          border-radius: 14px; font-family: 'Cairo', sans-serif;
+          font-weight: 600; font-size: 15px; color: #fff;
+          display: flex; align-items: center; gap: 10px;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+          animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+          z-index: 9999; max-width: 90%;
+        }
+        .custom-toast.info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .custom-toast.success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // ----- دوال قراءة وكتابة البيانات -----
+
+    // تحميل قائمة السنوات
     async function loadYears() {
       try {
-        const snapshot = await get(child(ref(database), 'years'));
-        if (snapshot.exists()) {
-          yearsData = snapshot.val();
-          populateYearSelect();
+        const snap = await get(child(ref(db), 'years'));
+        if (snap.exists()) {
+          const data = snap.val();
+          const years = Object.keys(data).sort();
+          adminYear.innerHTML = '<option value="">-- اختر السنة --</option>';
+          years.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            adminYear.appendChild(opt);
+          });
+          if (currentSelection.year) adminYear.value = currentSelection.year;
+          return data;
         } else {
-          showToast('⚠️ لا توجد سنوات، أنشئها أولاً', 'error');
+          adminYear.innerHTML = '<option value="">-- لا توجد سنوات --</option>';
+          return {};
         }
-      } catch(e) { console.error(e); showToast('❌ فشل تحميل السنوات', 'error'); }
-    }
-    function populateYearSelect() {
-      yearSelect.innerHTML = '<option value="">-- اختر السنة --</option>';
-      Object.keys(yearsData).sort().forEach(y => {
-        const opt = document.createElement('option'); opt.value = y; opt.textContent = y; yearSelect.appendChild(opt);
-      });
-      subjectSelect.innerHTML = '<option value="">-- اختر المادة --</option>'; subjectSelect.disabled = true;
-      teacherSelect.innerHTML = '<option value="">-- اختر المدرس --</option>'; teacherSelect.disabled = true;
-      chapterSelect.innerHTML = '<option value="">-- اختر الباب --</option>'; chapterSelect.disabled = true;
-      lectureSelect.innerHTML = '<option value="">-- اختر المحاضرة --</option>'; lectureSelect.disabled = true;
-      allVideos = []; renderVideos();
+      } catch (err) {
+        console.error(err);
+        showToast('فشل تحميل السنوات', 'error');
+        return {};
+      }
     }
 
-    yearSelect.addEventListener('change', async () => {
-      currentYear = yearSelect.value;
-      if (!currentYear) { subjectSelect.innerHTML = '<option value="">-- اختر المادة --</option>'; subjectSelect.disabled = true; teacherSelect.disabled = true; chapterSelect.disabled = true; lectureSelect.disabled = true; allVideos=[]; renderVideos(); return; }
-      const subs = yearsData[currentYear]?.subjects || {};
-      let names = Array.isArray(subs) ? subs.map(s=>s.subject_name||s).filter(Boolean) : Object.keys(subs);
-      subjectSelect.innerHTML = '<option value="">-- اختر المادة --</option>';
-      names.sort().forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.textContent=n; subjectSelect.appendChild(opt); });
-      subjectSelect.disabled = false;
-      teacherSelect.innerHTML = '<option value="">-- اختر المدرس --</option>'; teacherSelect.disabled = true;
-      chapterSelect.innerHTML = '<option value="">-- اختر الباب --</option>'; chapterSelect.disabled = true;
-      lectureSelect.innerHTML = '<option value="">-- اختر المحاضرة --</option>'; lectureSelect.disabled = true;
-      allVideos=[]; renderVideos();
-    });
-
-    subjectSelect.addEventListener('change', async () => {
-      currentSubject = subjectSelect.value;
-      if (!currentSubject || !currentYear) { teacherSelect.disabled = true; chapterSelect.disabled = true; lectureSelect.disabled = true; allVideos=[]; renderVideos(); return; }
-      const yearData = yearsData[currentYear];
-      const subs = yearData?.subjects || {};
-      let subData = null;
-      if (Array.isArray(subs)) subData = subs.find(s => (s.subject_name||s) === currentSubject);
-      else subData = subs[currentSubject] || {};
-      const teachers = subData?.teachers || [];
-      let names = Array.isArray(teachers) ? teachers.map(t=>t.teacher_name||t).filter(Boolean) : Object.keys(teachers);
-      teacherSelect.innerHTML = '<option value="">-- اختر المدرس --</option>';
-      names.sort().forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.textContent=n; teacherSelect.appendChild(opt); });
-      teacherSelect.disabled = false;
-      chapterSelect.innerHTML = '<option value="">-- اختر الباب --</option>'; chapterSelect.disabled = true;
-      lectureSelect.innerHTML = '<option value="">-- اختر المحاضرة --</option>'; lectureSelect.disabled = true;
-      allVideos=[]; renderVideos();
-    });
-
-    teacherSelect.addEventListener('change', async () => {
-      currentTeacher = teacherSelect.value;
-      if (!currentTeacher || !currentSubject || !currentYear) { chapterSelect.disabled = true; lectureSelect.disabled = true; allVideos=[]; renderVideos(); return; }
-      const yearData = yearsData[currentYear];
-      const subs = yearData?.subjects || {};
-      let subData = null;
-      if (Array.isArray(subs)) subData = subs.find(s => (s.subject_name||s) === currentSubject);
-      else subData = subs[currentSubject] || {};
-      const teachers = subData?.teachers || [];
-      let teacherData = null;
-      if (Array.isArray(teachers)) teacherData = teachers.find(t => (t.teacher_name||t) === currentTeacher);
-      else teacherData = teachers[currentTeacher] || {};
-      const chapters = teacherData?.chapters || [];
-      let names = Array.isArray(chapters) ? chapters.map(c=>c.chapter_name||c).filter(Boolean) : Object.keys(chapters);
-      chapterSelect.innerHTML = '<option value="">-- اختر الباب --</option>';
-      names.sort().forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.textContent=n; chapterSelect.appendChild(opt); });
-      chapterSelect.disabled = false;
-      lectureSelect.innerHTML = '<option value="">-- اختر المحاضرة --</option>'; lectureSelect.disabled = true;
-      allVideos=[]; renderVideos();
-    });
-
-    chapterSelect.addEventListener('change', async () => {
-      currentChapter = chapterSelect.value;
-      if (!currentChapter || !currentTeacher || !currentSubject || !currentYear) { lectureSelect.disabled = true; allVideos=[]; renderVideos(); return; }
-      const yearData = yearsData[currentYear];
-      const subs = yearData?.subjects || {};
-      let subData = null;
-      if (Array.isArray(subs)) subData = subs.find(s => (s.subject_name||s) === currentSubject);
-      else subData = subs[currentSubject] || {};
-      const teachers = subData?.teachers || [];
-      let teacherData = null;
-      if (Array.isArray(teachers)) teacherData = teachers.find(t => (t.teacher_name||t) === currentTeacher);
-      else teacherData = teachers[currentTeacher] || {};
-      const chapters = teacherData?.chapters || [];
-      let chapterData = null;
-      if (Array.isArray(chapters)) chapterData = chapters.find(c => (c.chapter_name||c) === currentChapter);
-      else chapterData = chapters[currentChapter] || {};
-      const lectures = chapterData?.lectures || [];
-      let names = Array.isArray(lectures) ? lectures.map(l=>l.lecture_name||l).filter(Boolean) : Object.keys(lectures);
-      lectureSelect.innerHTML = '<option value="">-- اختر المحاضرة --</option>';
-      names.sort().forEach(n => { const opt = document.createElement('option'); opt.value=n; opt.textContent=n; lectureSelect.appendChild(opt); });
-      lectureSelect.disabled = false;
-      allVideos=[]; renderVideos();
-    });
-
-    lectureSelect.addEventListener('change', async () => {
-      currentLecture = lectureSelect.value;
-      if (!currentLecture || !currentChapter || !currentTeacher || !currentSubject || !currentYear) { allVideos=[]; renderVideos(); return; }
-      await loadVideosForCurrent();
-    });
-
-    async function loadVideosForCurrent() {
+    // تحميل المواد حسب السنة
+    async function loadSubjects(year) {
+      if (!year) {
+        adminSubject.innerHTML = '<option value="">-- اختر المادة --</option>';
+        adminSubject.disabled = true;
+        return;
+      }
       try {
-        const path = `years/${currentYear}/subjects/${currentSubject}/teachers`;
-        const snapshot = await get(child(ref(database), path));
-        if (!snapshot.exists()) { allVideos=[]; renderVideos(); return; }
-        let teachers = snapshot.val();
-        let teacherData = null;
-        if (Array.isArray(teachers)) teacherData = teachers.find(t => (t.teacher_name||t) === currentTeacher);
-        else teacherData = teachers[currentTeacher] || Object.values(teachers).find(t => (t.teacher_name||t) === currentTeacher);
-        if (!teacherData) { allVideos=[]; renderVideos(); return; }
-        const chapters = teacherData.chapters || [];
-        let chapterData = null;
-        if (Array.isArray(chapters)) chapterData = chapters.find(c => (c.chapter_name||c) === currentChapter);
-        else chapterData = chapters[currentChapter] || Object.values(chapters).find(c => (c.chapter_name||c) === currentChapter);
-        if (!chapterData) { allVideos=[]; renderVideos(); return; }
-        const lectures = chapterData.lectures || [];
-        let lectureData = null;
-        if (Array.isArray(lectures)) lectureData = lectures.find(l => (l.lecture_name||l) === currentLecture);
-        else lectureData = lectures[currentLecture] || Object.values(lectures).find(l => (l.lecture_name||l) === currentLecture);
-        if (!lectureData) { allVideos=[]; renderVideos(); return; }
-        const videos = lectureData.videos || [];
+        const snap = await get(child(ref(db), `years/${year}/subjects`));
+        let subjects = [];
+        if (snap.exists()) {
+          const data = snap.val();
+          if (Array.isArray(data)) {
+            subjects = data.map(s => s.subject_name || s.name || s).filter(Boolean);
+          } else {
+            subjects = Object.keys(data);
+          }
+        }
+        adminSubject.innerHTML = '<option value="">-- اختر المادة --</option>';
+        subjects.sort().forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = s;
+          adminSubject.appendChild(opt);
+        });
+        adminSubject.disabled = false;
+        if (currentSelection.subject && subjects.includes(currentSelection.subject)) {
+          adminSubject.value = currentSelection.subject;
+        }
+        // بعد تحميل المواد، إذا كانت هناك مادة محددة مسبقاً، نحمل المدرسين تلقائياً
+        if (adminSubject.value) {
+          await loadTeachers(year, adminSubject.value);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('فشل تحميل المواد', 'error');
+      }
+    }
+
+    // تحميل المدرسين
+    async function loadTeachers(year, subject) {
+      if (!year || !subject) {
+        adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+        adminTeacher.disabled = true;
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        let teachers = [];
+        if (snap.exists()) {
+          const data = snap.val();
+          if (Array.isArray(data)) {
+            teachers = data.map(t => t.teacher_name || t.name || t).filter(Boolean);
+          } else {
+            teachers = Object.keys(data);
+          }
+        }
+        adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+        teachers.sort().forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          adminTeacher.appendChild(opt);
+        });
+        adminTeacher.disabled = false;
+        if (currentSelection.teacher && teachers.includes(currentSelection.teacher)) {
+          adminTeacher.value = currentSelection.teacher;
+        }
+        // بعد تحميل المدرسين، إذا كان هناك مدرس محدد، نحمل الأبواب
+        if (adminTeacher.value) {
+          await loadChapters(year, subject, adminTeacher.value);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('فشل تحميل المدرسين', 'error');
+      }
+    }
+
+    // ----- دوال عرض خانات الباب والمحاضرة (ذكية) -----
+
+    function renderChapterField(chapters) {
+      chapterContainer.innerHTML = '';
+      chapterNames = chapters || [];
+
+      if (chapterNames.length === 0) {
+        // لا توجد أبواب: نعرض حقل إدخال + زر إضافة
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'adminChapterInput';
+        input.placeholder = 'أكتب اسم الباب الجديد';
+        input.className = 'w-100';
+        input.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        input.addEventListener('input', () => {
+          currentSelection.chapter = input.value.trim();
+        });
+        chapterContainer.appendChild(input);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-success';
+        addBtn.textContent = '➕ إضافة باب';
+        addBtn.onclick = async () => {
+          const name = input.value.trim();
+          if (!name) { showToast('⚠️ أدخل اسم الباب', 'error'); return; }
+          await addNewChapter(name);
+        };
+        btnRow.appendChild(addBtn);
+        chapterContainer.appendChild(btnRow);
+
+        currentSelection.chapter = '';
+        // إلغاء تحديد المحاضرة
+        renderLectureField([]);
+        currentSelection.lecture = '';
+        allVideos = [];
+        renderVideos();
+      } else {
+        // توجد أبواب: نعرض قائمة منسدلة + زر إضافة جديد
+        const select = document.createElement('select');
+        select.id = 'adminChapter';
+        select.className = 'w-100';
+        select.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- اختر الباب --';
+        select.appendChild(defaultOpt);
+        chapterNames.sort().forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          select.appendChild(opt);
+        });
+        // تحديد الباب الحالي
+        if (currentSelection.chapter && chapterNames.includes(currentSelection.chapter)) {
+          select.value = currentSelection.chapter;
+        }
+        select.addEventListener('change', () => {
+          currentSelection.chapter = select.value;
+          if (currentSelection.chapter) {
+            loadLectures(currentSelection.year, currentSelection.subject, currentSelection.teacher, currentSelection
+              .chapter);
+          } else {
+            renderLectureField([]);
+            currentSelection.lecture = '';
+            allVideos = [];
+            renderVideos();
+          }
+        });
+        chapterContainer.appendChild(select);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-secondary';
+        addBtn.textContent = '➕ باب جديد';
+        addBtn.onclick = () => {
+          // إظهار حقل إدخال مؤقت
+          const existingSelect = document.getElementById('adminChapter');
+          if (existingSelect) existingSelect.style.display = 'none';
+          addBtn.style.display = 'none';
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = 'adminChapterInput';
+          input.placeholder = 'أكتب اسم الباب الجديد';
+          input.className = 'w-100';
+          input.style.cssText =
+            'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%; margin-top: 10px;';
+          input.addEventListener('input', () => {
+            currentSelection.chapter = input.value.trim();
+          });
+          chapterContainer.appendChild(input);
+
+          const confirmRow = document.createElement('div');
+          confirmRow.className = 'flex-row';
+          const confirmBtn = document.createElement('button');
+          confirmBtn.type = 'button';
+          confirmBtn.className = 'btn-success';
+          confirmBtn.textContent = '✅ تأكيد';
+          confirmBtn.onclick = async () => {
+            const name = input.value.trim();
+            if (!name) { showToast('⚠️ أدخل اسم الباب', 'error'); return; }
+            await addNewChapter(name);
+          };
+          confirmRow.appendChild(confirmBtn);
+
+          const cancelBtn = document.createElement('button');
+          cancelBtn.type = 'button';
+          cancelBtn.className = 'btn-danger';
+          cancelBtn.textContent = 'إلغاء';
+          cancelBtn.onclick = () => {
+            chapterContainer.innerHTML = '';
+            renderChapterField(chapterNames);
+          };
+          confirmRow.appendChild(cancelBtn);
+          chapterContainer.appendChild(confirmRow);
+        };
+        btnRow.appendChild(addBtn);
+        chapterContainer.appendChild(btnRow);
+      }
+    }
+
+    // دالة إضافة باب جديد (مُعالجة)
+    async function addNewChapter(chapterName) {
+      const { year, subject, teacher } = currentSelection;
+      if (!year || !subject || !teacher) {
+        showToast('⚠️ اختر السنة والمادة والمدرس أولاً', 'error');
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
+        }
+
+        let chapters = teacherObj.chapters || {};
+        if (Array.isArray(chapters)) {
+          if (chapters.some(c => (c.chapter_name || c.name || c) === chapterName)) {
+            showToast('⚠️ الباب موجود بالفعل', 'error');
+            return;
+          }
+          chapters.push({ chapter_name: chapterName, lectures: {} });
+        } else {
+          if (chapters[chapterName]) { showToast('⚠️ الباب موجود بالفعل', 'error'); return; }
+          chapters[chapterName] = { lectures: {} };
+        }
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        showToast('✅ تم إضافة الباب', 'success');
+
+        // تحديث المتغيرات قبل إعادة بناء الواجهة
+        currentSelection.chapter = chapterName;
+        chapterNames.push(chapterName);
+        renderChapterField(chapterNames);
+        // إعادة تحميل المحاضرات (فارغة)
+        renderLectureField([]);
+        currentSelection.lecture = '';
+        allVideos = [];
+        renderVideos();
+      } catch (err) {
+        console.error(err);
+        showToast('❌ فشل إضافة الباب', 'error');
+      }
+    }
+
+    // ----- دوال المحاضرات (نفس المنطق) -----
+
+    function renderLectureField(lectures) {
+      lectureContainer.innerHTML = '';
+      lectureNames = lectures || [];
+
+      if (lectureNames.length === 0) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'adminLectureInput';
+        input.placeholder = 'أكتب اسم المحاضرة الجديدة';
+        input.className = 'w-100';
+        input.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        input.addEventListener('input', () => {
+          currentSelection.lecture = input.value.trim();
+        });
+        lectureContainer.appendChild(input);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-success';
+        addBtn.textContent = '➕ إضافة محاضرة';
+        addBtn.onclick = async () => {
+          const name = input.value.trim();
+          if (!name) { showToast('⚠️ أدخل اسم المحاضرة', 'error'); return; }
+          await addNewLecture(name);
+        };
+        btnRow.appendChild(addBtn);
+        lectureContainer.appendChild(btnRow);
+
+        currentSelection.lecture = '';
+        allVideos = [];
+        renderVideos();
+      } else {
+        const select = document.createElement('select');
+        select.id = 'adminLecture';
+        select.className = 'w-100';
+        select.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- اختر المحاضرة --';
+        select.appendChild(defaultOpt);
+        lectureNames.sort().forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l;
+          opt.textContent = l;
+          select.appendChild(opt);
+        });
+        if (currentSelection.lecture && lectureNames.includes(currentSelection.lecture)) {
+          select.value = currentSelection.lecture;
+        }
+        select.addEventListener('change', () => {
+          currentSelection.lecture = select.value;
+          if (currentSelection.lecture) {
+            loadVideos(currentSelection.year, currentSelection.subject, currentSelection.teacher, currentSelection
+              .chapter, currentSelection.lecture);
+          } else {
+            allVideos = [];
+            renderVideos();
+          }
+        });
+        lectureContainer.appendChild(select);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-secondary';
+        addBtn.textContent = '➕ محاضرة جديدة';
+        addBtn.onclick = () => {
+          const existingSelect = document.getElementById('adminLecture');
+          if (existingSelect) existingSelect.style.display = 'none';
+          addBtn.style.display = 'none';
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = 'adminLectureInput';
+          input.placeholder = 'أكتب اسم المحاضرة الجديدة';
+          input.className = 'w-100';
+          input.style.cssText =
+            'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%; margin-top: 10px;';
+          input.addEventListener('input', () => {
+            currentSelection.lecture = input.value.trim();
+          });
+          lectureContainer.appendChild(input);
+
+          const confirmRow = document.createElement('div');
+          confirmRow.className = 'flex-row';
+          const confirmBtn = document.createElement('button');
+          confirmBtn.type = 'button';
+          confirmBtn.className = 'btn-success';
+          confirmBtn.textContent = '✅ تأكيد';
+          confirmBtn.onclick = async () => {
+            const name = input.value.trim();
+            if (!name) { showToast('⚠️ أدخل اسم المحاضرة', 'error'); return; }
+            await addNewLecture(name);
+          };
+          confirmRow.appendChild(confirmBtn);
+
+          const cancelBtn = document.createElement('button');
+          cancelBtn.type = 'button';
+          cancelBtn.className = 'btn-danger';
+          cancelBtn.textContent = 'إلغاء';
+          cancelBtn.onclick = () => {
+            lectureContainer.innerHTML = '';
+            renderLectureField(lectureNames);
+          };
+          confirmRow.appendChild(cancelBtn);
+          lectureContainer.appendChild(confirmRow);
+        };
+        btnRow.appendChild(addBtn);
+        lectureContainer.appendChild(btnRow);
+      }
+    }
+
+    // دالة إضافة محاضرة جديدة (مُعالجة)
+    async function addNewLecture(lectureName) {
+      const { year, subject, teacher, chapter } = currentSelection;
+      if (!year || !subject || !teacher || !chapter) {
+        showToast('⚠️ اختر السنة والمادة والمدرس والباب أولاً', 'error');
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
+        }
+
+        let chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        let chapterKey = null;
+        if (Array.isArray(chapters)) {
+          const idx = chapters.findIndex(c => (c.chapter_name || c.name || c) === chapter);
+          if (idx === -1) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = idx;
+          chapterObj = chapters[idx];
+        } else {
+          const keys = Object.keys(chapters);
+          let found = null;
+          for (const k of keys) {
+            if ((chapters[k].chapter_name || chapters[k].name || chapters[k]) === chapter) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = found;
+          chapterObj = chapters[found];
+        }
+
+        let lectures = chapterObj.lectures || {};
+        if (Array.isArray(lectures)) {
+          if (lectures.some(l => (l.lecture_name || l.name || l) === lectureName)) {
+            showToast('⚠️ المحاضرة موجودة بالفعل', 'error');
+            return;
+          }
+          lectures.push({ lecture_name: lectureName, videos: [] });
+        } else {
+          if (lectures[lectureName]) { showToast('⚠️ المحاضرة موجودة بالفعل', 'error'); return; }
+          lectures[lectureName] = { videos: [] };
+        }
+        chapterObj.lectures = lectures;
+        if (Array.isArray(chapters)) chapters[chapterKey] = chapterObj;
+        else chapters[chapterKey] = chapterObj;
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        showToast('✅ تم إضافة المحاضرة', 'success');
+
+        // تحديث المتغيرات قبل إعادة بناء الواجهة
+        currentSelection.lecture = lectureName;
+        lectureNames.push(lectureName);
+        renderLectureField(lectureNames);
+        allVideos = [];
+        renderVideos();
+      } catch (err) {
+        console.error(err);
+        showToast('❌ فشل إضافة المحاضرة', 'error');
+      }
+    }
+
+    // تحميل الأبواب
+    async function loadChapters(year, subject, teacher) {
+      if (!year || !subject || !teacher) {
+        renderChapterField([]);
+        renderLectureField([]);
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { renderChapterField([]); renderLectureField([]); return; }
+        const teachersData = snap.val();
+        let teacherObj = null;
+        if (Array.isArray(teachersData)) {
+          teacherObj = teachersData.find(t => (t.teacher_name || t.name || t) === teacher);
+        } else {
+          teacherObj = teachersData[teacher] || null;
+        }
+        if (!teacherObj) { renderChapterField([]); renderLectureField([]); return; }
+        const chapters = teacherObj.chapters || {};
+        let names = [];
+        if (Array.isArray(chapters)) {
+          names = chapters.map(c => c.chapter_name || c.name || c).filter(Boolean);
+        } else {
+          names = Object.keys(chapters);
+        }
+        // حفظ الاختيار الحالي (إذا كان موجوداً)
+        if (!currentSelection.chapter || !names.includes(currentSelection.chapter)) {
+          currentSelection.chapter = '';
+        }
+        renderChapterField(names);
+        // إذا كان هناك باب محدد، نحمّل محاضراته
+        if (currentSelection.chapter) {
+          await loadLectures(year, subject, teacher, currentSelection.chapter);
+        } else {
+          renderLectureField([]);
+          currentSelection.lecture = '';
+          allVideos = [];
+          renderVideos();
+        }
+      } catch (err) {
+        console.error(err);
+        renderChapterField([]);
+        showToast('فشل تحميل الأبواب', 'error');
+      }
+    }
+
+    // تحميل المحاضرات
+    async function loadLectures(year, subject, teacher, chapter) {
+      if (!year || !subject || !teacher || !chapter) {
+        renderLectureField([]);
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { renderLectureField([]); return; }
+        const teachersData = snap.val();
+        let teacherObj = null;
+        if (Array.isArray(teachersData)) {
+          teacherObj = teachersData.find(t => (t.teacher_name || t.name || t) === teacher);
+        } else {
+          teacherObj = teachersData[teacher] || null;
+        }
+        if (!teacherObj) { renderLectureField([]); return; }
+        const chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        if (Array.isArray(chapters)) {
+          chapterObj = chapters.find(c => (c.chapter_name || c.name || c) === chapter);
+        } else {
+          chapterObj = chapters[chapter] || null;
+        }
+        if (!chapterObj) { renderLectureField([]); return; }
+        const lectures = chapterObj.lectures || {};
+        let names = [];
+        if (Array.isArray(lectures)) {
+          names = lectures.map(l => l.lecture_name || l.name || l).filter(Boolean);
+        } else {
+          names = Object.keys(lectures);
+        }
+        // حفظ الاختيار الحالي
+        if (!currentSelection.lecture || !names.includes(currentSelection.lecture)) {
+          currentSelection.lecture = '';
+        }
+        renderLectureField(names);
+        if (currentSelection.lecture) {
+          await loadVideos(year, subject, teacher, chapter, currentSelection.lecture);
+        } else {
+          allVideos = [];
+          renderVideos();
+        }
+      } catch (err) {
+        console.error(err);
+        renderLectureField([]);
+        showToast('فشل تحميل المحاضرات', 'error');
+      }
+    }
+
+    // تحميل الفيديوهات
+    async function loadVideos(year, subject, teacher, chapter, lecture) {
+      if (!year || !subject || !teacher || !chapter || !lecture) {
+        allVideos = [];
+        renderVideos();
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { allVideos = []; renderVideos(); return; }
+        const teachersData = snap.val();
+        let teacherObj = null;
+        if (Array.isArray(teachersData)) {
+          teacherObj = teachersData.find(t => (t.teacher_name || t.name || t) === teacher);
+        } else {
+          teacherObj = teachersData[teacher] || null;
+        }
+        if (!teacherObj) { allVideos = []; renderVideos(); return; }
+        const chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        if (Array.isArray(chapters)) {
+          chapterObj = chapters.find(c => (c.chapter_name || c.name || c) === chapter);
+        } else {
+          chapterObj = chapters[chapter] || null;
+        }
+        if (!chapterObj) { allVideos = []; renderVideos(); return; }
+        const lectures = chapterObj.lectures || {};
+        let lectureObj = null;
+        if (Array.isArray(lectures)) {
+          lectureObj = lectures.find(l => (l.lecture_name || l.name || l) === lecture);
+        } else {
+          lectureObj = lectures[lecture] || null;
+        }
+        if (!lectureObj) { allVideos = []; renderVideos(); return; }
+        const videos = lectureObj.videos || [];
         allVideos = Array.isArray(videos) ? videos : Object.values(videos);
         renderVideos();
-      } catch(e) { console.error(e); allVideos=[]; renderVideos(); }
+      } catch (err) {
+        console.error(err);
+        allVideos = [];
+        renderVideos();
+        showToast('فشل تحميل الفيديوهات', 'error');
+      }
     }
 
+    // عرض الفيديوهات
     function renderVideos() {
       videosList.innerHTML = '';
       videoCount.textContent = allVideos.length;
-      if (allVideos.length === 0) { videosList.innerHTML = '<div class="empty-msg">⚠️ لا توجد فيديوهات</div>'; return; }
-      allVideos.forEach((v, i) => {
-        const name = v.name || v.video_name || `فيديو ${i+1}`;
-        const url = v.url || v.link || v.video_url || '#';
-        const item = document.createElement('div'); item.className = 'video-item';
-        item.innerHTML = `<div class="info"><div class="name">${name}</div><div class="url">${url}</div></div>
-          <div class="actions"><button class="btn-edit" data-i="${i}">✏️ تعديل</button><button class="btn-danger" data-i="${i}">🗑️ حذف</button></div>`;
-        item.querySelector('.btn-danger').onclick = () => deleteVideo(i);
-        item.querySelector('.btn-edit').onclick = () => editVideo(i);
+      if (allVideos.length === 0) {
+        videosList.innerHTML = '<div class="empty-msg">⚠️ لا توجد فيديوهات في هذه المحاضرة</div>';
+        return;
+      }
+      allVideos.forEach((video, index) => {
+        const name = video.name || video.video_name || `فيديو ${index+1}`;
+        const url = video.url || video.link || '#';
+        const item = document.createElement('div');
+        item.className = 'video-item';
+        item.innerHTML = `
+          <div class="info">
+            <div class="name">${name}</div>
+            <div class="url">${url}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-edit" data-index="${index}">✏️ تعديل</button>
+            <button class="btn-danger" data-index="${index}">🗑️ حذف</button>
+          </div>
+        `;
+        item.querySelector('.btn-danger').onclick = () => deleteVideo(index);
+        item.querySelector('.btn-edit').onclick = () => editVideo(index);
         videosList.appendChild(item);
       });
     }
 
-    addForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const year = yearSelect.value, subject = subjectSelect.value, teacher = teacherSelect.value,
-            chapter = chapterSelect.value, lecture = lectureSelect.value,
-            name = videoName.value.trim(), url = videoUrl.value.trim();
-      if (!year || !subject || !teacher || !chapter || !lecture || !name || !url) {
-        showToast('⚠️ يرجى ملء جميع الحقول', 'error'); return;
+    // ----- أحداث التغيير -----
+    adminYear.addEventListener('change', async () => {
+      currentSelection.year = adminYear.value;
+      // إعادة تعيين القوائم التابعة
+      adminSubject.innerHTML = '<option value="">-- اختر المادة --</option>';
+      adminSubject.disabled = true;
+      adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+      adminTeacher.disabled = true;
+      renderChapterField([]);
+      renderLectureField([]);
+      allVideos = [];
+      renderVideos();
+      // إذا تم اختيار سنة، نحمل المواد
+      if (currentSelection.year) {
+        await loadSubjects(currentSelection.year);
       }
-      if (!url.includes('youtube.com') && !url.includes('youtu.be')) { showToast('⚠️ رابط يوتيوب غير صحيح', 'error'); return; }
+    });
+
+    adminSubject.addEventListener('change', async () => {
+      currentSelection.subject = adminSubject.value;
+      // إعادة تعيين القوائم التابعة
+      adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+      adminTeacher.disabled = true;
+      renderChapterField([]);
+      renderLectureField([]);
+      allVideos = [];
+      renderVideos();
+      if (currentSelection.year && currentSelection.subject) {
+        await loadTeachers(currentSelection.year, currentSelection.subject);
+      }
+    });
+
+    adminTeacher.addEventListener('change', async () => {
+      currentSelection.teacher = adminTeacher.value;
+      renderChapterField([]);
+      renderLectureField([]);
+      allVideos = [];
+      renderVideos();
+      if (currentSelection.year && currentSelection.subject && currentSelection.teacher) {
+        await loadChapters(currentSelection.year, currentSelection.subject, currentSelection.teacher);
+      }
+    });
+
+    // ----- إضافة فيديو -----
+    adminForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const year = adminYear.value;
+      const subject = adminSubject.value;
+      const teacher = adminTeacher.value;
+      // الحصول على الباب والمحاضرة من الحقول النشطة
+      let chapter = currentSelection.chapter;
+      const chapterInput = document.getElementById('adminChapterInput');
+      if (chapterInput) {
+        chapter = chapterInput.value.trim();
+        if (!chapter) { showToast('⚠️ أدخل اسم الباب', 'error'); return; }
+      }
+      let lecture = currentSelection.lecture;
+      const lectureInput = document.getElementById('adminLectureInput');
+      if (lectureInput) {
+        lecture = lectureInput.value.trim();
+        if (!lecture) { showToast('⚠️ أدخل اسم المحاضرة', 'error'); return; }
+      }
+      const name = adminVideoName.value.trim();
+      const url = adminVideoUrl.value.trim();
+
+      if (!year || !subject || !teacher || !chapter || !lecture || !name || !url) {
+        showToast('⚠️ جميع الحقول مطلوبة', 'error');
+        return;
+      }
+      if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+        showToast('⚠️ الرابط يجب أن يكون رابط يوتيوب صحيح', 'error');
+        return;
+      }
+
       try {
-        const path = `years/${year}/subjects/${subject}/teachers`;
-        const snapshot = await get(child(ref(database), path));
-        if (!snapshot.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
-        let teachers = snapshot.val();
-        let teacherKey=null, teacherObj=null;
-        if (Array.isArray(teachers)) {
-          const found = teachers.find((t,i) => { if ((t.teacher_name||t) === teacher) { teacherKey=i; teacherObj=t; return true; } return false; });
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
           if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
-        } else {
-          const keys = Object.keys(teachers);
-          for (const k of keys) { const t = teachers[k]; if ((t.teacher_name||t) === teacher) { teacherKey=k; teacherObj=t; break; } }
-          if (!teacherKey) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
         }
-        let chapters = teacherObj.chapters || [];
-        let chapterKey=null, chapterObj=null;
+
+        // التأكد من وجود الباب (إن لم يكن، نضيفه)
+        let chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        let chapterKey = null;
         if (Array.isArray(chapters)) {
-          const found = chapters.find((c,i) => { if ((c.chapter_name||c) === chapter) { chapterKey=i; chapterObj=c; return true; } return false; });
-          if (!found) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          const idx = chapters.findIndex(c => (c.chapter_name || c.name || c) === chapter);
+          if (idx === -1) {
+            chapters.push({ chapter_name: chapter, lectures: {} });
+            chapterKey = chapters.length - 1;
+            chapterObj = chapters[chapterKey];
+            chapterNames.push(chapter);
+          } else {
+            chapterKey = idx;
+            chapterObj = chapters[idx];
+          }
         } else {
-          const keys = Object.keys(chapters);
-          for (const k of keys) { const c = chapters[k]; if ((c.chapter_name||c) === chapter) { chapterKey=k; chapterObj=c; break; } }
-          if (!chapterKey) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          if (!chapters[chapter]) {
+            chapters[chapter] = { lectures: {} };
+          }
+          chapterKey = chapter;
+          chapterObj = chapters[chapter];
         }
-        let lectures = chapterObj.lectures || [];
-        let lectureKey=null, lectureObj=null;
+
+        // التأكد من وجود المحاضرة
+        let lectures = chapterObj.lectures || {};
+        let lectureObj = null;
+        let lectureKey = null;
         if (Array.isArray(lectures)) {
-          const found = lectures.find((l,i) => { if ((l.lecture_name||l) === lecture) { lectureKey=i; lectureObj=l; return true; } return false; });
-          if (!found) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          const idx = lectures.findIndex(l => (l.lecture_name || l.name || l) === lecture);
+          if (idx === -1) {
+            lectures.push({ lecture_name: lecture, videos: [] });
+            lectureKey = lectures.length - 1;
+            lectureObj = lectures[lectureKey];
+            lectureNames.push(lecture);
+          } else {
+            lectureKey = idx;
+            lectureObj = lectures[idx];
+          }
         } else {
-          const keys = Object.keys(lectures);
-          for (const k of keys) { const l = lectures[k]; if ((l.lecture_name||l) === lecture) { lectureKey=k; lectureObj=l; break; } }
-          if (!lectureKey) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          if (!lectures[lecture]) {
+            lectures[lecture] = { videos: [] };
+          }
+          lectureKey = lecture;
+          lectureObj = lectures[lecture];
         }
+
+        // إضافة الفيديو
         let videos = lectureObj.videos || [];
         if (!Array.isArray(videos)) videos = Object.values(videos);
         videos.push({ name, url });
-        let updatedTeachers = Array.isArray(teachers) ? [...teachers] : {...teachers};
-        if (Array.isArray(updatedTeachers)) {
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: [] };
-          let updatedChapters = updatedTeachers[teacherKey].chapters;
-          if (Array.isArray(updatedChapters)) {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          } else {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          }
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: updatedChapters };
-        } else {
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: {} };
-          let updatedChapters = updatedTeachers[teacherKey].chapters;
-          if (Array.isArray(updatedChapters)) {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          } else {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          }
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: updatedChapters };
-        }
-        await set(ref(database, `years/${year}/subjects/${subject}/teachers`), updatedTeachers);
+        lectureObj.videos = videos;
+
+        // إعادة بناء الهيكل
+        if (Array.isArray(lectures)) lectures[lectureKey] = lectureObj;
+        else lectures[lectureKey] = lectureObj;
+        chapterObj.lectures = lectures;
+        if (Array.isArray(chapters)) chapters[chapterKey] = chapterObj;
+        else chapters[chapterKey] = chapterObj;
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
         showToast('✅ تم إضافة الفيديو', 'success');
-        await loadVideosForCurrent();
-        videoName.value = ''; videoUrl.value = '';
-        await loadYears(); yearSelect.value = currentYear;
-        // إعادة تعيين القوائم
-        await populateYearSelect();
-        // لا نريد إعادة تحميل كل شيء، نكتفي بتحديث البيانات محلياً
-        // لكننا سنقوم بإعادة تحميل السنوات وتحديث القوائم
-        // إعادة تحميل القوائم يدوياً
-        await loadYears();
-        // نعيد اختيار السنة الحالية
-        yearSelect.value = currentYear;
-        // نطلق حدث التغيير
-        yearSelect.dispatchEvent(new Event('change'));
-        // نعيد اختيار المادة الحالية
-        subjectSelect.value = currentSubject;
-        subjectSelect.dispatchEvent(new Event('change'));
-        teacherSelect.value = currentTeacher;
-        teacherSelect.dispatchEvent(new Event('change'));
-        chapterSelect.value = currentChapter;
-        chapterSelect.dispatchEvent(new Event('change'));
-        lectureSelect.value = currentLecture;
-        lectureSelect.dispatchEvent(new Event('change'));
-      } catch(e) { console.error(e); showToast('❌ حدث خطأ', 'error'); }
+        adminVideoName.value = '';
+        adminVideoUrl.value = '';
+        // تحديث القوائم
+        await loadChapters(year, subject, teacher);
+        // تحديث الفيديوهات
+        await loadVideos(year, subject, teacher, chapter, lecture);
+        // تحديث القوائم المحلية
+        renderChapterField(chapterNames);
+        renderLectureField(lectureNames);
+      } catch (err) {
+        console.error(err);
+        showToast('❌ حدث خطأ أثناء الإضافة', 'error');
+      }
     });
 
+    // ----- حذف فيديو -----
     async function deleteVideo(index) {
-      if (!confirm(`حذف "${allVideos[index]?.name}"؟`)) return;
-      try {
-        const newVids = [...allVideos]; newVids.splice(index, 1);
-        await updateVideoList(newVids);
-        allVideos = newVids; renderVideos();
-        showToast('🗑️ تم الحذف', 'success');
-      } catch(e) { console.error(e); showToast('❌ فشل الحذف', 'error'); }
+      if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
+      const newVideos = [...allVideos];
+      newVideos.splice(index, 1);
+      await updateVideosInDB(newVideos);
+      allVideos = newVideos;
+      renderVideos();
+      showToast('🗑️ تم الحذف', 'success');
     }
 
+    // ----- تعديل فيديو -----
     function editVideo(index) {
-      const v = allVideos[index]; if (!v) return;
-      const n = prompt('تعديل اسم الفيديو:', v.name); if (n===null) return;
-      const u = prompt('تعديل رابط الفيديو:', v.url); if (u===null) return;
-      if (!n.trim() || !u.trim()) { showToast('⚠️ الاسم والرابط مطلوبان', 'error'); return; }
-      const newVids = [...allVideos]; newVids[index] = { name: n.trim(), url: u.trim() };
-      updateVideoList(newVids); allVideos = newVids; renderVideos();
+      const video = allVideos[index];
+      if (!video) return;
+      const newName = prompt('تعديل اسم الفيديو:', video.name);
+      if (newName === null) return;
+      const newUrl = prompt('تعديل رابط الفيديو:', video.url);
+      if (newUrl === null) return;
+      const updated = { name: newName.trim(), url: newUrl.trim() };
+      if (!updated.name || !updated.url) {
+        showToast('⚠️ الاسم والرابط مطلوبان', 'error');
+        return;
+      }
+      const newVideos = [...allVideos];
+      newVideos[index] = updated;
+      updateVideosInDB(newVideos);
+      allVideos = newVideos;
+      renderVideos();
       showToast('✅ تم التعديل', 'success');
     }
 
-    async function updateVideoList(videos) {
+    // دالة تحديث الفيديوهات
+    async function updateVideosInDB(videos) {
+      const { year, subject, teacher, chapter, lecture } = currentSelection;
+      if (!year || !subject || !teacher || !chapter || !lecture) {
+        showToast('⚠️ البيانات غير مكتملة', 'error');
+        return;
+      }
       try {
-        const path = `years/${currentYear}/subjects/${currentSubject}/teachers`;
-        const snapshot = await get(child(ref(database), path));
-        if (!snapshot.exists()) { showToast('⚠️ البيانات غير موجودة', 'error'); return; }
-        let teachers = snapshot.val();
-        let teacherKey=null, teacherObj=null;
-        if (Array.isArray(teachers)) {
-          const found = teachers.find((t,i) => { if ((t.teacher_name||t) === currentTeacher) { teacherKey=i; teacherObj=t; return true; } return false; });
-          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ البيانات غير موجودة', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
         } else {
-          const keys = Object.keys(teachers);
-          for (const k of keys) { const t = teachers[k]; if ((t.teacher_name||t) === currentTeacher) { teacherKey=k; teacherObj=t; break; } }
-          if (!teacherKey) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
         }
-        let chapters = teacherObj.chapters || [];
-        let chapterKey=null, chapterObj=null;
+        let chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        let chapterKey = null;
         if (Array.isArray(chapters)) {
-          const found = chapters.find((c,i) => { if ((c.chapter_name||c) === currentChapter) { chapterKey=i; chapterObj=c; return true; } return false; });
-          if (!found) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          const idx = chapters.findIndex(c => (c.chapter_name || c.name || c) === chapter);
+          if (idx === -1) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = idx;
+          chapterObj = chapters[idx];
         } else {
           const keys = Object.keys(chapters);
-          for (const k of keys) { const c = chapters[k]; if ((c.chapter_name||c) === currentChapter) { chapterKey=k; chapterObj=c; break; } }
-          if (!chapterKey) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          let found = null;
+          for (const k of keys) {
+            if ((chapters[k].chapter_name || chapters[k].name || chapters[k]) === chapter) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = found;
+          chapterObj = chapters[found];
         }
-        let lectures = chapterObj.lectures || [];
-        let lectureKey=null, lectureObj=null;
+        let lectures = chapterObj.lectures || {};
+        let lectureObj = null;
+        let lectureKey = null;
         if (Array.isArray(lectures)) {
-          const found = lectures.find((l,i) => { if ((l.lecture_name||l) === currentLecture) { lectureKey=i; lectureObj=l; return true; } return false; });
-          if (!found) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          const idx = lectures.findIndex(l => (l.lecture_name || l.name || l) === lecture);
+          if (idx === -1) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          lectureKey = idx;
+          lectureObj = lectures[idx];
         } else {
           const keys = Object.keys(lectures);
-          for (const k of keys) { const l = lectures[k]; if ((l.lecture_name||l) === currentLecture) { lectureKey=k; lectureObj=l; break; } }
-          if (!lectureKey) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
-        }
-        let updatedTeachers = Array.isArray(teachers) ? [...teachers] : {...teachers};
-        if (Array.isArray(updatedTeachers)) {
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: [] };
-          let updatedChapters = updatedTeachers[teacherKey].chapters;
-          if (Array.isArray(updatedChapters)) {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          } else {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
+          let found = null;
+          for (const k of keys) {
+            if ((lectures[k].lecture_name || lectures[k].name || lectures[k]) === lecture) {
+              found = k;
+              break;
+            }
           }
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: updatedChapters };
-        } else {
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: {} };
-          let updatedChapters = updatedTeachers[teacherKey].chapters;
-          if (Array.isArray(updatedChapters)) {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          } else {
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: [] };
-            let updatedLectures = updatedChapters[chapterKey].lectures;
-            if (Array.isArray(updatedLectures)) { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            else { updatedLectures[lectureKey] = { ...lectureObj, videos }; }
-            updatedChapters[chapterKey] = { ...chapterObj, lectures: updatedLectures };
-          }
-          updatedTeachers[teacherKey] = { ...teacherObj, chapters: updatedChapters };
+          if (!found) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          lectureKey = found;
+          lectureObj = lectures[found];
         }
-        await set(ref(database, `years/${currentYear}/subjects/${currentSubject}/teachers`), updatedTeachers);
-        await loadVideosForCurrent();
-      } catch(e) { console.error(e); showToast('❌ فشل التحديث', 'error'); }
+        lectureObj.videos = videos;
+        if (Array.isArray(lectures)) lectures[lectureKey] = lectureObj;
+        else lectures[lectureKey] = lectureObj;
+        chapterObj.lectures = lectures;
+        if (Array.isArray(chapters)) chapters[chapterKey] = chapterObj;
+        else chapters[chapterKey] = chapterObj;
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        await loadVideos(year, subject, teacher, chapter, lecture);
+      } catch (err) {
+        console.error(err);
+        showToast('❌ فشل التحديث', 'error');
+      }
     }
 
-    loadYears();
-    showToast('👋 مرحباً في لوحة التحكم', 'info');
+    // ----- أزرار إضافة سنة/مادة/مدرس -----
+    document.getElementById('addYearBtn').addEventListener('click', async () => {
+      const newYear = prompt('أدخل اسم السنة الجديدة (مثال: أولى ثانوي)');
+      if (!newYear) return;
+      const yearKey = newYear.trim();
+      const snap = await get(child(ref(db), 'years'));
+      const years = snap.exists() ? snap.val() : {};
+      if (years[yearKey]) { showToast('⚠️ السنة موجودة', 'error'); return; }
+      years[yearKey] = { subjects: {} };
+      await set(ref(db, 'years'), years);
+      showToast('✅ تم إضافة السنة', 'success');
+      await loadYears();
+      adminYear.value = yearKey;
+      adminYear.dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('addSubjectBtn').addEventListener('click', async () => {
+      const year = adminYear.value;
+      if (!year) { showToast('⚠️ اختر السنة أولاً', 'error'); return; }
+      const newSubject = prompt('أدخل اسم المادة الجديدة');
+      if (!newSubject) return;
+      const subjectKey = newSubject.trim();
+      const snap = await get(child(ref(db), `years/${year}/subjects`));
+      let subjects = snap.exists() ? snap.val() : {};
+      if (Array.isArray(subjects)) {
+        if (subjects.some(s => (s.subject_name || s.name || s) === subjectKey)) {
+          showToast('⚠️ المادة موجودة', 'error');
+          return;
+        }
+        subjects.push({ subject_name: subjectKey, teachers: [] });
+      } else {
+        if (subjects[subjectKey]) { showToast('⚠️ المادة موجودة', 'error'); return; }
+        subjects[subjectKey] = { teachers: {} };
+      }
+      await set(ref(db, `years/${year}/subjects`), subjects);
+      showToast('✅ تم إضافة المادة', 'success');
+      await loadSubjects(year);
+      adminSubject.value = subjectKey;
+      adminSubject.dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('addTeacherBtn').addEventListener('click', async () => {
+      const year = adminYear.value;
+      const subject = adminSubject.value;
+      if (!year || !subject) { showToast('⚠️ اختر السنة والمادة أولاً', 'error'); return; }
+      const newTeacher = prompt('أدخل اسم المدرس الجديد');
+      if (!newTeacher) return;
+      const teacherKey = newTeacher.trim();
+      const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+      let teachers = snap.exists() ? snap.val() : [];
+      if (Array.isArray(teachers)) {
+        if (teachers.some(t => (t.teacher_name || t.name || t) === teacherKey)) {
+          showToast('⚠️ المدرس موجود', 'error');
+          return;
+        }
+        teachers.push({ teacher_name: teacherKey, chapters: {} });
+      } else {
+        if (teachers[teacherKey]) { showToast('⚠️ المدرس موجود', 'error'); return; }
+        teachers[teacherKey] = { chapters: {} };
+      }
+      await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachers);
+      showToast('✅ تم إضافة المدرس', 'success');
+      await loadTeachers(year, subject);
+      adminTeacher.value = teacherKey;
+      adminTeacher.dispatchEvent(new Event('change'));
+    });
+
+    // ----- تهيئة الصفحة -----
+    async function init() {
+      await loadYears();
+      if (adminYear.value) {
+        await loadSubjects(adminYear.value);
+      }
+    }
+    init();
+
+    // ----- التوست والوضع الليلي والنهاري -----
+    document.getElementById('darkToggle').addEventListener('click', function() {
+      this.classList.toggle('active');
+      document.body.classList.toggle('light-mode');
+    });
+
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'منصة THE BEST - إدارة',
+            text: 'لوحة تحكم المنصة',
+            url: window.location.href
+          });
+        } catch { showToast('❌ تم إلغاء المشاركة', 'error'); }
+      } else showToast('المشاركة غير مدعومة', 'error');
+    });
+
+    document.getElementById('notifyBtn').addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!', 'info'));
+
+    document.getElementById('backBtn').onclick = () => window.location.href = 'index.html';
   </script>
 </body>
 </html>
