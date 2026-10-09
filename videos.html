@@ -508,22 +508,62 @@ function extractYouTubeId(url) {
   return null;
 }
 
-// ===== تشغيل فيديو =====
-function playVideo(video, index, total) {
-  const videoId = extractYouTubeId(video.url);
-  if (videoId) {
-    playerFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-    videoTitle.textContent = video.name || `فيديو ${index + 1}`;
-    videoSub.textContent = `${lecture || 'محاضرة'} • ${teacher || 'مدرس'}`;
-    
-    // تحديث العنصر النشط
-    document.querySelectorAll('.playlist-item').forEach(el => el.classList.remove('active'));
-    const items = document.querySelectorAll('.playlist-item');
-    if (items[index]) items[index].classList.add('active');
-  } else {
-    showToast('⚠️ رابط الفيديو غير صالح');
+  
+function getBunnyEmbedUrl(url) {
+  if (typeof url !== 'string') return null;
+
+  url = url.trim();
+
+  // يدعم رابط Bunny Player العادي
+  const match = url.match(
+    /^https?:\/\/player\.mediadelivery\.net\/(?:play|embed)\/(\d+)\/([a-f0-9-]+)/i
+  );
+
+  if (match) {
+    return `https://player.mediadelivery.net/embed/${match[1]}/${match[2]}`;
   }
+
+  return null;
 }
+
+
+
+function playVideo(video, index, total) {
+  const rawUrl = typeof video === 'string'
+    ? video
+    : video?.url || video?.videoUrl || video?.video_url ||
+      video?.stream_url || video?.src || video?.link || '';
+
+  const name = typeof video === 'object' && video
+    ? video.name || `فيديو ${index + 1}`
+    : `فيديو ${index + 1}`;
+
+  const youtubeId = extractYouTubeId(rawUrl);
+  const bunnyUrl = getBunnyEmbedUrl(rawUrl);
+
+  if (youtubeId) {
+    playerFrame.src =
+      `https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`;
+  } else if (bunnyUrl) {
+    playerFrame.src = bunnyUrl;
+    playerFrame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen';
+    playerFrame.setAttribute('referrerpolicy', 'origin');
+  } else {
+    console.error('رابط الفيديو غير مدعوم:', rawUrl);
+    showToast('⚠️ رابط الفيديو غير صالح أو غير مدعوم');
+    return;
+  }
+
+  videoTitle.textContent = name;
+  videoSub.textContent = `${lecture || 'محاضرة'} • ${teacher || 'مدرس'}`;
+
+  document.querySelectorAll('.playlist-item')
+    .forEach(el => el.classList.remove('active'));
+
+  const items = document.querySelectorAll('.playlist-item');
+  if (items[index]) items[index].classList.add('active');
+}
+
 
 // ===== تحميل الفيديوهات =====
 async function loadVideos() {
