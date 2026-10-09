@@ -1,0 +1,211 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>تشغيل الفيديو - منصة THE BEST</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gold: #ffd700;
+      --background: #050505;
+      --panel: #111111;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: radial-gradient(circle at top, #17130a, var(--background) 55%);
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(15, 15, 15, .96);
+      border-bottom: 1px solid rgba(255, 215, 0, .2);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .back {
+      color: var(--gold);
+      font-size: 25px;
+      cursor: pointer;
+      border: 0;
+      background: transparent;
+      padding: 0 8px;
+    }
+
+    .title {
+      color: var(--gold);
+      font-size: 17px;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(255, 215, 0, .3);
+    }
+
+    .brand {
+      font-size: 11px;
+      color: #aaa;
+      white-space: nowrap;
+    }
+
+    main {
+      width: min(100% - 24px, 950px);
+      margin: 28px auto;
+    }
+
+    .player-card {
+      padding: 8px;
+      background: linear-gradient(145deg, #242016, #0a0a0a 45%);
+      border: 1px solid rgba(255, 215, 0, .25);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+    }
+
+    .video-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      border-radius: 12px;
+    }
+
+    .video-container iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      position: absolute;
+      inset: 0;
+    }
+
+    .hint {
+      text-align: center;
+      color: #c8b85d;
+      font-size: 13px;
+      line-height: 1.9;
+      margin: 16px 5px;
+    }
+
+    .status {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin-top: 22px;
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        padding: 12px 10px;
+      }
+
+      .title {
+        font-size: 15px;
+      }
+
+      main {
+        width: 100%;
+        margin: 18px auto;
+      }
+
+      .player-card {
+        padding: 4px;
+        border-radius: 10px;
+        border-left: 0;
+        border-right: 0;
+      }
+
+      .video-container {
+        border-radius: 7px;
+      }
+
+      .hint {
+        padding: 0 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <button class="back" type="button" onclick="history.back()" aria-label="رجوع">⬅</button>
+    <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐 🎬</div>
+    <div class="brand">THE BEST</div>
+  </header>
+
+  <main>
+    <section class="player-card">
+      <div class="video-container">
+        <iframe
+          id="videoFrame"
+          title="مشغل الفيديو"
+          src="https://player.mediadelivery.net/embed/724564/d54ff63a-3048-4bab-a622-cef080a280a8"
+          loading="eager"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <div class="hint">
+      💡 لو الفيديو لم يبدأ، انتظر قليلًا وتأكد من اتصال الإنترنت.
+      <br>
+      يمكنك استخدام أزرار المشغّل للتحكم في الفيديو والجودة.
+    </div>
+
+    <div class="status">
+      THE BEST • Video Player
+    </div>
+  </main>
+
+  <script>
+    // لو الصفحة بتستقبل عنوان الفيديو من الصفحة السابقة،
+    // نقرأه ونستخدمه فقط لو كان رابط Bunny Stream صالحًا.
+    const savedSources = localStorage.getItem("video_sources");
+
+    if (savedSources) {
+      try {
+        const data = JSON.parse(savedSources);
+        const item = Array.isArray(data) ? data[0] : data;
+
+        const source = typeof item === "string"
+          ? item
+          : item?.stream_url || item?.src || "";
+
+        // نقبل روابط صفحة تشغيل Bunny فقط، وليس ملفات m3u8.
+        if (typeof source === "string") {
+          const match = source.match(
+            /^https:\/\/player\.mediadelivery\.net\/play\/(\d+)\/([a-f0-9-]+)\/?$/i
+          );
+
+          if (match) {
+            document.getElementById("videoFrame").src =
+              "https://player.mediadelivery.net/embed/" +
+              match[1] + "/" + match[2];
+          }
+        }
+      } catch (error) {
+        console.warn("تعذر قراءة رابط الفيديو المحفوظ.", error);
+      }
+    }
+  </script>
+</body>
+</html>
+```
