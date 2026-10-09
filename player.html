@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -124,7 +125,7 @@
   <div style="width:25px"></div>
 </div>
 
-<video id="player" playsinline controls poster="poster.jpg"></video>
+<video id="player" playsinline controls poster="poster.jpg" hidden></video>
 
 <iframe
   id="bunnyFrame"
@@ -159,10 +160,21 @@
   }
 
   function getSource(item) {
-    if (typeof item === 'string') return item;
+    if (typeof item === 'string') {
+      return item.trim();
+    }
 
     if (item && typeof item === 'object') {
-      return item.stream_url || item.src || item.url || '';
+      const source =
+        item.stream_url ||
+        item.src ||
+        item.url ||
+        item.videoUrl ||
+        item.video_url ||
+        item.link ||
+        '';
+
+      return typeof source === 'string' ? source.trim() : '';
     }
 
     return '';
@@ -170,12 +182,16 @@
 
   function getBunnyEmbedUrl(source) {
     try {
-      const url = new URL(source);
+      const url = new URL(source.trim());
 
       if (url.protocol !== 'https:') return null;
 
-      // روابط مشغّل Bunny الرسمية بصيغة play أو embed.
-      if (url.hostname !== 'player.mediadelivery.net') {
+      const allowedHosts = [
+        'player.mediadelivery.net',
+        'iframe.mediadelivery.net'
+      ];
+
+      if (!allowedHosts.includes(url.hostname.toLowerCase())) {
         return null;
       }
 
@@ -185,65 +201,36 @@
 
       if (!match) return null;
 
-      return 'https://player.mediadelivery.net/embed/' +
-        match[2] + '/' + match[3];
+      const libraryId = match[2];
+      const videoId = match[3];
+
+      return (
+        'https://player.mediadelivery.net/embed/' +
+        libraryId + '/' + videoId
+      );
     } catch (_) {
       return null;
     }
   }
 
-  if (!savedSources) {
-    videoElement.hidden = true;
-    showError('لم يتم تحديد رابط الفيديو. ارجع للصفحة السابقة واختَر الفيديو.');
-    return;
-  }
-
-  let videoData;
-
-  try {
-    videoData = JSON.parse(savedSources);
-  } catch (error) {
-    videoElement.hidden = true;
-    showError('تعذر قراءة بيانات الفيديو المحفوظة.');
-    console.error(error);
-    return;
-  }
-
-  const sourceItems = Array.isArray(videoData)
-    ? videoData
-    : [videoData];
-
-  const firstItem = sourceItems[0];
-  const firstSource = getSource(firstItem);
-
-  if (!firstSource) {
-    videoElement.hidden = true;
-    showError('رابط الفيديو غير موجود داخل البيانات المحفوظة.');
-    return;
-  }
-
-  // الحالة الأولى: رابط Bunny Stream من نوع play.
-  const bunnyUrl = getBunnyEmbedUrl(firstSource);
-
-  if (bunnyUrl) {
-    videoElement.hidden = true;
-    bunnyFrame.hidden = false;
-    bunnyFrame.src = bunnyUrl;
-    hint.textContent = '💡 استخدم أدوات التحكم داخل مشغّل الفيديو.';
-    return;
-  }
-
-  // الحالة الثانية: رابط HLS مباشر من نوع m3u8.
-  if (/\.m3u8(?:$|\?)/i.test(firstSource)) {
+  function initializeHls(source) {
     videoElement.hidden = false;
     bunnyFrame.hidden = true;
 
     const player = new Plyr(videoElement, {
       title: videoTitle,
       controls: [
-        'play-large', 'play', 'rewind', 'fast-forward',
-        'progress', 'current-time', 'duration',
-        'mute', 'volume', 'settings', 'fullscreen'
+        'play-large',
+        'play',
+        'rewind',
+        'fast-forward',
+        'progress',
+        'current-time',
+        'duration',
+        'mute',
+        'volume',
+        'settings',
+        'fullscreen'
       ],
       settings: ['quality', 'speed', 'loop'],
       rewindTime: 10,
@@ -252,53 +239,122 @@
 
     if (Hls.isSupported()) {
       const hls = new Hls();
-      hls.loadSource(firstSource);
+
+      hls.loadSource(source);
       hls.attachMedia(videoElement);
 
       hls.on(Hls.Events.ERROR, function (_, data) {
         if (data.fatal) {
-          showError('تعذر تشغيل الفيديو. تحقق من الرابط أو صلاحيات الوصول.');
+          showError(
+            'تعذر تشغيل الفيديو. تحقق من الرابط وصلاحيات الوصول.'
+          );
         }
       });
-    } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-      videoElement.src = firstSource;
+    } else if (
+      videoElement.canPlayType('application/vnd.apple.mpegurl')
+    ) {
+      videoElement.src = source;
     } else {
       showError('المتصفح لا يدعم تشغيل هذا النوع من الفيديو.');
     }
 
-    player.on('play', async () => {
+    player.on('play', async function () {
       try {
         if (!player.fullscreen.active) {
           await player.fullscreen.enter();
         }
 
-        if (screen.orientation?.lock) {
+        if (screen.orientation && screen.orientation.lock) {
           await screen.orientation.lock('landscape');
         }
       } catch (_) {
-        // بعض المتصفحات تمنع ملء الشاشة أو تدوير الشاشة تلقائيًا.
+        // بعض المتصفحات لا تسمح بالتدوير أو ملء الشاشة تلقائيًا.
       }
     });
 
-    player.on('ended', () => {
+    player.on('ended', function () {
       alert('🎬 انتهى الفيديو');
+    });
+  }
+
+  if (!savedSources) {
+    showError(
+      'لم يتم تحديد رابط الفيديو. ارجع للصفحة السابقة واختَر الفيديو.'
+    );
+    return;
+  }
+
+  let videoData;
+
+  try {
+    videoData = JSON.parse(savedSources);
+  } catch (error) {
+    showError('تعذر قراءة بيانات الفيديو المحفوظة.');
+    console.error('VIDEO DATA ERROR:', error);
+    return;
+  }
+
+  const sourceItems = Array.isArray(videoData)
+    ? videoData
+    : [videoData];
+
+  const firstItem = sourceItems.find(function (item) {
+    return Boolean(getSource(item));
+  });
+
+  const firstSource = getSource(firstItem);
+
+  console.log('VIDEO DATA:', videoData);
+  console.log('VIDEO SOURCE:', firstSource);
+
+  if (!firstSource) {
+    showError(
+      'رابط الفيديو غير موجود داخل البيانات المحفوظة. تأكد من اسم حقل الرابط.'
+    );
+    return;
+  }
+
+  // الحالة الأولى: رابط مشغّل Bunny Stream.
+  const bunnyUrl = getBunnyEmbedUrl(firstSource);
+
+  if (bunnyUrl) {
+    videoElement.hidden = true;
+    bunnyFrame.hidden = false;
+    bunnyFrame.src = bunnyUrl;
+
+    hint.textContent =
+      '💡 استخدم أدوات التحكم داخل مشغّل الفيديو.';
+
+    bunnyFrame.addEventListener('error', function () {
+      showError('تعذر تحميل مشغّل Bunny Stream.');
     });
 
     return;
   }
 
-  // أي رابط آخر لا يُعامل تلقائيًا على أنه رابط HLS أو Bunny.
-  videoElement.hidden = true;
+  // الحالة الثانية: رابط HLS مباشر.
+  if (/\.m3u8(?:$|\?)/i.test(firstSource)) {
+    initializeHls(firstSource);
+    return;
+  }
+
+  // روابط غير مدعومة.
   showError(
-    'نوع رابط الفيديو غير مدعوم. احفظ رابط Bunny Stream بصيغة play أو رابط HLS مباشر مصرح به.'
+    'رابط الفيديو غير مدعوم. الرابط المستلم: ' +
+    firstSource
   );
+
 })();
 
-setTimeout(() => {
+setTimeout(function () {
   const hint = document.getElementById('hint');
-  if (hint) hint.style.display = 'none';
+
+  if (hint) {
+    hint.style.display = 'none';
+  }
 }, 7000);
 </script>
 
 </body>
 </html>
+```
