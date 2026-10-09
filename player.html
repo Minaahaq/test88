@@ -2,11 +2,17 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>تشغيل الفيديو - منصة THE BEST</title>
+
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     font-family: 'Cairo', sans-serif;
@@ -28,141 +34,271 @@
     z-index: 100;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
   }
+
   .title {
     color: #ffd700;
     font-weight: 700;
     font-size: 18px;
     text-shadow: 0 0 8px #ffd700;
   }
+
   .back {
     font-size: 22px;
     cursor: pointer;
     color: #ffd700;
     transition: transform 0.3s;
     user-select: none;
+    border: 0;
+    background: transparent;
   }
-  .back:hover { transform: translateX(-5px); }
 
-  #player {
+  .back:hover {
+    transform: translateX(-5px);
+  }
+
+  #player,
+  #bunnyFrame {
+    display: block;
     max-width: 950px;
     width: 100%;
     height: 60vh;
+    min-height: 240px;
+    border: 0;
     border-radius: 18px;
     margin: 25px auto;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
     background: #000;
   }
 
+  #bunnyFrame {
+    aspect-ratio: 16 / 9;
+  }
+
   #hint {
-    margin-top: 12px;
+    margin: 12px auto;
     color: #ffd700;
     font-size: 14px;
     text-shadow: 0 0 4px #ffd700;
+    padding: 0 12px;
   }
 
   .error-msg {
     margin: 40px auto;
     color: #ff4d4d;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
-    text-shadow: 0 0 8px #ff0000;
+    padding: 20px;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  @media (max-width: 600px) {
+    #player,
+    #bunnyFrame {
+      width: 100%;
+      height: auto;
+      min-height: 230px;
+      aspect-ratio: 16 / 9;
+      border-radius: 10px;
+      margin: 18px auto;
+    }
+
+    .topbar {
+      padding: 12px;
+    }
+
+    .title {
+      font-size: 16px;
+    }
   }
 </style>
 </head>
+
 <body>
 
 <div class="topbar">
-  <div class="back" onclick="history.back()">⬅</div>
+  <button class="back" onclick="history.back()" aria-label="رجوع">⬅</button>
   <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐 🎬</div>
-  <div style="width:25px;"></div>
+  <div style="width:25px"></div>
 </div>
 
 <video id="player" playsinline controls poster="poster.jpg"></video>
-<div id="hint">💡 اسحب الفيديو لتقديمه أو تأخيره على الهاتف</div>
+
+<iframe
+  id="bunnyFrame"
+  title="Bunny Stream Video"
+  hidden
+  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
+  allowfullscreen
+  loading="eager">
+</iframe>
+
+<div id="hint">💡 استخدم أزرار المشغّل للتحكم في الفيديو.</div>
+<div id="error" class="error-msg" hidden></div>
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-let qualitySources = [];
-let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
-const savedSources = localStorage.getItem("video_sources");
+(async function () {
+  const videoElement = document.getElementById('player');
+  const bunnyFrame = document.getElementById('bunnyFrame');
+  const errorElement = document.getElementById('error');
+  const hint = document.getElementById('hint');
 
-if (savedSources) {
-  try {
-    const videoData = JSON.parse(savedSources);
+  const videoTitle =
+    localStorage.getItem('video_title') || 'Lecture Video';
 
-    // إذا كان الفيديو مخزن كمصفوفة (معظم الأحيان هتكون عنصر واحد)
-    if (Array.isArray(videoData)) {
-      qualitySources = videoData.map(v => ({
-        src: v.stream_url || v.src || v,  // استخدام stream_url أولًا
-        type: "application/x-mpegURL",
-        size: parseInt(v.label) || 720
-      }));
-    } else {
-      qualitySources = [{
-        src: videoData.stream_url || videoData.src || videoData,
-        type: "application/x-mpegURL",
-        size: parseInt(videoData.label) || 720
-      }];
+  const savedSources = localStorage.getItem('video_sources');
+
+  function showError(message) {
+    errorElement.textContent = message;
+    errorElement.hidden = false;
+  }
+
+  function getSource(item) {
+    if (typeof item === 'string') return item;
+
+    if (item && typeof item === 'object') {
+      return item.stream_url || item.src || item.url || '';
     }
 
-  } catch (err) {
-    console.error("❌ Error parsing savedSources:", err);
+    return '';
   }
-} else {
-  document.body.innerHTML = "<div class='error-msg'>لم يتم تحديد رابط الفيديو 😢</div>";
-}
 
-// إنشاء المشغل مع أزرار مدمجة
-const player = new Plyr('#player', {
-  controls: [
-    'play-large','play','rewind','fast-forward','progress','current-time','duration',
-    'mute','volume','settings','fullscreen'
-  ],
-  settings: ['quality','speed','loop'],
-  rewindTime: 10,
-  forwardTime: 10
-});
+  function getBunnyEmbedUrl(source) {
+    try {
+      const url = new URL(source);
 
-// تشغيل HLS إذا كان الفيديو بصيغة m3u8
-if (qualitySources.length > 0) {
-  const firstSrc = qualitySources[0].src;
-  if (typeof firstSrc === "string" && firstSrc.endsWith(".m3u8") && Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(firstSrc);
-    hls.attachMedia(document.getElementById('player'));
-  } else {
-    player.source = {
-      type: 'video',
+      if (url.protocol !== 'https:') return null;
+
+      // روابط مشغّل Bunny الرسمية بصيغة play أو embed.
+      if (url.hostname !== 'player.mediadelivery.net') {
+        return null;
+      }
+
+      const match = url.pathname.match(
+        /^\/(play|embed)\/(\d+)\/([a-f0-9-]+)\/?$/i
+      );
+
+      if (!match) return null;
+
+      return 'https://player.mediadelivery.net/embed/' +
+        match[2] + '/' + match[3];
+    } catch (_) {
+      return null;
+    }
+  }
+
+  if (!savedSources) {
+    videoElement.hidden = true;
+    showError('لم يتم تحديد رابط الفيديو. ارجع للصفحة السابقة واختَر الفيديو.');
+    return;
+  }
+
+  let videoData;
+
+  try {
+    videoData = JSON.parse(savedSources);
+  } catch (error) {
+    videoElement.hidden = true;
+    showError('تعذر قراءة بيانات الفيديو المحفوظة.');
+    console.error(error);
+    return;
+  }
+
+  const sourceItems = Array.isArray(videoData)
+    ? videoData
+    : [videoData];
+
+  const firstItem = sourceItems[0];
+  const firstSource = getSource(firstItem);
+
+  if (!firstSource) {
+    videoElement.hidden = true;
+    showError('رابط الفيديو غير موجود داخل البيانات المحفوظة.');
+    return;
+  }
+
+  // الحالة الأولى: رابط Bunny Stream من نوع play.
+  const bunnyUrl = getBunnyEmbedUrl(firstSource);
+
+  if (bunnyUrl) {
+    videoElement.hidden = true;
+    bunnyFrame.hidden = false;
+    bunnyFrame.src = bunnyUrl;
+    hint.textContent = '💡 استخدم أدوات التحكم داخل مشغّل الفيديو.';
+    return;
+  }
+
+  // الحالة الثانية: رابط HLS مباشر من نوع m3u8.
+  if (/\.m3u8(?:$|\?)/i.test(firstSource)) {
+    videoElement.hidden = false;
+    bunnyFrame.hidden = true;
+
+    const player = new Plyr(videoElement, {
       title: videoTitle,
-      sources: qualitySources
-    };
-  }
-}
+      controls: [
+        'play-large', 'play', 'rewind', 'fast-forward',
+        'progress', 'current-time', 'duration',
+        'mute', 'volume', 'settings', 'fullscreen'
+      ],
+      settings: ['quality', 'speed', 'loop'],
+      rewindTime: 10,
+      forwardTime: 10
+    });
 
-// 🔄 Fullscreen وتدوير تلقائي عند التشغيل
-player.on('play', async () => {
-  try {
-    if (!player.fullscreen.active) player.fullscreen.enter();
-    if (screen.orientation && screen.orientation.lock) {
-      await screen.orientation.lock('landscape');
-      console.log("📱 تم تفعيل الوضع الأفقي تلقائياً");
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(firstSource);
+      hls.attachMedia(videoElement);
+
+      hls.on(Hls.Events.ERROR, function (_, data) {
+        if (data.fatal) {
+          showError('تعذر تشغيل الفيديو. تحقق من الرابط أو صلاحيات الوصول.');
+        }
+      });
+    } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+      videoElement.src = firstSource;
+    } else {
+      showError('المتصفح لا يدعم تشغيل هذا النوع من الفيديو.');
     }
-  } catch (err) {
-    console.warn("⚠️ لا يمكن تفعيل التدوير التلقائي:", err);
+
+    player.on('play', async () => {
+      try {
+        if (!player.fullscreen.active) {
+          await player.fullscreen.enter();
+        }
+
+        if (screen.orientation?.lock) {
+          await screen.orientation.lock('landscape');
+        }
+      } catch (_) {
+        // بعض المتصفحات تمنع ملء الشاشة أو تدوير الشاشة تلقائيًا.
+      }
+    });
+
+    player.on('ended', () => {
+      alert('🎬 انتهى الفيديو');
+    });
+
+    return;
   }
-});
 
-// ⏰ نهاية الفيديو
-player.on('ended', () => {
-  alert("🎬 انتهى الفيديو");
-});
+  // أي رابط آخر لا يُعامل تلقائيًا على أنه رابط HLS أو Bunny.
+  videoElement.hidden = true;
+  showError(
+    'نوع رابط الفيديو غير مدعوم. احفظ رابط Bunny Stream بصيغة play أو رابط HLS مباشر مصرح به.'
+  );
+})();
 
-// رسالة تلميحية للمستخدم (مخفية بعد 5 ثواني)
-setTimeout(() => document.getElementById('hint').style.display = 'none', 5000);
+setTimeout(() => {
+  const hint = document.getElementById('hint');
+  if (hint) hint.style.display = 'none';
+}, 7000);
 </script>
-
 
 </body>
 </html>
