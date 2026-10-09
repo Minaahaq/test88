@@ -108,140 +108,25 @@
       display: block; background: #000;
     }
 
-    /* ===== زر الفول سكرين المخصص ===== */
-    .custom-fullscreen-btn {
-      position: absolute;
-      bottom: 60px; /* فوق شريط العنوان */
-      right: 10px;
-      z-index: 60;
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.65);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      backdrop-filter: blur(6px);
-      transition: 0.2s;
-    }
-    .custom-fullscreen-btn:hover {
-      background: var(--gold);
-      color: #000;
-      border-color: var(--gold);
-    }
-
-    /* ===== الفقاعة الدائرية الصغيرة (الاستيكر المصغّر) ===== */
+    /* ===== صورة اللوجو (بدل الفقاعة) ===== */
     .custom-sticker {
       position: absolute;
       top: 8px;
       left: 8px;
       z-index: 50;
 
-      width: 64px;   /* ✅ صغّرناها */
+      width: 64px;   /* نفس حجم الفقاعة على الديسكتوب */
       height: 64px;
-      border-radius: 50%;
+      border-radius: 50%;   /* دائرية زي الفقاعة */
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      padding: 4px;
-
-      background:
-        radial-gradient(circle at 30% 25%,
-          #fff8c4 0%,
-          #ffd700 30%,
-          #b8860b 75%,
-          #6b4a00 100%);
-
-      color: #111;
-      font-family: 'Cairo', sans-serif;
-      font-size: 9px;   /* ✅ صغّرنا الخط */
-      font-weight: 900;
-      line-height: 1.15;
-      text-shadow: 0 1px 1px rgba(255,255,255,0.5);
-
+      object-fit: cover;
       pointer-events: none;
       user-select: none;
-      overflow: hidden;
 
+      /* ظل خفيف عشان تبان */
       box-shadow:
         0 0 0 2px rgba(255, 215, 0, 0.6),
-        0 0 10px rgba(255, 215, 0, 0.7),
-        0 0 20px rgba(255, 215, 0, 0.35),
-        inset 0 -5px 10px rgba(0, 0, 0, 0.35),
-        inset 0 5px 10px rgba(255, 255, 255, 0.5);
-
-      border: 1.5px solid rgba(255, 255, 255, 0.6);
-      opacity: 0.92; /* ✅ شفافية خفيفة عشان الفيديو يبان من وراها */
-    }
-    .custom-sticker::before {
-      content: "";
-      position: absolute;
-      top: 8%;
-      left: 18%;
-      width: 55%;
-      height: 32%;
-      border-radius: 50%;
-      background: radial-gradient(
-        ellipse at center,
-        rgba(255,255,255,0.95) 0%,
-        rgba(255,255,255,0.6) 40%,
-        rgba(255,255,255,0) 75%
-      );
-      transform: rotate(-20deg);
-      pointer-events: none;
-    }
-    .custom-sticker::after {
-      content: "";
-      position: absolute;
-      bottom: 8%;
-      right: 22%;
-      width: 20%;
-      height: 12%;
-      border-radius: 50%;
-      background: radial-gradient(
-        ellipse at center,
-        rgba(255,255,255,0.7) 0%,
-        rgba(255,255,255,0) 80%
-      );
-      pointer-events: none;
-    }
-
-    /* ===== حالة الفول سكرين المخصص ===== */
-    .video-player:fullscreen {
-      border-radius: 0;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100vw;
-      height: 100vh;
-    }
-    .video-player:fullscreen iframe {
-      width: 100%;
-      height: 100%;
-      aspect-ratio: auto;
-    }
-    .video-player:fullscreen .custom-sticker {
-      width: 90px;
-      height: 90px;
-      font-size: 12px;
-      top: 16px;
-      left: 16px;
-      opacity: 0.92;
-    }
-    .video-player:fullscreen .custom-fullscreen-btn {
-      bottom: 20px;
-      right: 20px;
-    }
-    .video-player:-webkit-full-screen {
-      width: 100vw; height: 100vh; background: #000;
-    }
-    .video-player:-webkit-full-screen iframe {
-      width: 100%; height: 100%; aspect-ratio: auto;
+        0 0 10px rgba(255, 215, 0, 0.5);
     }
 
     .video-info {
@@ -360,18 +245,11 @@
       .status-bar { font-size: 12px; }
       .topbar .brand { font-size: 15px; }
 
-      /* ✅ الفقاعة على الموبايل أصغر كمان */
+      /* ✅ نفس حجم الفقاعة على الموبايل */
       .custom-sticker {
         top: 6px; left: 6px;
         width: 52px;
         height: 52px;
-        font-size: 8px;
-        border-width: 1px;
-      }
-      .custom-fullscreen-btn {
-        width: 36px; height: 36px;
-        font-size: 16px;
-        bottom: 55px; right: 8px;
       }
     }
   </style>
@@ -404,17 +282,12 @@
 
   <!-- ===== مشغل الفيديوهات ===== -->
   <div class="player-wrapper">
-    <div class="video-player" id="videoPlayerBox">
+    <div class="video-player">
       <iframe id="playerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-      <!-- 🔥 الفقاعة الدائرية -->
-      <div class="custom-sticker">
-        <span>منصتك</span>
-        <span>التعليمية</span>
-      </div>
-
-      <!-- زر الفول سكرين المخصص (عشان الفقاعة تفضل ظاهرة) -->
-      <button class="custom-fullscreen-btn" id="customFsBtn" title="ملء الشاشة">⛶</button>
+      <!-- 🔥 صورة اللوجو بدل الفقاعة -->
+      <!-- 👇 غيّر مسار الصورة من هنا -->
+      <img class="custom-sticker" src="logo.png" alt="Logo" />
 
       <div class="video-info">
         <div class="lecture-title" id="videoTitle">🎬 اختر فيديو من القائمة</div>
@@ -467,8 +340,6 @@ const darkToggle = document.getElementById('darkToggle');
 const shareBtn = document.getElementById('shareBtn');
 const notifyBtn = document.getElementById('notifyBtn');
 const backBtn = document.getElementById('backBtn');
-const videoPlayerBox = document.getElementById('videoPlayerBox');
-const customFsBtn = document.getElementById('customFsBtn');
 
 const statusTime = document.getElementById('statusTime');
 const statusNetwork = document.getElementById('statusNetwork');
@@ -704,32 +575,6 @@ shareBtn.addEventListener('click', async () => {
 
 // ===== إشعارات =====
 notifyBtn.addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!'));
-
-// ===== الفول سكرين المخصص (عشان الفقاعة تفضل ظاهرة) =====
-customFsBtn.addEventListener('click', async () => {
-  try {
-    if (!document.fullscreenElement) {
-      if (videoPlayerBox.requestFullscreen) {
-        await videoPlayerBox.requestFullscreen();
-      } else if (videoPlayerBox.webkitRequestFullscreen) {
-        videoPlayerBox.webkitRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) await document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    }
-  } catch (e) {
-    console.warn('Fullscreen error:', e);
-  }
-});
-
-// تحديث أيقونة الزر حسب حالة الفول سكرين
-document.addEventListener('fullscreenchange', () => {
-  customFsBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
-});
-document.addEventListener('webkitfullscreenchange', () => {
-  customFsBtn.textContent = document.webkitFullscreenElement ? '⛶' : '⛶';
-});
 </script>
 </body>
 </html>
