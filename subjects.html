@@ -3,8 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e0e0e" />
   <title>المواد - منصة THE BEST</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================= */
+    /* ✨ إضافة 1: Splash Screen (لودنج البداية)      */
+    /* ============================================= */
+    #splashScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #0e0e0e 70%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+    }
+    #splashScreen.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .splash-logo {
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #d4a017 0%, #f5d742 50%, #d4a017 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1.5px;
+      margin-bottom: 40px;
+      animation: splashPulse 2s ease-in-out infinite, gradientShift 3s ease infinite;
+      filter: drop-shadow(0 0 30px rgba(212,160,23,0.4));
+    }
+    @keyframes splashPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .splash-loader {
+      width: 60px;
+      height: 60px;
+      position: relative;
+    }
+    .splash-loader::before,
+    .splash-loader::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+    .splash-loader::before {
+      border-top-color: #d4a017;
+      border-right-color: #d4a017;
+      animation: splashSpin 1s linear infinite;
+    }
+    .splash-loader::after {
+      border-bottom-color: #f5d742;
+      border-left-color: #f5d742;
+      animation: splashSpin 1.5s linear infinite reverse;
+      inset: 8px;
+    }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
+    .splash-text {
+      margin-top: 28px;
+      color: #f5f5f7;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0.5;
+      letter-spacing: 3px;
+      animation: textBlink 1.5s ease-in-out infinite;
+    }
+    @keyframes textBlink {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.9; }
+    }
+
+    /* شريط تقدم علوي */
+    #topProgressBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #d4a017, #f5d742, #d4a017);
+      background-size: 200% 100%;
+      z-index: 99998;
+      transition: width 0.3s ease, opacity 0.4s;
+      box-shadow: 0 0 12px rgba(212,160,23,0.8);
+      animation: progressShine 2s linear infinite;
+    }
+    @keyframes progressShine {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+  </style>
+
   <style>
     /* ===== RESET & ROOT ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -13,6 +114,7 @@
       --card-bg: #ffffff;
       --text: #1c1c1e;
       --gold: #d4a017;
+      --gold-light: #f5d742;
       --shadow: 0 8px 30px rgba(0,0,0,0.08);
       --topbar-bg: rgba(255,255,255,0.92);
     }
@@ -50,7 +152,6 @@
       position: relative;
       transition: background 0.3s;
     }
-    /* ===== شريط الحالة الحقيقي ===== */
     .status-bar {
       display: flex;
       justify-content: space-between;
@@ -63,24 +164,10 @@
       letter-spacing: 0.2px;
       min-height: 40px;
     }
-    .status-left, .status-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .status-right span {
-      font-size: 15px;
-    }
-    .status-battery {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .battery-level {
-      font-size: 14px;
-      font-weight: 700;
-    }
-    /* ===== شريط التنقل ===== */
+    .status-left, .status-right { display: flex; align-items: center; gap: 8px; }
+    .status-right span { font-size: 15px; }
+    .status-battery { display: flex; align-items: center; gap: 4px; }
+    .battery-level { font-size: 14px; font-weight: 700; }
     .topbar {
       display: flex;
       align-items: center;
@@ -103,17 +190,8 @@
       border-radius: 12px;
     }
     .topbar .back-btn:hover { opacity: 1; background: rgba(0,0,0,0.05); }
-    .topbar .brand {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
-      opacity: 0.9;
-    }
-    .topbar .actions {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
+    .topbar .brand { font-size: 18px; font-weight: 700; color: var(--text); opacity: 0.9; }
+    .topbar .actions { display: flex; align-items: center; gap: 18px; }
     .topbar .actions button, .topbar .actions a {
       background: none;
       border: none;
@@ -135,7 +213,6 @@
       opacity: 1;
       background: rgba(0,0,0,0.08);
     }
-    /* ===== مفتاح الوضع ===== */
     .toggle-dark {
       width: 52px;
       height: 30px;
@@ -160,7 +237,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .toggle-dark.active .thumb { transform: translateX(22px); }
-    /* ===== العنوان الرئيسي ===== */
     .page-title {
       font-size: 28px;
       font-weight: 800;
@@ -172,7 +248,10 @@
       gap: 10px;
     }
     .page-title span { background: var(--gold); color: white; font-size: 16px; padding: 4px 14px; border-radius: 40px; font-weight: 600; }
-    /* ===== شبكة المواد ===== */
+
+    /* ============================================= */
+    /* ✨ إضافة 2: كروت المواد بالصور (بانر كامل)    */
+    /* ============================================= */
     .subjects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -181,58 +260,122 @@
     .subject-card {
       background: var(--card-bg);
       border-radius: 24px;
-      padding: 22px 12px;
       box-shadow: var(--shadow);
-      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1), box-shadow 0.3s;
       cursor: pointer;
       text-align: center;
       font-weight: 700;
-      font-size: 1.1rem;
       color: var(--text);
       border: 1px solid rgba(212,160,23,0.05);
       user-select: none;
       position: relative;
       overflow: hidden;
+      aspect-ratio: 1 / 1.15;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: cardFadeIn 0.5s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
+    }
+    @keyframes cardFadeIn {
+      to { opacity: 1; transform: translateY(0); }
     }
     .subject-card:active {
       transform: scale(0.94);
       box-shadow: 0 0 0 2px var(--gold), 0 4px 16px rgba(212,160,23,0.3);
     }
-    .subject-card .subject-icon {
-      font-size: 2.2rem;
-      display: block;
-      margin-bottom: 8px;
+    .subject-card .subject-image {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.4, 1), filter 0.5s, opacity 0.5s;
+      z-index: 1;
+      filter: blur(12px);
+      opacity: 0;
+    }
+    .subject-card .subject-image.loaded {
+      filter: blur(0);
+      opacity: 1;
+    }
+    .subject-card:hover .subject-image.loaded {
+      transform: scale(1.08);
+    }
+    .subject-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0.15) 50%,
+        rgba(0,0,0,0.78) 100%
+      );
+      z-index: 2;
+      pointer-events: none;
+      border-radius: 24px;
+    }
+    .subject-card .subject-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      z-index: 1;
+      transition: opacity 0.4s;
+    }
+    body.light-mode .subject-card .subject-fallback {
+      background: linear-gradient(135deg, #f5e6c8 0%, #e6d4a8 100%);
     }
     .subject-card .subject-label {
-      font-size: 1rem;
-      font-weight: 700;
+      position: relative;
+      z-index: 3;
+      margin-top: auto;
+      padding: 16px 10px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff !important;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+      line-height: 1.3;
+      letter-spacing: -0.3px;
     }
-    .subject-card.loading {
-      grid-column: 1 / -1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 14px;
-      background: transparent;
-      box-shadow: none;
-      border: none;
-      font-weight: 400;
-      color: var(--text);
-      opacity: 0.6;
-      cursor: default;
-      padding: 40px 0;
+
+    /* Skeleton */
+    .subject-card.skeleton {
+      background: var(--card-bg);
+      pointer-events: none;
     }
-    .subject-card.loading::after {
+    .subject-card.skeleton::before {
       content: "";
-      width: 28px;
-      height: 28px;
-      border: 3px solid var(--gold);
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: skeletonShine 1.5s infinite;
+      z-index: 5;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    /* ===== زر البروفايل العائم ===== */
+    @keyframes skeletonShine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Ripple */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transform: scale(0);
+      animation: rippleAnim 0.6s ease-out;
+      pointer-events: none;
+      z-index: 10;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
     .profile-float {
       position: fixed;
       bottom: 30px;
@@ -254,7 +397,6 @@
       font-size: 28px;
     }
     .profile-float:hover { transform: scale(1.05); background: var(--gold); color: white; border-color: white; }
-    /* ===== Toast ===== */
     .custom-toast {
       position: fixed;
       bottom: 100px;
@@ -275,21 +417,46 @@
     }
     @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(30px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(30px); } }
-    /* ===== استجابة ===== */
     @media (max-width: 480px) {
       .app-container { padding: 0 16px 80px; }
       .page-title { font-size: 24px; }
       .subjects-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-      .subject-card { padding: 18px 10px; font-size: 1rem; }
+      .subject-card .subject-label { font-size: 0.95rem; padding: 12px 8px; }
       .profile-float { width: 50px; height: 50px; bottom: 20px; left: 20px; font-size: 22px; }
       .status-bar { font-size: 12px; }
     }
   </style>
 </head>
 <body>
+
+<div id="topProgressBar"></div>
+
+<div id="splashScreen">
+  <div class="splash-logo">THE BEST</div>
+  <div class="splash-loader"></div>
+  <div class="splash-text">جاري التحميل...</div>
+</div>
+
+<!-- ✨ تفعيل الوضع الليلي قبل الرسم -->
+<script>
+  (function() {
+    try {
+      var saved = localStorage.getItem('theme');
+      var theme = saved || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      document.addEventListener('DOMContentLoaded', function() {
+        if (theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.add('light-mode');
+        }
+      });
+    } catch(e) {}
+  })();
+</script>
+
 <div class="app-container" id="app">
 
-  <!-- ===== شريط الحالة الحقيقي ===== -->
   <div class="status-bar">
     <div class="status-left">
       <span id="statusTime">00:00</span>
@@ -303,7 +470,6 @@
     </div>
   </div>
 
-  <!-- شريط التنقل -->
   <div class="topbar">
     <button class="back-btn" id="backBtn">‹</button>
     <div class="brand">المواد</div>
@@ -317,17 +483,16 @@
     </div>
   </div>
 
-  <!-- العنوان -->
   <div class="page-title" id="pageTitle">
     📚 المواد <span id="yearBadge">اختر</span>
   </div>
 
-  <!-- شبكة المواد -->
   <div class="subjects-grid" id="subjectsList">
-    <div class="subject-card loading">جاري التحميل...</div>
+    <div class="subject-card skeleton"></div>
+    <div class="subject-card skeleton"></div>
+    <div class="subject-card skeleton"></div>
   </div>
 
-  <!-- زر البروفايل العائم -->
   <a href="profile.html" class="profile-float">👤</a>
 </div>
 
@@ -343,7 +508,6 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get, child } from 'firebase/database';
 
-// ===== Firebase Config =====
 const firebaseConfig = {
   apiKey: "AIzaSyB0p0us6BuzD2ngzjhRnmUIhlOcBeRp0vQ",
   authDomain: "tok-tak-d6e17.firebaseapp.com",
@@ -358,7 +522,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-// ===== عناصر DOM =====
 const subjectsList = document.getElementById('subjectsList');
 const pageTitle = document.getElementById('pageTitle');
 const yearBadge = document.getElementById('yearBadge');
@@ -367,13 +530,12 @@ const shareBtn = document.getElementById('shareBtn');
 const notifyBtn = document.getElementById('notifyBtn');
 const backBtn = document.getElementById('backBtn');
 
-// عناصر شريط الحالة
 const statusTime = document.getElementById('statusTime');
 const statusNetwork = document.getElementById('statusNetwork');
 const batteryIcon = document.getElementById('batteryIcon');
 const batteryLevel = document.getElementById('batteryLevel');
 
-// ===== استخراج السنة من URL =====
+// استخراج السنة من URL
 const urlParams = new URLSearchParams(window.location.search);
 const year = urlParams.get('year');
 
@@ -384,7 +546,33 @@ if (year) {
   yearBadge.textContent = 'غير محدد';
 }
 
-// ===== 1. الوقت الحقيقي =====
+// =============================================
+// ✨ شريط التقدم + Splash
+// =============================================
+const topProgressBar = document.getElementById('topProgressBar');
+const splashScreen = document.getElementById('splashScreen');
+
+let progress = 0;
+const progressInterval = setInterval(() => {
+  progress += Math.random() * 12;
+  if (progress >= 90) {
+    progress = 90;
+    clearInterval(progressInterval);
+  }
+  topProgressBar.style.width = progress + '%';
+}, 200);
+
+function finishLoading() {
+  clearInterval(progressInterval);
+  topProgressBar.style.width = '100%';
+  setTimeout(() => {
+    splashScreen.classList.add('hide');
+    topProgressBar.style.opacity = '0';
+    setTimeout(() => { topProgressBar.style.display = 'none'; }, 400);
+  }, 500);
+}
+
+// الوقت
 function updateTime() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2, '0');
@@ -394,31 +582,16 @@ function updateTime() {
 updateTime();
 setInterval(updateTime, 1000);
 
-// ===== 2. الشبكة الحقيقية =====
+// الشبكة
 function updateNetwork() {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  if (!connection) {
-    statusNetwork.textContent = '📶';
-    return;
-  }
-  const type = connection.effectiveType;
-  let icon = '📶';
-  switch(type) {
-    case 'wifi': icon = '📶'; break;
-    case '4g': icon = '📶'; break;
-    case '5g': icon = '📶'; break;
-    case '3g': icon = '📶'; break;
-    default: icon = '📶';
-  }
-  statusNetwork.textContent = icon;
-  statusNetwork.title = type || 'شبكة';
+  if (!connection) { statusNetwork.textContent = '📶'; return; }
+  statusNetwork.textContent = '📶';
 }
 updateNetwork();
-if (navigator.connection) {
-  navigator.connection.addEventListener('change', updateNetwork);
-}
+if (navigator.connection) navigator.connection.addEventListener('change', updateNetwork);
 
-// ===== 3. البطارية الحقيقية =====
+// البطارية
 async function updateBattery() {
   try {
     if (!navigator.getBattery) {
@@ -429,11 +602,8 @@ async function updateBattery() {
     const battery = await navigator.getBattery();
     const level = Math.round(battery.level * 100);
     batteryLevel.textContent = `${level}%`;
-    if (battery.charging) {
-      batteryIcon.textContent = '⚡️';
-    } else {
-      batteryIcon.textContent = level > 20 ? '🔋' : '🪫';
-    }
+    if (battery.charging) batteryIcon.textContent = '⚡️';
+    else batteryIcon.textContent = level > 20 ? '🔋' : '🪫';
     battery.addEventListener('levelchange', updateBattery);
     battery.addEventListener('chargingchange', updateBattery);
   } catch {
@@ -443,7 +613,7 @@ async function updateBattery() {
 }
 updateBattery();
 
-// ===== Toast =====
+// Toast
 function showToast(msg) {
   const existing = document.querySelector('.custom-toast');
   if (existing) existing.remove();
@@ -454,19 +624,45 @@ function showToast(msg) {
   setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
 }
 
-// ===== تحميل المواد =====
+// Haptic
+function vibrate(ms = 10) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+// Ripple
+function createRipple(e, el) {
+  const rect = el.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - size / 2;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top - size / 2;
+  ripple.style.left = x + 'px';
+  ripple.style.top = y + 'px';
+  el.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+}
+
+// =============================================
+// ✨ تحميل المواد بالصور من فولدر /subject/
+// =============================================
 async function loadSubjects() {
   if (!year) {
-    subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لم يتم تحديد السنة</div>`;
+    subjectsList.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;opacity:0.6;">⚠️ لم يتم تحديد السنة</div>`;
+    finishLoading();
     return;
   }
   try {
     const dbRef = ref(database);
     const snapshot = await get(child(dbRef, `years/${year}/subjects`));
+
     if (!snapshot.exists()) {
-      subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لا توجد مواد في هذه السنة</div>`;
+      subjectsList.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;opacity:0.6;">⚠️ لا توجد مواد في هذه السنة</div>`;
+      finishLoading();
       return;
     }
+
     const data = snapshot.val();
     let subjectNames = [];
     if (Array.isArray(data)) {
@@ -474,28 +670,90 @@ async function loadSubjects() {
     } else {
       subjectNames = Object.keys(data);
     }
+
     subjectsList.innerHTML = '';
+
     if (subjectNames.length === 0) {
-      subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;">⚠️ لا توجد مواد</div>`;
+      subjectsList.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;opacity:0.6;">⚠️ لا توجد مواد</div>`;
+      finishLoading();
       return;
     }
-    subjectNames.sort().forEach(sub => {
+
+    subjectNames.sort().forEach((sub, index) => {
       const card = document.createElement('div');
       card.className = 'subject-card';
-      card.innerHTML = `<span class="subject-icon">📘</span><span class="subject-label">${sub}</span>`;
-      card.addEventListener('click', () => {
-        window.location.href = `teachers.html?year=${encodeURIComponent(year)}&subject=${encodeURIComponent(sub)}`;
+      card.style.animationDelay = (index * 0.08) + 's';
+
+      // Fallback
+      const fallback = document.createElement('div');
+      fallback.className = 'subject-fallback';
+      fallback.textContent = '📘';
+      card.appendChild(fallback);
+
+      // الصورة من فولدر /subject/
+      const img = document.createElement('img');
+      img.className = 'subject-image';
+      img.alt = sub;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+
+      const cleanName = sub.trim();
+      const attempts = [
+        `/subject/${cleanName}.jpg`,
+        `/subject/${cleanName}.png`,
+        `/subject/${cleanName}.jpeg`,
+        `/subject/${cleanName}.webp`,
+        `/subject/${cleanName.replace(/\s+/g, '_')}.jpg`,
+        `/subject/${cleanName.replace(/\s+/g, '-')}.jpg`
+      ];
+      let attemptIndex = 0;
+
+      img.onload = () => {
+        img.classList.add('loaded');
+        fallback.style.opacity = '0';
+      };
+
+      img.onerror = () => {
+        attemptIndex++;
+        if (attemptIndex < attempts.length) {
+          img.src = attempts[attemptIndex];
+        } else {
+          img.style.display = 'none';
+        }
+      };
+
+      img.src = attempts[0];
+      card.appendChild(img);
+
+      // اسم المادة
+      const label = document.createElement('div');
+      label.className = 'subject-label';
+      label.textContent = sub;
+      card.appendChild(label);
+
+      // عند الضغط
+      card.addEventListener('click', (e) => {
+        vibrate(15);
+        createRipple(e, card);
+        setTimeout(() => {
+          window.location.href = `teachers.html?year=${encodeURIComponent(year)}&subject=${encodeURIComponent(sub)}`;
+        }, 150);
       });
+
       subjectsList.appendChild(card);
     });
+
+    finishLoading();
+
   } catch (err) {
     console.error(err);
-    subjectsList.innerHTML = `<div class="subject-card" style="grid-column:1/-1;background:transparent;box-shadow:none;cursor:default;color:#ff3b30;">❌ حدث خطأ أثناء التحميل</div>`;
+    subjectsList.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#ff3b30;">❌ حدث خطأ أثناء التحميل</div>`;
+    finishLoading();
   }
 }
 loadSubjects();
 
-// ===== تبديل الوضع =====
+// تبديل الوضع
 function toggleTheme() {
   const isDark = document.body.classList.contains('dark-mode');
   if (isDark) {
@@ -509,8 +767,11 @@ function toggleTheme() {
     darkToggle.classList.add('active');
     localStorage.setItem('theme', 'dark');
   }
+  vibrate(10);
 }
-const savedTheme = localStorage.getItem('theme') || 'light';
+
+// ✨ الوضع الافتراضي = داكن
+const savedTheme = localStorage.getItem('theme') || 'dark';
 if (savedTheme === 'dark') {
   document.body.classList.add('dark-mode');
   darkToggle.classList.add('active');
@@ -519,12 +780,14 @@ if (savedTheme === 'dark') {
 }
 darkToggle.addEventListener('click', toggleTheme);
 
-// ===== أزرار =====
+// الأزرار
 backBtn.addEventListener('click', () => {
+  vibrate(10);
   window.location.href = 'index.html';
 });
 
 shareBtn.addEventListener('click', async () => {
+  vibrate(10);
   if (navigator.share) {
     try {
       await navigator.share({
@@ -541,23 +804,10 @@ shareBtn.addEventListener('click', async () => {
 });
 
 notifyBtn.addEventListener('click', () => {
+  vibrate(10);
   showToast('🔔 الإشعارات ستُفعل قريباً!');
 });
-
-// ===== تأثير الضغط على البطاقات =====
-document.addEventListener('click', (e) => {
-  const card = e.target.closest('.subject-card');
-  if (card && !card.classList.contains('loading')) {
-    card.style.transition = 'background 0.15s';
-    card.style.background = 'var(--gold)';
-    card.style.color = 'white';
-    setTimeout(() => {
-      card.style.background = '';
-      card.style.color = '';
-    }, 200);
-  }
-});
 </script>
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
