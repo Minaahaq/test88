@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 
   * {
     box-sizing: border-box;
@@ -100,23 +100,88 @@
     background: #000;
   }
 
-  /* الاستيكر الخاص بك (تغطية فوق الاستيكر القديم) */
+  /* ========== الفقاعة الدائرية الكبيرة (الاستيكر الجديد) ========== */
   .custom-sticker {
     position: absolute;
-    top: 12px;
-    right: 12px; /* يمكنك تغييرها إلى left: 12px حسب مكان الاستيكر القديم */
+    top: 10px;
+    left: 10px; /* فوق اللوجو القديم */
     z-index: 50;
-    padding: 6px 14px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.95);
-    color: #ffd700;
+
+    width: 110px;          /* الحجم الكبير لتغطية اللوجو */
+    height: 110px;
+    border-radius: 50%;    /* دائري */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 8px;
+
+    /* تدرج ذهبي لامع */
+    background:
+      radial-gradient(circle at 30% 25%,
+        #fff8c4 0%,
+        #ffd700 25%,
+        #b8860b 70%,
+        #6b4a00 100%);
+
+    color: #111;
     font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.2;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.5);
+
     pointer-events: none;
     user-select: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 215, 0, 0.5);
+    overflow: hidden;
+
+    /* تأثير الفقاعة والحدود اللامعة */
+    box-shadow:
+      0 0 0 3px rgba(255, 215, 0, 0.55),
+      0 0 15px rgba(255, 215, 0, 0.8),
+      0 0 30px rgba(255, 215, 0, 0.4),
+      inset 0 -8px 15px rgba(0, 0, 0, 0.35),
+      inset 0 8px 15px rgba(255, 255, 255, 0.5);
+
+    border: 2px solid rgba(255, 255, 255, 0.65);
+  }
+
+  /* لمعة زجاجية أعلى الفقاعة (تأثير Bubble / Glossy) */
+  .custom-sticker::before {
+    content: "";
+    position: absolute;
+    top: 6%;
+    left: 18%;
+    width: 55%;
+    height: 35%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.6) 40%,
+      rgba(255, 255, 255, 0) 75%
+    );
+    transform: rotate(-20deg);
+    pointer-events: none;
+  }
+
+  /* لمعة صغيرة أسفل الفقاعة */
+  .custom-sticker::after {
+    content: "";
+    position: absolute;
+    bottom: 8%;
+    right: 22%;
+    width: 20%;
+    height: 12%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0) 80%
+    );
+    pointer-events: none;
   }
 
   #hint {
@@ -161,11 +226,14 @@
       min-height: 230px;
     }
 
+    /* تصغير الفقاعة شوية على الموبايل مع الحفاظ على تغطية اللوجو */
     .custom-sticker {
-      top: 8px;
-      right: 8px; /* يمكنك تغييرها إلى left: 8px */
-      padding: 4px 8px;
-      font-size: 11px;
+      top: 6px;
+      left: 6px;
+      width: 85px;
+      height: 85px;
+      font-size: 10px;
+      border-width: 1.5px;
     }
 
     .topbar {
@@ -190,7 +258,10 @@
 <!-- مشغّل Plyr الرئيسي مع الاستيكر -->
 <div class="plyr-player-wrapper" id="plyrWrapper">
   <video id="player" playsinline controls poster="poster.jpg" hidden></video>
-  <div class="custom-sticker">اسم منصتك هنا</div>
+  <div class="custom-sticker">
+    <span>منصتك</span>
+    <span>التعليمية</span>
+  </div>
 </div>
 
 <!-- مشغّل Bunny مع الاستيكر الخاص بك -->
@@ -203,7 +274,10 @@
     loading="eager">
   </iframe>
 
-  <div class="custom-sticker">اسم منصتك هنا</div>
+  <div class="custom-sticker">
+    <span>منصتك</span>
+    <span>التعليمية</span>
+  </div>
 </div>
 
 <div id="hint">💡 استخدم أزرار المشغّل للتحكم في الفيديو.</div>
