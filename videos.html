@@ -3,8 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e0e0e" />
   <title>الفيديوهات - منصة THE BEST</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================= */
+    /* ✨ إضافة 1: Splash Screen                      */
+    /* ============================================= */
+    #splashScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 70%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 99999;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+    }
+    #splashScreen.hide { opacity: 0; visibility: hidden; }
+    .splash-logo {
+      font-size: 48px; font-weight: 900;
+      background: linear-gradient(135deg, #d4a017 0%, #f5d742 50%, #d4a017 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1.5px; margin-bottom: 40px;
+      animation: splashPulse 2s ease-in-out infinite, gradientShift 3s ease infinite;
+      filter: drop-shadow(0 0 30px rgba(212,160,23,0.4));
+    }
+    @keyframes splashPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06);} }
+    @keyframes gradientShift { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+    .splash-loader { width: 60px; height: 60px; position: relative; }
+    .splash-loader::before, .splash-loader::after {
+      content: ""; position: absolute; inset: 0; border-radius: 50%; border: 3px solid transparent;
+    }
+    .splash-loader::before {
+      border-top-color: #d4a017; border-right-color: #d4a017;
+      animation: splashSpin 1s linear infinite;
+    }
+    .splash-loader::after {
+      border-bottom-color: #f5d742; border-left-color: #f5d742;
+      animation: splashSpin 1.5s linear infinite reverse; inset: 8px;
+    }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
+    .splash-text {
+      margin-top: 28px; color: #f5f5f7; font-size: 14px; font-weight: 600;
+      opacity: 0.5; letter-spacing: 3px;
+      animation: textBlink 1.5s ease-in-out infinite;
+    }
+    @keyframes textBlink { 0%,100%{opacity:0.4;} 50%{opacity:0.9;} }
+    #topProgressBar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, #d4a017, #f5d742, #d4a017);
+      background-size: 200% 100%; z-index: 99998;
+      transition: width 0.3s ease, opacity 0.4s;
+      box-shadow: 0 0 12px rgba(212,160,23,0.8);
+      animation: progressShine 2s linear infinite;
+    }
+    @keyframes progressShine { 0%{background-position:0% 50%;} 100%{background-position:200% 50%;} }
+  </style>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     :root {
@@ -30,24 +89,16 @@
     }
     body {
       font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       min-height: 100vh;
       transition: background 0.3s, color 0.3s;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      display: flex; justify-content: center; align-items: flex-start;
     }
     .app-container {
-      max-width: 430px;
-      width: 100%;
-      background: var(--bg);
-      min-height: 100vh;
-      padding: 0 16px 100px;
-      position: relative;
-      transition: background 0.3s;
+      max-width: 430px; width: 100%; background: var(--bg);
+      min-height: 100vh; padding: 0 16px 100px;
+      position: relative; transition: background 0.3s;
     }
-    /* ===== شريط الحالة ===== */
     .status-bar {
       display: flex; justify-content: space-between; align-items: center;
       padding: 12px 2px 6px; font-size: 13px; font-weight: 600;
@@ -56,7 +107,6 @@
     .status-left, .status-right { display: flex; align-items: center; gap: 8px; }
     .status-battery { display: flex; align-items: center; gap: 4px; }
     .battery-level { font-size: 13px; font-weight: 700; }
-    /* ===== شريط التنقل ===== */
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 0 14px; border-bottom: 1px solid var(--separator);
@@ -67,7 +117,9 @@
       border-radius: 50%; width: 38px; height: 38px;
       display: flex; align-items: center; justify-content: center;
       border: none; color: var(--text); font-weight: 600;
+      transition: 0.2s;
     }
+    .topbar .back-btn:hover { background: rgba(255,255,255,0.12); }
     .topbar .brand {
       font-size: 17px; font-weight: 800;
       background: linear-gradient(135deg, #d4a017, #f5d742);
@@ -80,6 +132,10 @@
       font-size: 20px; color: var(--text); opacity: 0.7;
       display: flex; align-items: center; justify-content: center;
       width: 34px; height: 34px; border-radius: 50%; text-decoration: none;
+      transition: 0.2s;
+    }
+    .topbar .actions button:hover, .topbar .actions a:hover {
+      opacity: 1; background: rgba(255,255,255,0.12);
     }
     .toggle-dark {
       width: 48px; height: 28px; background: #3a3a3c; border-radius: 28px;
@@ -108,38 +164,90 @@
       display: block; background: #000;
     }
 
-    /* ===== صورة اللوجو (بدل الفقاعة) ===== */
+    /* ============================================= */
+    /* ✨ إضافة 2: تحسين اللوجو (custom-sticker)      */
+    /* ============================================= */
     .custom-sticker {
       position: absolute;
       top: 8px;
       left: 8px;
       z-index: 50;
-
-      width: 64px;   /* نفس حجم الفقاعة على الديسكتوب */
+      width: 64px;
       height: 64px;
-      border-radius: 50%;   /* دائرية زي الفقاعة */
-
+      border-radius: 50%;
       object-fit: cover;
       pointer-events: none;
       user-select: none;
-
-      /* ظل خفيف عشان تبان */
       box-shadow:
         0 0 0 2px rgba(255, 215, 0, 0.6),
         0 0 10px rgba(255, 215, 0, 0.5);
+      /* ✨ animation دخول + نبض */
+      animation: logoEnter 0.8s cubic-bezier(0.3, 1.4, 0.5, 1) 0.3s both,
+                 logoPulse 3s ease-in-out 1.1s infinite;
+    }
+    @keyframes logoEnter {
+      0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 0 2px rgba(255, 215, 0, 0.6),
+          0 0 10px rgba(255, 215, 0, 0.5);
+      }
+      50% {
+        box-shadow:
+          0 0 0 3px rgba(255, 215, 0, 0.8),
+          0 0 20px rgba(255, 215, 0, 0.8),
+          0 0 30px rgba(255, 215, 0, 0.4);
+      }
     }
 
+    /* ============================================= */
+    /* ✨ إضافة 3: معلومات الفيديو + صورة المادة     */
+    /* ============================================= */
     .video-info {
       padding: 16px 18px;
       background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .video-info .subject-thumb {
+      width: 48px; height: 48px; border-radius: 50%;
+      flex-shrink: 0;
+      overflow: hidden; position: relative;
+      background: linear-gradient(135deg, #d4a017, #f5d742);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 12px rgba(212,160,23,0.35);
+    }
+    .video-info .subject-thumb img {
+      width: 100%; height: 100%; object-fit: cover;
+      position: absolute; inset: 0;
+      opacity: 0; filter: blur(8px);
+      transition: opacity 0.5s, filter 0.5s;
+    }
+    .video-info .subject-thumb img.loaded {
+      opacity: 1; filter: blur(0);
+    }
+    .video-info .subject-thumb .fallback-emoji {
+      position: relative; z-index: 1;
+      font-size: 22px;
+      color: white;
+    }
+    .video-info .info-text {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column; gap: 4px;
     }
     .video-info .lecture-title {
-      font-size: 18px; font-weight: 700; color: var(--text);
-      margin-bottom: 4px;
+      font-size: 16px; font-weight: 700; color: var(--text);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .video-info .lecture-sub {
-      font-size: 14px; color: var(--subtext); font-weight: 400;
+      font-size: 13px; color: var(--subtext); font-weight: 400;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+
     /* ===== قائمة التشغيل ===== */
     .playlist {
       background: var(--card-bg);
@@ -150,6 +258,8 @@
       max-height: 400px;
       overflow-y: auto;
     }
+    .playlist::-webkit-scrollbar { width: 4px; }
+    .playlist::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
     .playlist-title {
       color: var(--gold); font-weight: 700; font-size: 16px;
       margin-bottom: 12px; padding-bottom: 10px;
@@ -161,7 +271,11 @@
       padding: 12px 14px; border-radius: 12px; cursor: pointer;
       transition: all 0.2s ease; margin-bottom: 4px;
       border: 1px solid transparent;
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateX(-15px);
+      animation: playlistItemIn 0.5s cubic-bezier(0.2, 0.9, 0.4, 1) forwards;
     }
+    @keyframes playlistItemIn { to { opacity: 1; transform: translateX(0); } }
     .playlist-item:hover {
       background: var(--card-hover);
       transform: translateX(-4px);
@@ -187,26 +301,56 @@
     .playlist-item.active .play-icon,
     .playlist-item:hover .play-icon { opacity: 1; }
 
-    /* ===== حالات خاصة ===== */
-    .loading-state {
-      display: flex; justify-content: center; align-items: center;
-      padding: 40px 0; color: var(--subtext); font-size: 15px; gap: 12px;
+    /* Ripple */
+    .ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(212,160,23,0.4);
+      transform: scale(0);
+      animation: rippleAnim 0.6s ease-out;
+      pointer-events: none; z-index: 10;
     }
-    .loading-state::after {
-      content: ""; width: 28px; height: 28px;
-      border: 3px solid var(--gold); border-top-color: transparent;
-      border-radius: 50%; animation: spin 0.8s linear infinite;
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+    /* Skeleton Loading */
+    .skeleton-playlist {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; margin-bottom: 4px;
+      pointer-events: none;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .skeleton-playlist .sk-index {
+      width: 28px; height: 16px; border-radius: 4px;
+      background: var(--separator);
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+    .skeleton-playlist .sk-title {
+      flex: 1; height: 16px; border-radius: 6px;
+      background: var(--separator);
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+    .skeleton-playlist .sk-icon {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--separator);
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes skeletonPulse {
+      0%,100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* حالات خاصة */
     .empty-state {
       text-align: center; color: var(--subtext);
-      padding: 30px 0; font-size: 15px;
+      padding: 40px 20px; font-size: 15px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 10px;
     }
+    .empty-state .emoji { font-size: 44px; opacity: 0.5; }
     .error-state {
       text-align: center; color: #ff3b30;
       padding: 30px 0; font-size: 15px;
     }
-    /* ===== زر البروفايل ===== */
+
+    /* زر البروفايل */
     .profile-float {
       position: fixed; bottom: 30px; left: 30px;
       width: 56px; height: 56px; border-radius: 50%;
@@ -220,7 +364,8 @@
       transform: scale(1.05); background: var(--gold);
       color: white; border-color: white;
     }
-    /* ===== Toast ===== */
+
+    /* Toast */
     .custom-toast {
       position: fixed; bottom: 100px; left: 50%;
       transform: translateX(-50%);
@@ -232,31 +377,38 @@
       animation: toastIn 0.4s ease, toastOut 0.4s ease 2.8s forwards;
       max-width: 85%; white-space: nowrap;
     }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(30px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-    @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(30px); } }
+    @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(30px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+    @keyframes toastOut { to{opacity:0;transform:translateX(-50%) translateY(30px);} }
 
     @media (max-width: 480px) {
       .app-container { padding: 0 12px 80px; }
-      .video-info .lecture-title { font-size: 16px; }
+      .video-info { padding: 14px 16px; gap: 10px; }
+      .video-info .subject-thumb { width: 42px; height: 42px; }
+      .video-info .lecture-title { font-size: 15px; }
       .playlist { max-height: 300px; padding: 12px; }
       .playlist-item { padding: 10px 12px; }
       .playlist-item .title { font-size: 14px; }
       .profile-float { width: 48px; height: 48px; bottom: 20px; left: 20px; font-size: 22px; }
       .status-bar { font-size: 12px; }
       .topbar .brand { font-size: 15px; }
-
-      /* ✅ نفس حجم الفقاعة على الموبايل */
       .custom-sticker {
         top: 6px; left: 6px;
-        width: 52px;
-        height: 52px;
+        width: 52px; height: 52px;
       }
     }
   </style>
 </head>
 <body class="dark-mode">
+
+<div id="topProgressBar"></div>
+
+<div id="splashScreen">
+  <div class="splash-logo">THE BEST</div>
+  <div class="splash-loader"></div>
+  <div class="splash-text">جاري التحميل...</div>
+</div>
+
 <div class="app-container">
-  <!-- ===== شريط الحالة ===== -->
   <div class="status-bar">
     <div class="status-left"><span id="statusTime">00:00</span></div>
     <div class="status-right">
@@ -268,7 +420,6 @@
     </div>
   </div>
 
-  <!-- ===== شريط التنقل ===== -->
   <div class="topbar">
     <button class="back-btn" id="backBtn">←</button>
     <div class="brand">THE BEST</div>
@@ -280,29 +431,46 @@
     </div>
   </div>
 
-  <!-- ===== مشغل الفيديوهات ===== -->
   <div class="player-wrapper">
     <div class="video-player">
       <iframe id="playerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-      <!-- 🔥 صورة اللوجو بدل الفقاعة -->
-      <!-- 👇 غيّر مسار الصورة من هنا -->
+      <!-- 🔥 صورة اللوجو -->
       <img class="custom-sticker" src="logo.png" alt="Logo" />
 
       <div class="video-info">
-        <div class="lecture-title" id="videoTitle">🎬 اختر فيديو من القائمة</div>
-        <div class="lecture-sub" id="videoSub">المحاضرة • المدرس</div>
+        <div class="subject-thumb" id="subjectThumb">
+          <span class="fallback-emoji">📚</span>
+        </div>
+        <div class="info-text">
+          <div class="lecture-title" id="videoTitle">🎬 اختر فيديو من القائمة</div>
+          <div class="lecture-sub" id="videoSub">المحاضرة • المدرس</div>
+        </div>
       </div>
     </div>
 
-    <!-- ===== قائمة التشغيل ===== -->
     <div class="playlist">
       <div class="playlist-title">📋 قائمة التشغيل</div>
-      <div id="playlistItems"><div class="loading-state">جاري التحميل</div></div>
+      <div id="playlistItems">
+        <div class="skeleton-playlist">
+          <div class="sk-index"></div>
+          <div class="sk-title"></div>
+          <div class="sk-icon"></div>
+        </div>
+        <div class="skeleton-playlist">
+          <div class="sk-index"></div>
+          <div class="sk-title"></div>
+          <div class="sk-icon"></div>
+        </div>
+        <div class="skeleton-playlist">
+          <div class="sk-index"></div>
+          <div class="sk-title"></div>
+          <div class="sk-icon"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== زر البروفايل ===== -->
   <a href="profile.html" class="profile-float">👤</a>
 </div>
 
@@ -331,7 +499,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
-// ===== عناصر DOM =====
 const playlistItems = document.getElementById('playlistItems');
 const playerFrame = document.getElementById('playerFrame');
 const videoTitle = document.getElementById('videoTitle');
@@ -340,13 +507,12 @@ const darkToggle = document.getElementById('darkToggle');
 const shareBtn = document.getElementById('shareBtn');
 const notifyBtn = document.getElementById('notifyBtn');
 const backBtn = document.getElementById('backBtn');
-
+const subjectThumb = document.getElementById('subjectThumb');
 const statusTime = document.getElementById('statusTime');
 const statusNetwork = document.getElementById('statusNetwork');
 const batteryIcon = document.getElementById('batteryIcon');
 const batteryLevel = document.getElementById('batteryLevel');
 
-// ===== معاملات الرابط =====
 const urlParams = new URLSearchParams(window.location.search);
 const year = urlParams.get('year');
 const subject = urlParams.get('subject');
@@ -354,8 +520,79 @@ const teacher = urlParams.get('teacher');
 const chapter = urlParams.get('chapter');
 const lecture = urlParams.get('lecture');
 
+// ===== Splash + Progress =====
+const topProgressBar = document.getElementById('topProgressBar');
+const splashScreen = document.getElementById('splashScreen');
+let progress = 0;
+const progressInterval = setInterval(() => {
+  progress += Math.random() * 12;
+  if (progress >= 90) { progress = 90; clearInterval(progressInterval); }
+  topProgressBar.style.width = progress + '%';
+}, 200);
+
+function finishLoading() {
+  clearInterval(progressInterval);
+  topProgressBar.style.width = '100%';
+  setTimeout(() => {
+    splashScreen.classList.add('hide');
+    topProgressBar.style.opacity = '0';
+    setTimeout(() => { topProgressBar.style.display = 'none'; }, 400);
+  }, 500);
+}
+
+// =============================================
+// ✨ صورة المادة في معلومات الفيديو
+// =============================================
+function loadSubjectImage() {
+  if (!subject) return;
+  const clean = subject.trim();
+  const attempts = [
+    `subject/${clean}.jpg`,
+    `subject/${clean}.png`,
+    `subject/${clean}.jpeg`,
+    `subject/${clean}.webp`,
+    `subject/${clean.replace(/\s+/g, '_')}.jpg`,
+    `subject/${clean.replace(/\s+/g, '-')}.jpg`
+  ];
+
+  const img = document.createElement('img');
+  img.alt = subject;
+  img.loading = 'lazy';
+  let idx = 0;
+  img.onload = () => { img.classList.add('loaded'); };
+  img.onerror = () => {
+    idx++;
+    if (idx < attempts.length) img.src = attempts[idx];
+    else img.style.display = 'none';
+  };
+  img.src = attempts[0];
+  subjectThumb.appendChild(img);
+}
+loadSubjectImage();
+
+// ===== Haptic =====
+function vibrate(ms = 10) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+// ===== Ripple =====
+function createRipple(e, el) {
+  const rect = el.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - size / 2;
+  const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top - size / 2;
+  ripple.style.left = x + 'px';
+  ripple.style.top = y + 'px';
+  el.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+}
+
 // ===== العودة =====
 backBtn.addEventListener('click', () => {
+  vibrate(10);
   window.location.href = `lecture_name.html?year=${encodeURIComponent(year || '')}&subject=${encodeURIComponent(subject || '')}&teacher=${encodeURIComponent(teacher || '')}&chapter=${encodeURIComponent(chapter || '')}`;
 });
 
@@ -383,7 +620,7 @@ async function updateBattery() {
     const battery = await navigator.getBattery();
     const level = Math.round(battery.level * 100);
     batteryLevel.textContent = `${level}%`;
-    batteryIcon.textContent = battery.charging ? '⚡️' : '🔋';
+    batteryIcon.textContent = battery.charging ? '⚡️' : (level > 20 ? '🔋' : '🪫');
     battery.addEventListener('levelchange', updateBattery);
     battery.addEventListener('chargingchange', updateBattery);
   } catch { batteryLevel.textContent = '--%'; batteryIcon.textContent = '🔋'; }
@@ -468,14 +705,16 @@ function playVideo(video, index, total) {
 // ===== تحميل الفيديوهات =====
 async function loadVideos() {
   if (!year || !subject || !teacher || !chapter || !lecture) {
-    playlistItems.innerHTML = `<div class="empty-state">⚠️ البيانات غير مكتملة</div>`;
+    playlistItems.innerHTML = `<div class="empty-state"><span class="emoji">⚠️</span>البيانات غير مكتملة</div>`;
+    finishLoading();
     return;
   }
   try {
     const dbRef = ref(database);
     const teachersSnap = await get(child(dbRef, `years/${year}/subjects/${subject}/teachers`));
     if (!teachersSnap.exists()) {
-      playlistItems.innerHTML = `<div class="empty-state">⚠️ لا توجد بيانات</div>`;
+      playlistItems.innerHTML = `<div class="empty-state"><span class="emoji">📭</span>لا توجد بيانات</div>`;
+      finishLoading();
       return;
     }
     const teachersData = teachersSnap.val();
@@ -486,7 +725,8 @@ async function loadVideos() {
       teacherObj = teachersData[teacher] || null;
     }
     if (!teacherObj) {
-      playlistItems.innerHTML = `<div class="empty-state">⚠️ المدرس غير موجود</div>`;
+      playlistItems.innerHTML = `<div class="empty-state"><span class="emoji">⚠️</span>المدرس غير موجود</div>`;
+      finishLoading();
       return;
     }
     const chapters = teacherObj.chapters || {};
@@ -497,7 +737,8 @@ async function loadVideos() {
       chapterObj = chapters[chapter] || null;
     }
     if (!chapterObj) {
-      playlistItems.innerHTML = `<div class="empty-state">⚠️ الباب غير موجود</div>`;
+      playlistItems.innerHTML = `<div class="empty-state"><span class="emoji">⚠️</span>الباب غير موجود</div>`;
+      finishLoading();
       return;
     }
     const lectures = chapterObj.lectures || {};
@@ -508,13 +749,15 @@ async function loadVideos() {
       lectureObj = lectures[lecture] || null;
     }
     if (!lectureObj) {
-      playlistItems.innerHTML = `<div class="empty-state">⚠️ المحاضرة غير موجودة</div>`;
+      playlistItems.innerHTML = `<div class="empty-state"><span class="emoji">⚠️</span>المحاضرة غير موجودة</div>`;
+      finishLoading();
       return;
     }
     let videos = lectureObj.videos || [];
     if (!Array.isArray(videos)) videos = Object.values(videos);
     if (videos.length === 0) {
-      playlistItems.innerHTML = `<div class="empty-state">⚠️ لا توجد فيديوهات في هذه المحاضرة</div>`;
+      playlistItems.innerHTML = `<div class="empty-state"><span class="emoji">📭</span>لا توجد فيديوهات في هذه المحاضرة</div>`;
+      finishLoading();
       return;
     }
 
@@ -522,6 +765,7 @@ async function loadVideos() {
     videos.forEach((video, index) => {
       const item = document.createElement('div');
       item.className = 'playlist-item' + (index === 0 ? ' active' : '');
+      item.style.animationDelay = (index * 0.06) + 's';
       const duration = video.duration || '';
       item.innerHTML = `
         <span class="index">#${index + 1}</span>
@@ -529,15 +773,22 @@ async function loadVideos() {
         ${duration ? `<span class="duration">${duration}</span>` : ''}
         <span class="play-icon">▶</span>
       `;
-      item.onclick = () => playVideo(video, index, videos.length);
+      item.onclick = (e) => {
+        vibrate(15);
+        createRipple(e, item);
+        setTimeout(() => playVideo(video, index, videos.length), 100);
+      };
       playlistItems.appendChild(item);
     });
 
     if (videos.length > 0) playVideo(videos[0], 0, videos.length);
 
+    finishLoading();
+
   } catch (err) {
     console.error(err);
     playlistItems.innerHTML = `<div class="error-state">❌ حدث خطأ أثناء التحميل</div>`;
+    finishLoading();
   }
 }
 loadVideos();
@@ -554,6 +805,7 @@ function toggleTheme() {
     darkToggle.classList.remove('active');
     localStorage.setItem('theme', 'light');
   }
+  vibrate(10);
 }
 const savedTheme = localStorage.getItem('theme') || 'dark';
 if (savedTheme === 'light') {
@@ -566,6 +818,7 @@ darkToggle.addEventListener('click', toggleTheme);
 
 // ===== مشاركة =====
 shareBtn.addEventListener('click', async () => {
+  vibrate(10);
   if (navigator.share) {
     try {
       await navigator.share({ title: 'منصة THE BEST', text: 'منصة تعليمية متكاملة', url: window.location.href });
@@ -574,7 +827,10 @@ shareBtn.addEventListener('click', async () => {
 });
 
 // ===== إشعارات =====
-notifyBtn.addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!'));
+notifyBtn.addEventListener('click', () => {
+  vibrate(10);
+  showToast('🔔 الإشعارات ستُفعل قريباً!');
+});
 </script>
 </body>
 </html>
