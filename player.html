@@ -1,504 +1,1503 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>تشغيل الفيديو - منصة THE BEST</title>
-
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: radial-gradient(circle at top, #0a0a0a, #000);
-    color: #fff;
-    margin: 0;
-    text-align: center;
-    overflow-x: hidden;
-  }
-
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #111;
-    padding: 14px 18px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
-  }
-
-  .title {
-    color: #ffd700;
-    font-weight: 700;
-    font-size: 18px;
-    text-shadow: 0 0 8px #ffd700;
-  }
-
-  .back {
-    font-size: 22px;
-    cursor: pointer;
-    color: #ffd700;
-    transition: transform 0.3s;
-    user-select: none;
-    border: 0;
-    background: transparent;
-  }
-
-  .back:hover {
-    transform: translateX(-5px);
-  }
-
-  /* حاوية مشغّل Plyr الأصلي */
-  .plyr-player-wrapper {
-    position: relative;
-    max-width: 950px;
-    width: 100%;
-    margin: 25px auto;
-  }
-
-  #player {
-    display: block;
-    width: 100%;
-    height: 60vh;
-    min-height: 240px;
-    border: 0;
-    border-radius: 18px;
-    margin: 0 auto;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-    background: #000;
-  }
-
-  /* حاوية مشغّل Bunny */
-  .bunny-player-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 950px;
-    margin: 25px auto;
-    overflow: hidden;
-    border-radius: 18px;
-    background: #000;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-  }
-
-  .bunny-player-wrapper #bunnyFrame {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    min-height: 240px;
-    margin: 0;
-    border: 0;
-    border-radius: 0;
-    background: #000;
-  }
-
-  /* ========== الفقاعة الدائرية الكبيرة (الاستيكر الجديد) ========== */
-  .custom-sticker {
-    position: absolute;
-    top: 10px;
-    left: 10px; /* فوق اللوجو القديم */
-    z-index: 50;
-
-    width: 110px;          /* الحجم الكبير لتغطية اللوجو */
-    height: 110px;
-    border-radius: 50%;    /* دائري */
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    padding: 8px;
-
-    /* تدرج ذهبي لامع */
-    background:
-      radial-gradient(circle at 30% 25%,
-        #fff8c4 0%,
-        #ffd700 25%,
-        #b8860b 70%,
-        #6b4a00 100%);
-
-    color: #111;
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px;
-    font-weight: 900;
-    line-height: 1.2;
-    text-shadow: 0 1px 1px rgba(255,255,255,0.5);
-
-    pointer-events: none;
-    user-select: none;
-    overflow: hidden;
-
-    /* تأثير الفقاعة والحدود اللامعة */
-    box-shadow:
-      0 0 0 3px rgba(255, 215, 0, 0.55),
-      0 0 15px rgba(255, 215, 0, 0.8),
-      0 0 30px rgba(255, 215, 0, 0.4),
-      inset 0 -8px 15px rgba(0, 0, 0, 0.35),
-      inset 0 8px 15px rgba(255, 255, 255, 0.5);
-
-    border: 2px solid rgba(255, 255, 255, 0.65);
-  }
-
-  /* لمعة زجاجية أعلى الفقاعة (تأثير Bubble / Glossy) */
-  .custom-sticker::before {
-    content: "";
-    position: absolute;
-    top: 6%;
-    left: 18%;
-    width: 55%;
-    height: 35%;
-    border-radius: 50%;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(255, 255, 255, 0.6) 40%,
-      rgba(255, 255, 255, 0) 75%
-    );
-    transform: rotate(-20deg);
-    pointer-events: none;
-  }
-
-  /* لمعة صغيرة أسفل الفقاعة */
-  .custom-sticker::after {
-    content: "";
-    position: absolute;
-    bottom: 8%;
-    right: 22%;
-    width: 20%;
-    height: 12%;
-    border-radius: 50%;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(255, 255, 255, 0.7) 0%,
-      rgba(255, 255, 255, 0) 80%
-    );
-    pointer-events: none;
-  }
-
-  #hint {
-    margin: 12px auto;
-    color: #ffd700;
-    font-size: 14px;
-    text-shadow: 0 0 4px #ffd700;
-    padding: 0 12px;
-  }
-
-  .error-msg {
-    margin: 40px auto;
-    color: #ff4d4d;
-    font-size: 18px;
-    font-weight: 700;
-    padding: 20px;
-    overflow-wrap: anywhere;
-  }
-
-  [hidden] {
-    display: none !important;
-  }
-
-  @media (max-width: 600px) {
-    .plyr-player-wrapper {
-      margin: 18px auto;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم - منصة THE BEST</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #0d0d0d;
+      --bg-secondary: #1a1a1a;
+      --bg-card: #222;
+      --bg-input: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #ffd700;
+      --border-color: rgba(255,215,0,0.2);
+      --topbar-bg: #0a0a0a;
+      --profile-btn-bg: #222;
+      --profile-btn-border: #ffd700;
     }
-
-    #player {
-      height: auto;
-      min-height: 230px;
-      aspect-ratio: 16 / 9;
-      border-radius: 10px;
+    body.light-mode {
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ffffff;
+      --bg-card: #f0f0f0;
+      --bg-input: #e8e8e8;
+      --text-primary: #000000;
+      --text-secondary: #b8860b;
+      --border-color: rgba(0,0,0,0.15);
+      --topbar-bg: #ffffff;
+      --profile-btn-bg: #ffffff;
+      --profile-btn-border: #333;
     }
-
-    .bunny-player-wrapper {
-      margin: 18px auto;
-      border-radius: 10px;
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 80px 15px 30px;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
     }
-
-    .bunny-player-wrapper #bunnyFrame {
-      min-height: 230px;
-    }
-
-    /* تصغير الفقاعة شوية على الموبايل مع الحفاظ على تغطية اللوجو */
-    .custom-sticker {
-      top: 6px;
-      left: 6px;
-      width: 85px;
-      height: 85px;
-      font-size: 10px;
-      border-width: 1.5px;
-    }
-
     .topbar {
-      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--topbar-bg);
+      padding: 10px 15px;
+      position: fixed;
+      top:0; right:0; left:0;
+      z-index:1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
-
-    .title {
-      font-size: 16px;
+    .menu-btn {
+      font-size: 18px;
+      cursor: pointer;
+      background: rgba(255,215,0,0.1);
+      border: 1px solid var(--text-secondary);
+      color: var(--text-secondary);
+      padding: 5px 9px;
+      border-radius: 8px;
+      transition: 0.3s;
+      user-select: none;
     }
-  }
-</style>
+    .menu-btn:hover { background: rgba(255,215,0,0.2); transform: translateY(-1px); }
+    .title { font-size: 15px; font-weight: bold; color: var(--text-secondary); letter-spacing: 1px; }
+    .icons { display: flex; align-items: center; gap: 12px; }
+    .icons img { width: 22px; height: 22px; cursor: pointer; transition: transform 0.2s; }
+    .icons img:hover { transform: scale(1.1); }
+    .toggle-dark {
+      background: #fff;
+      border-radius: 12px;
+      width: 40px;
+      height: 20px;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle-dark::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #111;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle-dark.active::after { left: 22px; background: #ff0; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .admin-header h1 {
+      color: var(--text-secondary);
+      font-size: 2rem;
+      font-weight: 800;
+      text-shadow: 0 0 15px rgba(255,215,0,0.2);
+    }
+    .admin-header .badge {
+      background: var(--text-secondary);
+      color: #000;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .add-section {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .add-section h2 {
+      color: var(--text-secondary);
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .form-group select, .form-group input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.95rem;
+      transition: 0.3s;
+      outline: none;
+      width: 100%;
+    }
+    .form-group select:focus, .form-group input:focus {
+      border-color: var(--text-secondary);
+      box-shadow: 0 0 0 3px rgba(255,215,0,0.15);
+    }
+    .form-group select option {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .btn-primary {
+      background: var(--text-secondary);
+      color: #000;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255,215,0,0.3);
+    }
+    .btn-success {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn-success:hover { background: #218838; transform: scale(1.05); }
+    .btn-secondary {
+      background: #6c757d;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      font-family: 'Cairo', sans-serif;
+    }
+    .btn-secondary:hover { background: #5a6268; transform: scale(1.05); }
+    .btn-danger {
+      background: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .btn-danger:hover { background: #c82333; transform: scale(1.05); }
+    .btn-edit {
+      background: #17a2b8;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-left: 6px;
+    }
+    .btn-edit:hover { background: #138496; transform: scale(1.05); }
+    .videos-section {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .videos-section h2 {
+      color: var(--text-secondary);
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .video-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--text-secondary);
+      transition: 0.3s;
+    }
+    .video-item:hover { transform: translateX(4px); background: rgba(255,215,0,0.05); }
+    .video-item .info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+    .video-item .info .name { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
+    .video-item .info .url { font-size: 0.8rem; color: #888; direction: ltr; }
+    .video-item .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .empty-msg { text-align: center; color: #888; padding: 30px 0; font-size: 1.1rem; }
+    .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .mt-10 { margin-top: 10px; }
+    .w-100 { width: 100%; }
+    .profile-float-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: var(--profile-btn-bg);
+      border: 2px solid var(--profile-btn-border);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: 0.3s;
+      z-index: 1200;
+    }
+    .profile-float-btn:hover { transform: scale(1.1); background: var(--text-secondary); }
+    .profile-float-btn img { width: 28px; height: 28px; }
+    @media (max-width: 600px) {
+      body { padding: 70px 10px 20px; }
+      .admin-header h1 { font-size: 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .video-item { flex-wrap: wrap; }
+      .video-item .actions { width: 100%; justify-content: flex-start; }
+      .profile-float-btn { width: 45px; height: 45px; bottom: 15px; left: 15px; }
+      .profile-float-btn img { width: 22px; height: 22px; }
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="topbar">
-  <button class="back" onclick="history.back()" aria-label="رجوع">⬅</button>
-  <div class="title">THE BEST 🎬</div>
-  <div style="width:25px"></div>
-</div>
-
-<!-- مشغّل Plyr الرئيسي مع الاستيكر -->
-<div class="plyr-player-wrapper" id="plyrWrapper">
-  <video id="player" playsinline controls poster="poster.jpg" hidden></video>
-  <div class="custom-sticker">
-    <span>منصتك</span>
-    <span>التعليمية</span>
+  <div class="topbar">
+    <div class="menu-btn" id="backBtn">⬅</div>
+    <div class="title">🛠️ 𝑨𝒅𝒎𝒊𝒏 𝑷𝒂𝒏𝒆𝒍</div>
+    <div class="icons">
+      <div class="toggle-dark" id="darkToggle"></div>
+      <a href="https://wa.me/" target="_blank"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" /></a>
+      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="مشاركة" />
+      <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png" alt="إشعارات" />
+    </div>
   </div>
-</div>
-
-<!-- مشغّل Bunny مع الاستيكر الخاص بك -->
-<div class="bunny-player-wrapper" id="bunnyWrapper" hidden>
-  <iframe
-    id="bunnyFrame"
-    title="Bunny Stream Video"
-    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
-    allowfullscreen
-    loading="eager">
-  </iframe>
-
-  <div class="custom-sticker">
-    <span>منصتك</span>
-    <span>التعليمية</span>
+  <div class="container">
+    <div class="admin-header">
+      <h1>📹 إدارة المنصة</h1>
+      <span class="badge">Admin</span>
+    </div>
+    <div class="add-section">
+      <h2>➕ إدارة البيانات</h2>
+      <form id="adminForm" class="form-grid">
+        <div class="form-group">
+          <label for="adminYear">السنة الدراسية</label>
+          <select id="adminYear"><option value="">-- اختر السنة --</option></select>
+        </div>
+        <div class="form-group">
+          <label for="adminSubject">المادة</label>
+          <select id="adminSubject" disabled><option value="">-- اختر المادة --</option></select>
+        </div>
+        <div class="form-group">
+          <label for="adminTeacher">المدرس</label>
+          <select id="adminTeacher" disabled><option value="">-- اختر المدرس --</option></select>
+        </div>
+        <div class="form-group" id="chapterGroup">
+          <label for="adminChapter">الباب</label>
+          <div id="chapterContainer"></div>
+        </div>
+        <div class="form-group" id="lectureGroup">
+          <label for="adminLecture">المحاضرة</label>
+          <div id="lectureContainer"></div>
+        </div>
+        <div class="form-group">
+          <label for="adminVideoName">اسم الفيديو</label>
+          <input type="text" id="adminVideoName" placeholder="مثال: شرح الدرس الأول" />
+        </div>
+        <div class="form-group">
+          <label for="adminVideoUrl">رابط الفيديو (YouTube)</label>
+          <input type="url" id="adminVideoUrl" placeholder="https://youtu.be/..." />
+        </div>
+        <div style="display: flex; gap: 10px; grid-column: 1 / -1; justify-content: center; flex-wrap: wrap;">
+          <button type="submit" class="btn-primary">📤 إضافة فيديو</button>
+          <button type="button" class="btn-primary" style="background: #28a745;" id="addYearBtn">➕ سنة جديدة</button>
+          <button type="button" class="btn-primary" style="background: #17a2b8;" id="addSubjectBtn">➕ مادة جديدة</button>
+          <button type="button" class="btn-primary" style="background: #ffc107; color:#000;" id="addTeacherBtn">➕ مدرس جديد</button>
+        </div>
+      </form>
+    </div>
+    <div class="videos-section">
+      <h2><span>📋 الفيديوهات</span><span id="videoCount">0</span></h2>
+      <div id="videosList"><div class="empty-msg">اختر البيانات لعرض الفيديوهات</div></div>
+    </div>
   </div>
-</div>
+  <a href="profile.html" class="profile-float-btn"><img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل" /></a>
 
-<div id="hint">💡 استخدم أزرار المشغّل للتحكم في الفيديو.</div>
-<div id="error" class="error-msg" hidden></div>
-
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-<script>
-(async function () {
-  const videoElement = document.getElementById('player');
-  const bunnyFrame = document.getElementById('bunnyFrame');
-  const bunnyWrapper = document.getElementById('bunnyWrapper');
-  const plyrWrapper = document.getElementById('plyrWrapper');
-  const errorElement = document.getElementById('error');
-  const hint = document.getElementById('hint');
-
-  const videoTitle =
-    localStorage.getItem('video_title') || 'Lecture Video';
-
-  const savedSources = localStorage.getItem('video_sources');
-
-  function showError(message) {
-    errorElement.textContent = message;
-    errorElement.hidden = false;
-  }
-
-  function getSource(item) {
-    if (typeof item === 'string') {
-      return item.trim();
-    }
-
-    if (item && typeof item === 'object') {
-      const source =
-        item.stream_url ||
-        item.src ||
-        item.url ||
-        item.videoUrl ||
-        item.video_url ||
-        item.link ||
-        '';
-
-      return typeof source === 'string' ? source.trim() : '';
-    }
-
-    return '';
-  }
-
-  function getBunnyEmbedUrl(source) {
-    try {
-      const url = new URL(source.trim());
-
-      if (url.protocol !== 'https:') return null;
-
-      const allowedHosts = [
-        'player.mediadelivery.net',
-        'iframe.mediadelivery.net'
-      ];
-
-      if (!allowedHosts.includes(url.hostname.toLowerCase())) {
-        return null;
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
       }
-
-      const match = url.pathname.match(
-        /^\/(play|embed)\/(\d+)\/([a-f0-9-]+)\/?$/i
-      );
-
-      if (!match) return null;
-
-      const libraryId = match[2];
-      const videoId = match[3];
-
-      return (
-        'https://player.mediadelivery.net/embed/' +
-        libraryId + '/' + videoId
-      );
-    } catch (_) {
-      return null;
     }
-  }
+  </script>
+  <script type="module">
+    import { initializeApp } from 'firebase/app';
+    import { getDatabase, ref, get, set, push, update, remove, child } from 'firebase/database';
 
-  function initializeHls(source) {
-    videoElement.hidden = false;
-    plyrWrapper.hidden = false;
-    bunnyWrapper.hidden = true;
+    // ----- تهيئة Firebase -----
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0p0us6BuzD2ngzjhRnmUIhlOcBeRp0vQ",
+      authDomain: "tok-tak-d6e17.firebaseapp.com",
+      databaseURL: "https://tok-tak-d6e17-default-rtdb.firebaseio.com",
+      projectId: "tok-tak-d6e17",
+      storageBucket: "tok-tak-d6e17.appspot.com",
+      messagingSenderId: "547062578826",
+      appId: "1:547062578826:web:aa285cf798341be07cb773",
+      measurementId: "G-7EMKEQKPVV"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    const player = new Plyr(videoElement, {
-      title: videoTitle,
-      controls: [
-        'play-large',
-        'play',
-        'rewind',
-        'fast-forward',
-        'progress',
-        'current-time',
-        'duration',
-        'mute',
-        'volume',
-        'settings',
-        'fullscreen'
-      ],
-      settings: ['quality', 'speed', 'loop'],
-      rewindTime: 10,
-      forwardTime: 10
-    });
+    // ----- عناصر DOM -----
+    const adminYear = document.getElementById('adminYear');
+    const adminSubject = document.getElementById('adminSubject');
+    const adminTeacher = document.getElementById('adminTeacher');
+    const chapterContainer = document.getElementById('chapterContainer');
+    const lectureContainer = document.getElementById('lectureContainer');
+    const adminVideoName = document.getElementById('adminVideoName');
+    const adminVideoUrl = document.getElementById('adminVideoUrl');
+    const adminForm = document.getElementById('adminForm');
+    const videosList = document.getElementById('videosList');
+    const videoCount = document.getElementById('videoCount');
 
-    if (Hls.isSupported()) {
-      const hls = new Hls();
+    // ----- متغيرات الحالة -----
+    let currentSelection = {
+      year: '',
+      subject: '',
+      teacher: '',
+      chapter: '',
+      lecture: ''
+    };
+    let allVideos = [];
+    let chapterNames = [];
+    let lectureNames = [];
 
-      hls.loadSource(source);
-      hls.attachMedia(videoElement);
-
-      hls.on(Hls.Events.ERROR, function (_, data) {
-        if (data.fatal) {
-          showError(
-            'تعذر تشغيل الفيديو. تحقق من الرابط وصلاحيات الوصول.'
-          );
+    // ----- دوال مساعدة -----
+    function showToast(msg, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `custom-toast ${type}`;
+      toast.innerHTML = `<span>${msg}</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+    }
+    if (!document.querySelector('#toastStyle')) {
+      const style = document.createElement('style');
+      style.id = 'toastStyle';
+      style.textContent = `
+        .custom-toast {
+          position: fixed; bottom: 20px; right: 20px; padding: 14px 22px;
+          border-radius: 14px; font-family: 'Cairo', sans-serif;
+          font-weight: 600; font-size: 15px; color: #fff;
+          display: flex; align-items: center; gap: 10px;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+          animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+          z-index: 9999; max-width: 90%;
         }
-      });
-    } else if (
-      videoElement.canPlayType('application/vnd.apple.mpegurl')
-    ) {
-      videoElement.src = source;
-    } else {
-      showError('المتصفح لا يدعم تشغيل هذا النوع من الفيديو.');
+        .custom-toast.info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .custom-toast.success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
+      `;
+      document.head.appendChild(style);
     }
 
-    player.on('play', async function () {
+    // ----- دوال قراءة وكتابة البيانات -----
+
+    // تحميل قائمة السنوات
+    async function loadYears() {
       try {
-        if (!player.fullscreen.active) {
-          await player.fullscreen.enter();
+        const snap = await get(child(ref(db), 'years'));
+        if (snap.exists()) {
+          const data = snap.val();
+          const years = Object.keys(data).sort();
+          adminYear.innerHTML = '<option value="">-- اختر السنة --</option>';
+          years.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            adminYear.appendChild(opt);
+          });
+          if (currentSelection.year) adminYear.value = currentSelection.year;
+          return data;
+        } else {
+          adminYear.innerHTML = '<option value="">-- لا توجد سنوات --</option>';
+          return {};
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('فشل تحميل السنوات', 'error');
+        return {};
+      }
+    }
+
+    // تحميل المواد حسب السنة
+    async function loadSubjects(year) {
+      if (!year) {
+        adminSubject.innerHTML = '<option value="">-- اختر المادة --</option>';
+        adminSubject.disabled = true;
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects`));
+        let subjects = [];
+        if (snap.exists()) {
+          const data = snap.val();
+          if (Array.isArray(data)) {
+            subjects = data.map(s => s.subject_name || s.name || s).filter(Boolean);
+          } else {
+            subjects = Object.keys(data);
+          }
+        }
+        adminSubject.innerHTML = '<option value="">-- اختر المادة --</option>';
+        subjects.sort().forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.textContent = s;
+          adminSubject.appendChild(opt);
+        });
+        adminSubject.disabled = false;
+        if (currentSelection.subject && subjects.includes(currentSelection.subject)) {
+          adminSubject.value = currentSelection.subject;
+        }
+        // بعد تحميل المواد، إذا كانت هناك مادة محددة مسبقاً، نحمل المدرسين تلقائياً
+        if (adminSubject.value) {
+          await loadTeachers(year, adminSubject.value);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('فشل تحميل المواد', 'error');
+      }
+    }
+
+    // تحميل المدرسين
+    async function loadTeachers(year, subject) {
+      if (!year || !subject) {
+        adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+        adminTeacher.disabled = true;
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        let teachers = [];
+        if (snap.exists()) {
+          const data = snap.val();
+          if (Array.isArray(data)) {
+            teachers = data.map(t => t.teacher_name || t.name || t).filter(Boolean);
+          } else {
+            teachers = Object.keys(data);
+          }
+        }
+        adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+        teachers.sort().forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          adminTeacher.appendChild(opt);
+        });
+        adminTeacher.disabled = false;
+        if (currentSelection.teacher && teachers.includes(currentSelection.teacher)) {
+          adminTeacher.value = currentSelection.teacher;
+        }
+        // بعد تحميل المدرسين، إذا كان هناك مدرس محدد، نحمل الأبواب
+        if (adminTeacher.value) {
+          await loadChapters(year, subject, adminTeacher.value);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('فشل تحميل المدرسين', 'error');
+      }
+    }
+
+    // ----- دوال عرض خانات الباب والمحاضرة (ذكية) -----
+
+    function renderChapterField(chapters) {
+      chapterContainer.innerHTML = '';
+      chapterNames = chapters || [];
+
+      if (chapterNames.length === 0) {
+        // لا توجد أبواب: نعرض حقل إدخال + زر إضافة
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'adminChapterInput';
+        input.placeholder = 'أكتب اسم الباب الجديد';
+        input.className = 'w-100';
+        input.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        input.addEventListener('input', () => {
+          currentSelection.chapter = input.value.trim();
+        });
+        chapterContainer.appendChild(input);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-success';
+        addBtn.textContent = '➕ إضافة باب';
+        addBtn.onclick = async () => {
+          const name = input.value.trim();
+          if (!name) { showToast('⚠️ أدخل اسم الباب', 'error'); return; }
+          await addNewChapter(name);
+        };
+        btnRow.appendChild(addBtn);
+        chapterContainer.appendChild(btnRow);
+
+        currentSelection.chapter = '';
+        // إلغاء تحديد المحاضرة
+        renderLectureField([]);
+        currentSelection.lecture = '';
+        allVideos = [];
+        renderVideos();
+      } else {
+        // توجد أبواب: نعرض قائمة منسدلة + زر إضافة جديد
+        const select = document.createElement('select');
+        select.id = 'adminChapter';
+        select.className = 'w-100';
+        select.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- اختر الباب --';
+        select.appendChild(defaultOpt);
+        chapterNames.sort().forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          select.appendChild(opt);
+        });
+        if (currentSelection.chapter && chapterNames.includes(currentSelection.chapter)) {
+          select.value = currentSelection.chapter;
+        }
+        select.addEventListener('change', () => {
+          currentSelection.chapter = select.value;
+          if (currentSelection.chapter) {
+            loadLectures(currentSelection.year, currentSelection.subject, currentSelection.teacher, currentSelection
+              .chapter);
+          } else {
+            renderLectureField([]);
+            currentSelection.lecture = '';
+            allVideos = [];
+            renderVideos();
+          }
+        });
+        chapterContainer.appendChild(select);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-secondary';
+        addBtn.textContent = '➕ باب جديد';
+        addBtn.onclick = () => {
+          // إظهار حقل إدخال مؤقت
+          const existingSelect = document.getElementById('adminChapter');
+          if (existingSelect) existingSelect.style.display = 'none';
+          addBtn.style.display = 'none';
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = 'adminChapterInput';
+          input.placeholder = 'أكتب اسم الباب الجديد';
+          input.className = 'w-100';
+          input.style.cssText =
+            'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%; margin-top: 10px;';
+          input.addEventListener('input', () => {
+            currentSelection.chapter = input.value.trim();
+          });
+          chapterContainer.appendChild(input);
+
+          const confirmRow = document.createElement('div');
+          confirmRow.className = 'flex-row';
+          const confirmBtn = document.createElement('button');
+          confirmBtn.type = 'button';
+          confirmBtn.className = 'btn-success';
+          confirmBtn.textContent = '✅ تأكيد';
+          confirmBtn.onclick = async () => {
+            const name = input.value.trim();
+            if (!name) { showToast('⚠️ أدخل اسم الباب', 'error'); return; }
+            await addNewChapter(name);
+          };
+          confirmRow.appendChild(confirmBtn);
+
+          const cancelBtn = document.createElement('button');
+          cancelBtn.type = 'button';
+          cancelBtn.className = 'btn-danger';
+          cancelBtn.textContent = 'إلغاء';
+          cancelBtn.onclick = () => {
+            chapterContainer.innerHTML = '';
+            renderChapterField(chapterNames);
+          };
+          confirmRow.appendChild(cancelBtn);
+          chapterContainer.appendChild(confirmRow);
+        };
+        btnRow.appendChild(addBtn);
+        chapterContainer.appendChild(btnRow);
+      }
+    }
+
+    // دالة إضافة باب جديد
+    async function addNewChapter(chapterName) {
+      const { year, subject, teacher } = currentSelection;
+      if (!year || !subject || !teacher) {
+        showToast('⚠️ اختر السنة والمادة والمدرس أولاً', 'error');
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
         }
 
-        if (screen.orientation && screen.orientation.lock) {
-          await screen.orientation.lock('landscape');
+        let chapters = teacherObj.chapters || {};
+        if (Array.isArray(chapters)) {
+          if (chapters.some(c => (c.chapter_name || c.name || c) === chapterName)) {
+            showToast('⚠️ الباب موجود بالفعل', 'error');
+            return;
+          }
+          chapters.push({ chapter_name: chapterName, lectures: {} });
+        } else {
+          if (chapters[chapterName]) { showToast('⚠️ الباب موجود بالفعل', 'error'); return; }
+          chapters[chapterName] = { lectures: {} };
         }
-      } catch (_) {
-        // بعض المتصفحات لا تسمح بالتدوير أو ملء الشاشة تلقائيًا.
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        showToast('✅ تم إضافة الباب', 'success');
+        // تحديث القائمة
+        chapterNames.push(chapterName);
+        renderChapterField(chapterNames);
+        currentSelection.chapter = chapterName;
+        // إعادة تحميل المحاضرات (فارغة)
+        renderLectureField([]);
+        currentSelection.lecture = '';
+        allVideos = [];
+        renderVideos();
+      } catch (err) {
+        console.error(err);
+        showToast('❌ فشل إضافة الباب', 'error');
+      }
+    }
+
+    // ----- دوال المحاضرات (نفس المنطق) -----
+
+    function renderLectureField(lectures) {
+      lectureContainer.innerHTML = '';
+      lectureNames = lectures || [];
+
+      if (lectureNames.length === 0) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'adminLectureInput';
+        input.placeholder = 'أكتب اسم المحاضرة الجديدة';
+        input.className = 'w-100';
+        input.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        input.addEventListener('input', () => {
+          currentSelection.lecture = input.value.trim();
+        });
+        lectureContainer.appendChild(input);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-success';
+        addBtn.textContent = '➕ إضافة محاضرة';
+        addBtn.onclick = async () => {
+          const name = input.value.trim();
+          if (!name) { showToast('⚠️ أدخل اسم المحاضرة', 'error'); return; }
+          await addNewLecture(name);
+        };
+        btnRow.appendChild(addBtn);
+        lectureContainer.appendChild(btnRow);
+
+        currentSelection.lecture = '';
+        allVideos = [];
+        renderVideos();
+      } else {
+        const select = document.createElement('select');
+        select.id = 'adminLecture';
+        select.className = 'w-100';
+        select.style.cssText =
+          'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%;';
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = '-- اختر المحاضرة --';
+        select.appendChild(defaultOpt);
+        lectureNames.sort().forEach(l => {
+          const opt = document.createElement('option');
+          opt.value = l;
+          opt.textContent = l;
+          select.appendChild(opt);
+        });
+        if (currentSelection.lecture && lectureNames.includes(currentSelection.lecture)) {
+          select.value = currentSelection.lecture;
+        }
+        select.addEventListener('change', () => {
+          currentSelection.lecture = select.value;
+          if (currentSelection.lecture) {
+            loadVideos(currentSelection.year, currentSelection.subject, currentSelection.teacher, currentSelection
+              .chapter, currentSelection.lecture);
+          } else {
+            allVideos = [];
+            renderVideos();
+          }
+        });
+        lectureContainer.appendChild(select);
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'flex-row';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-secondary';
+        addBtn.textContent = '➕ محاضرة جديدة';
+        addBtn.onclick = () => {
+          const existingSelect = document.getElementById('adminLecture');
+          if (existingSelect) existingSelect.style.display = 'none';
+          addBtn.style.display = 'none';
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.id = 'adminLectureInput';
+          input.placeholder = 'أكتب اسم المحاضرة الجديدة';
+          input.className = 'w-100';
+          input.style.cssText =
+            'background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: "Cairo", sans-serif; font-size: 0.95rem; outline: none; width: 100%; margin-top: 10px;';
+          input.addEventListener('input', () => {
+            currentSelection.lecture = input.value.trim();
+          });
+          lectureContainer.appendChild(input);
+
+          const confirmRow = document.createElement('div');
+          confirmRow.className = 'flex-row';
+          const confirmBtn = document.createElement('button');
+          confirmBtn.type = 'button';
+          confirmBtn.className = 'btn-success';
+          confirmBtn.textContent = '✅ تأكيد';
+          confirmBtn.onclick = async () => {
+            const name = input.value.trim();
+            if (!name) { showToast('⚠️ أدخل اسم المحاضرة', 'error'); return; }
+            await addNewLecture(name);
+          };
+          confirmRow.appendChild(confirmBtn);
+
+          const cancelBtn = document.createElement('button');
+          cancelBtn.type = 'button';
+          cancelBtn.className = 'btn-danger';
+          cancelBtn.textContent = 'إلغاء';
+          cancelBtn.onclick = () => {
+            lectureContainer.innerHTML = '';
+            renderLectureField(lectureNames);
+          };
+          confirmRow.appendChild(cancelBtn);
+          lectureContainer.appendChild(confirmRow);
+        };
+        btnRow.appendChild(addBtn);
+        lectureContainer.appendChild(btnRow);
+      }
+    }
+
+    // دالة إضافة محاضرة جديدة
+    async function addNewLecture(lectureName) {
+      const { year, subject, teacher, chapter } = currentSelection;
+      if (!year || !subject || !teacher || !chapter) {
+        showToast('⚠️ اختر السنة والمادة والمدرس والباب أولاً', 'error');
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
+        }
+
+        let chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        let chapterKey = null;
+        if (Array.isArray(chapters)) {
+          const idx = chapters.findIndex(c => (c.chapter_name || c.name || c) === chapter);
+          if (idx === -1) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = idx;
+          chapterObj = chapters[idx];
+        } else {
+          const keys = Object.keys(chapters);
+          let found = null;
+          for (const k of keys) {
+            if ((chapters[k].chapter_name || chapters[k].name || chapters[k]) === chapter) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = found;
+          chapterObj = chapters[found];
+        }
+
+        let lectures = chapterObj.lectures || {};
+        if (Array.isArray(lectures)) {
+          if (lectures.some(l => (l.lecture_name || l.name || l) === lectureName)) {
+            showToast('⚠️ المحاضرة موجودة بالفعل', 'error');
+            return;
+          }
+          lectures.push({ lecture_name: lectureName, videos: [] });
+        } else {
+          if (lectures[lectureName]) { showToast('⚠️ المحاضرة موجودة بالفعل', 'error'); return; }
+          lectures[lectureName] = { videos: [] };
+        }
+        chapterObj.lectures = lectures;
+        if (Array.isArray(chapters)) chapters[chapterKey] = chapterObj;
+        else chapters[chapterKey] = chapterObj;
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        showToast('✅ تم إضافة المحاضرة', 'success');
+        lectureNames.push(lectureName);
+        renderLectureField(lectureNames);
+        currentSelection.lecture = lectureName;
+        allVideos = [];
+        renderVideos();
+      } catch (err) {
+        console.error(err);
+        showToast('❌ فشل إضافة المحاضرة', 'error');
+      }
+    }
+
+    // تحميل الأبواب
+    async function loadChapters(year, subject, teacher) {
+      if (!year || !subject || !teacher) {
+        renderChapterField([]);
+        renderLectureField([]);
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { renderChapterField([]); renderLectureField([]); return; }
+        const teachersData = snap.val();
+        let teacherObj = null;
+        if (Array.isArray(teachersData)) {
+          teacherObj = teachersData.find(t => (t.teacher_name || t.name || t) === teacher);
+        } else {
+          teacherObj = teachersData[teacher] || null;
+        }
+        if (!teacherObj) { renderChapterField([]); renderLectureField([]); return; }
+        const chapters = teacherObj.chapters || {};
+        let names = [];
+        if (Array.isArray(chapters)) {
+          names = chapters.map(c => c.chapter_name || c.name || c).filter(Boolean);
+        } else {
+          names = Object.keys(chapters);
+        }
+        renderChapterField(names);
+        // إذا كان هناك باب محدد، نحمّل محاضراته
+        if (currentSelection.chapter && names.includes(currentSelection.chapter)) {
+          await loadLectures(year, subject, teacher, currentSelection.chapter);
+        } else {
+          renderLectureField([]);
+          currentSelection.lecture = '';
+          allVideos = [];
+          renderVideos();
+        }
+      } catch (err) {
+        console.error(err);
+        renderChapterField([]);
+        showToast('فشل تحميل الأبواب', 'error');
+      }
+    }
+
+    // تحميل المحاضرات
+    async function loadLectures(year, subject, teacher, chapter) {
+      if (!year || !subject || !teacher || !chapter) {
+        renderLectureField([]);
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { renderLectureField([]); return; }
+        const teachersData = snap.val();
+        let teacherObj = null;
+        if (Array.isArray(teachersData)) {
+          teacherObj = teachersData.find(t => (t.teacher_name || t.name || t) === teacher);
+        } else {
+          teacherObj = teachersData[teacher] || null;
+        }
+        if (!teacherObj) { renderLectureField([]); return; }
+        const chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        if (Array.isArray(chapters)) {
+          chapterObj = chapters.find(c => (c.chapter_name || c.name || c) === chapter);
+        } else {
+          chapterObj = chapters[chapter] || null;
+        }
+        if (!chapterObj) { renderLectureField([]); return; }
+        const lectures = chapterObj.lectures || {};
+        let names = [];
+        if (Array.isArray(lectures)) {
+          names = lectures.map(l => l.lecture_name || l.name || l).filter(Boolean);
+        } else {
+          names = Object.keys(lectures);
+        }
+        renderLectureField(names);
+        if (currentSelection.lecture && names.includes(currentSelection.lecture)) {
+          await loadVideos(year, subject, teacher, chapter, currentSelection.lecture);
+        } else {
+          allVideos = [];
+          renderVideos();
+        }
+      } catch (err) {
+        console.error(err);
+        renderLectureField([]);
+        showToast('فشل تحميل المحاضرات', 'error');
+      }
+    }
+
+    // تحميل الفيديوهات
+    async function loadVideos(year, subject, teacher, chapter, lecture) {
+      if (!year || !subject || !teacher || !chapter || !lecture) {
+        allVideos = [];
+        renderVideos();
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { allVideos = []; renderVideos(); return; }
+        const teachersData = snap.val();
+        let teacherObj = null;
+        if (Array.isArray(teachersData)) {
+          teacherObj = teachersData.find(t => (t.teacher_name || t.name || t) === teacher);
+        } else {
+          teacherObj = teachersData[teacher] || null;
+        }
+        if (!teacherObj) { allVideos = []; renderVideos(); return; }
+        const chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        if (Array.isArray(chapters)) {
+          chapterObj = chapters.find(c => (c.chapter_name || c.name || c) === chapter);
+        } else {
+          chapterObj = chapters[chapter] || null;
+        }
+        if (!chapterObj) { allVideos = []; renderVideos(); return; }
+        const lectures = chapterObj.lectures || {};
+        let lectureObj = null;
+        if (Array.isArray(lectures)) {
+          lectureObj = lectures.find(l => (l.lecture_name || l.name || l) === lecture);
+        } else {
+          lectureObj = lectures[lecture] || null;
+        }
+        if (!lectureObj) { allVideos = []; renderVideos(); return; }
+        const videos = lectureObj.videos || [];
+        allVideos = Array.isArray(videos) ? videos : Object.values(videos);
+        renderVideos();
+      } catch (err) {
+        console.error(err);
+        allVideos = [];
+        renderVideos();
+        showToast('فشل تحميل الفيديوهات', 'error');
+      }
+    }
+
+    // عرض الفيديوهات
+    function renderVideos() {
+      videosList.innerHTML = '';
+      videoCount.textContent = allVideos.length;
+      if (allVideos.length === 0) {
+        videosList.innerHTML = '<div class="empty-msg">⚠️ لا توجد فيديوهات في هذه المحاضرة</div>';
+        return;
+      }
+      allVideos.forEach((video, index) => {
+        const name = video.name || video.video_name || `فيديو ${index+1}`;
+        const url = video.url || video.link || '#';
+        const item = document.createElement('div');
+        item.className = 'video-item';
+        item.innerHTML = `
+          <div class="info">
+            <div class="name">${name}</div>
+            <div class="url">${url}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-edit" data-index="${index}">✏️ تعديل</button>
+            <button class="btn-danger" data-index="${index}">🗑️ حذف</button>
+          </div>
+        `;
+        item.querySelector('.btn-danger').onclick = () => deleteVideo(index);
+        item.querySelector('.btn-edit').onclick = () => editVideo(index);
+        videosList.appendChild(item);
+      });
+    }
+
+    // ----- أحداث التغيير -----
+    adminYear.addEventListener('change', async () => {
+      currentSelection.year = adminYear.value;
+      // إعادة تعيين القوائم التابعة
+      adminSubject.innerHTML = '<option value="">-- اختر المادة --</option>';
+      adminSubject.disabled = true;
+      adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+      adminTeacher.disabled = true;
+      renderChapterField([]);
+      renderLectureField([]);
+      allVideos = [];
+      renderVideos();
+      // إذا تم اختيار سنة، نحمل المواد
+      if (currentSelection.year) {
+        await loadSubjects(currentSelection.year);
       }
     });
 
-    player.on('ended', function () {
-      alert('🎬 انتهى الفيديو');
-    });
-  }
-
-  if (!savedSources) {
-    showError(
-      'لم يتم تحديد رابط الفيديو. ارجع للصفحة السابقة واختَر الفيديو.'
-    );
-    return;
-  }
-
-  let videoData;
-
-  try {
-    videoData = JSON.parse(savedSources);
-  } catch (error) {
-    showError('تعذر قراءة بيانات الفيديو المحفوظة.');
-    console.error('VIDEO DATA ERROR:', error);
-    return;
-  }
-
-  const sourceItems = Array.isArray(videoData)
-    ? videoData
-    : [videoData];
-
-  const firstItem = sourceItems.find(function (item) {
-    return Boolean(getSource(item));
-  });
-
-  const firstSource = getSource(firstItem);
-
-  if (!firstSource) {
-    showError(
-      'رابط الفيديو غير موجود داخل البيانات المحفوظة. تأكد من اسم حقل الرابط.'
-    );
-    return;
-  }
-
-  // الحالة الأولى: رابط مشغّل Bunny Stream
-  const bunnyUrl = getBunnyEmbedUrl(firstSource);
-
-  if (bunnyUrl) {
-    videoElement.hidden = true;
-    plyrWrapper.hidden = true;
-    bunnyWrapper.hidden = false;
-    bunnyFrame.src = bunnyUrl;
-
-    hint.textContent =
-      '💡 استخدم أدوات التحكم داخل مشغّل الفيديو.';
-
-    bunnyFrame.addEventListener('error', function () {
-      showError('تعذر تحميل مشغّل Bunny Stream.');
+    adminSubject.addEventListener('change', async () => {
+      currentSelection.subject = adminSubject.value;
+      // إعادة تعيين القوائم التابعة
+      adminTeacher.innerHTML = '<option value="">-- اختر المدرس --</option>';
+      adminTeacher.disabled = true;
+      renderChapterField([]);
+      renderLectureField([]);
+      allVideos = [];
+      renderVideos();
+      if (currentSelection.year && currentSelection.subject) {
+        await loadTeachers(currentSelection.year, currentSelection.subject);
+      }
     });
 
-    return;
-  }
+    adminTeacher.addEventListener('change', async () => {
+      currentSelection.teacher = adminTeacher.value;
+      renderChapterField([]);
+      renderLectureField([]);
+      allVideos = [];
+      renderVideos();
+      if (currentSelection.year && currentSelection.subject && currentSelection.teacher) {
+        await loadChapters(currentSelection.year, currentSelection.subject, currentSelection.teacher);
+      }
+    });
 
-  // الحالة الثانية: رابط HLS مباشر
-  if (/\.m3u8(?:$|\?)/i.test(firstSource)) {
-    initializeHls(firstSource);
-    return;
-  }
+    // ----- إضافة فيديو -----
+    adminForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const year = adminYear.value;
+      const subject = adminSubject.value;
+      const teacher = adminTeacher.value;
+      // الحصول على الباب والمحاضرة من الحقول النشطة
+      let chapter = currentSelection.chapter;
+      const chapterInput = document.getElementById('adminChapterInput');
+      if (chapterInput) {
+        chapter = chapterInput.value.trim();
+        if (!chapter) { showToast('⚠️ أدخل اسم الباب', 'error'); return; }
+      }
+      let lecture = currentSelection.lecture;
+      const lectureInput = document.getElementById('adminLectureInput');
+      if (lectureInput) {
+        lecture = lectureInput.value.trim();
+        if (!lecture) { showToast('⚠️ أدخل اسم المحاضرة', 'error'); return; }
+      }
+      const name = adminVideoName.value.trim();
+      const url = adminVideoUrl.value.trim();
 
-  // روابط غير مدعومة
-  showError(
-    'رابط الفيديو غير مدعوم. الرابط المستلم: ' +
-    firstSource
-  );
+      if (!year || !subject || !teacher || !chapter || !lecture || !name || !url) {
+        showToast('⚠️ جميع الحقول مطلوبة', 'error');
+        return;
+      }
+      if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+        showToast('⚠️ الرابط يجب أن يكون رابط يوتيوب صحيح', 'error');
+        return;
+      }
 
-})();
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
+        }
 
-setTimeout(function () {
-  const hint = document.getElementById('hint');
+        // التأكد من وجود الباب (إن لم يكن، نضيفه)
+        let chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        let chapterKey = null;
+        if (Array.isArray(chapters)) {
+          const idx = chapters.findIndex(c => (c.chapter_name || c.name || c) === chapter);
+          if (idx === -1) {
+            chapters.push({ chapter_name: chapter, lectures: {} });
+            chapterKey = chapters.length - 1;
+            chapterObj = chapters[chapterKey];
+            chapterNames.push(chapter);
+          } else {
+            chapterKey = idx;
+            chapterObj = chapters[idx];
+          }
+        } else {
+          if (!chapters[chapter]) {
+            chapters[chapter] = { lectures: {} };
+          }
+          chapterKey = chapter;
+          chapterObj = chapters[chapter];
+        }
 
-  if (hint) {
-    hint.style.display = 'none';
-  }
-}, 7000);
-</script>
+        // التأكد من وجود المحاضرة
+        let lectures = chapterObj.lectures || {};
+        let lectureObj = null;
+        let lectureKey = null;
+        if (Array.isArray(lectures)) {
+          const idx = lectures.findIndex(l => (l.lecture_name || l.name || l) === lecture);
+          if (idx === -1) {
+            lectures.push({ lecture_name: lecture, videos: [] });
+            lectureKey = lectures.length - 1;
+            lectureObj = lectures[lectureKey];
+            lectureNames.push(lecture);
+          } else {
+            lectureKey = idx;
+            lectureObj = lectures[idx];
+          }
+        } else {
+          if (!lectures[lecture]) {
+            lectures[lecture] = { videos: [] };
+          }
+          lectureKey = lecture;
+          lectureObj = lectures[lecture];
+        }
 
+        // إضافة الفيديو
+        let videos = lectureObj.videos || [];
+        if (!Array.isArray(videos)) videos = Object.values(videos);
+        videos.push({ name, url });
+        lectureObj.videos = videos;
+
+        // إعادة بناء الهيكل
+        if (Array.isArray(lectures)) lectures[lectureKey] = lectureObj;
+        else lectures[lectureKey] = lectureObj;
+        chapterObj.lectures = lectures;
+        if (Array.isArray(chapters)) chapters[chapterKey] = chapterObj;
+        else chapters[chapterKey] = chapterObj;
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        showToast('✅ تم إضافة الفيديو', 'success');
+        adminVideoName.value = '';
+        adminVideoUrl.value = '';
+        // تحديث القوائم
+        await loadChapters(year, subject, teacher);
+        // تحديث الفيديوهات
+        await loadVideos(year, subject, teacher, chapter, lecture);
+        // تحديث القوائم المحلية
+        renderChapterField(chapterNames);
+        renderLectureField(lectureNames);
+      } catch (err) {
+        console.error(err);
+        showToast('❌ حدث خطأ أثناء الإضافة', 'error');
+      }
+    });
+
+    // ----- حذف فيديو -----
+    async function deleteVideo(index) {
+      if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
+      const newVideos = [...allVideos];
+      newVideos.splice(index, 1);
+      await updateVideosInDB(newVideos);
+      allVideos = newVideos;
+      renderVideos();
+      showToast('🗑️ تم الحذف', 'success');
+    }
+
+    // ----- تعديل فيديو -----
+    function editVideo(index) {
+      const video = allVideos[index];
+      if (!video) return;
+      const newName = prompt('تعديل اسم الفيديو:', video.name);
+      if (newName === null) return;
+      const newUrl = prompt('تعديل رابط الفيديو:', video.url);
+      if (newUrl === null) return;
+      const updated = { name: newName.trim(), url: newUrl.trim() };
+      if (!updated.name || !updated.url) {
+        showToast('⚠️ الاسم والرابط مطلوبان', 'error');
+        return;
+      }
+      const newVideos = [...allVideos];
+      newVideos[index] = updated;
+      updateVideosInDB(newVideos);
+      allVideos = newVideos;
+      renderVideos();
+      showToast('✅ تم التعديل', 'success');
+    }
+
+    // دالة تحديث الفيديوهات
+    async function updateVideosInDB(videos) {
+      const { year, subject, teacher, chapter, lecture } = currentSelection;
+      if (!year || !subject || !teacher || !chapter || !lecture) {
+        showToast('⚠️ البيانات غير مكتملة', 'error');
+        return;
+      }
+      try {
+        const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+        if (!snap.exists()) { showToast('⚠️ البيانات غير موجودة', 'error'); return; }
+        let teachersData = snap.val();
+        let teacherObj = null;
+        let teacherKey = null;
+        if (Array.isArray(teachersData)) {
+          const idx = teachersData.findIndex(t => (t.teacher_name || t.name || t) === teacher);
+          if (idx === -1) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = idx;
+          teacherObj = teachersData[idx];
+        } else {
+          const keys = Object.keys(teachersData);
+          let found = null;
+          for (const k of keys) {
+            if ((teachersData[k].teacher_name || teachersData[k].name || teachersData[k]) === teacher) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المدرس غير موجود', 'error'); return; }
+          teacherKey = found;
+          teacherObj = teachersData[found];
+        }
+        let chapters = teacherObj.chapters || {};
+        let chapterObj = null;
+        let chapterKey = null;
+        if (Array.isArray(chapters)) {
+          const idx = chapters.findIndex(c => (c.chapter_name || c.name || c) === chapter);
+          if (idx === -1) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = idx;
+          chapterObj = chapters[idx];
+        } else {
+          const keys = Object.keys(chapters);
+          let found = null;
+          for (const k of keys) {
+            if ((chapters[k].chapter_name || chapters[k].name || chapters[k]) === chapter) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ الباب غير موجود', 'error'); return; }
+          chapterKey = found;
+          chapterObj = chapters[found];
+        }
+        let lectures = chapterObj.lectures || {};
+        let lectureObj = null;
+        let lectureKey = null;
+        if (Array.isArray(lectures)) {
+          const idx = lectures.findIndex(l => (l.lecture_name || l.name || l) === lecture);
+          if (idx === -1) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          lectureKey = idx;
+          lectureObj = lectures[idx];
+        } else {
+          const keys = Object.keys(lectures);
+          let found = null;
+          for (const k of keys) {
+            if ((lectures[k].lecture_name || lectures[k].name || lectures[k]) === lecture) {
+              found = k;
+              break;
+            }
+          }
+          if (!found) { showToast('⚠️ المحاضرة غير موجودة', 'error'); return; }
+          lectureKey = found;
+          lectureObj = lectures[found];
+        }
+        lectureObj.videos = videos;
+        if (Array.isArray(lectures)) lectures[lectureKey] = lectureObj;
+        else lectures[lectureKey] = lectureObj;
+        chapterObj.lectures = lectures;
+        if (Array.isArray(chapters)) chapters[chapterKey] = chapterObj;
+        else chapters[chapterKey] = chapterObj;
+        teacherObj.chapters = chapters;
+        if (Array.isArray(teachersData)) teachersData[teacherKey] = teacherObj;
+        else teachersData[teacherKey] = teacherObj;
+        await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachersData);
+        await loadVideos(year, subject, teacher, chapter, lecture);
+      } catch (err) {
+        console.error(err);
+        showToast('❌ فشل التحديث', 'error');
+      }
+    }
+
+    // ----- أزرار إضافة سنة/مادة/مدرس -----
+    document.getElementById('addYearBtn').addEventListener('click', async () => {
+      const newYear = prompt('أدخل اسم السنة الجديدة (مثال: أولى ثانوي)');
+      if (!newYear) return;
+      const yearKey = newYear.trim();
+      const snap = await get(child(ref(db), 'years'));
+      const years = snap.exists() ? snap.val() : {};
+      if (years[yearKey]) { showToast('⚠️ السنة موجودة', 'error'); return; }
+      years[yearKey] = { subjects: {} };
+      await set(ref(db, 'years'), years);
+      showToast('✅ تم إضافة السنة', 'success');
+      await loadYears();
+      adminYear.value = yearKey;
+      adminYear.dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('addSubjectBtn').addEventListener('click', async () => {
+      const year = adminYear.value;
+      if (!year) { showToast('⚠️ اختر السنة أولاً', 'error'); return; }
+      const newSubject = prompt('أدخل اسم المادة الجديدة');
+      if (!newSubject) return;
+      const subjectKey = newSubject.trim();
+      const snap = await get(child(ref(db), `years/${year}/subjects`));
+      let subjects = snap.exists() ? snap.val() : {};
+      if (Array.isArray(subjects)) {
+        if (subjects.some(s => (s.subject_name || s.name || s) === subjectKey)) {
+          showToast('⚠️ المادة موجودة', 'error');
+          return;
+        }
+        subjects.push({ subject_name: subjectKey, teachers: [] });
+      } else {
+        if (subjects[subjectKey]) { showToast('⚠️ المادة موجودة', 'error'); return; }
+        subjects[subjectKey] = { teachers: {} };
+      }
+      await set(ref(db, `years/${year}/subjects`), subjects);
+      showToast('✅ تم إضافة المادة', 'success');
+      await loadSubjects(year);
+      adminSubject.value = subjectKey;
+      adminSubject.dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('addTeacherBtn').addEventListener('click', async () => {
+      const year = adminYear.value;
+      const subject = adminSubject.value;
+      if (!year || !subject) { showToast('⚠️ اختر السنة والمادة أولاً', 'error'); return; }
+      const newTeacher = prompt('أدخل اسم المدرس الجديد');
+      if (!newTeacher) return;
+      const teacherKey = newTeacher.trim();
+      const snap = await get(child(ref(db), `years/${year}/subjects/${subject}/teachers`));
+      let teachers = snap.exists() ? snap.val() : [];
+      if (Array.isArray(teachers)) {
+        if (teachers.some(t => (t.teacher_name || t.name || t) === teacherKey)) {
+          showToast('⚠️ المدرس موجود', 'error');
+          return;
+        }
+        teachers.push({ teacher_name: teacherKey, chapters: {} });
+      } else {
+        if (teachers[teacherKey]) { showToast('⚠️ المدرس موجود', 'error'); return; }
+        teachers[teacherKey] = { chapters: {} };
+      }
+      await set(ref(db, `years/${year}/subjects/${subject}/teachers`), teachers);
+      showToast('✅ تم إضافة المدرس', 'success');
+      await loadTeachers(year, subject);
+      adminTeacher.value = teacherKey;
+      adminTeacher.dispatchEvent(new Event('change'));
+    });
+
+    // ----- تهيئة الصفحة -----
+    async function init() {
+      await loadYears();
+      // إذا كانت هناك سنة محددة، نحمّل المواد تلقائياً
+      if (adminYear.value) {
+        await loadSubjects(adminYear.value);
+      }
+    }
+    init();
+
+    // ----- التوست والوضع الليلي والنهاري -----
+    document.getElementById('darkToggle').addEventListener('click', function() {
+      this.classList.toggle('active');
+      document.body.classList.toggle('light-mode');
+    });
+
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'منصة THE BEST - إدارة',
+            text: 'لوحة تحكم المنصة',
+            url: window.location.href
+          });
+        } catch { showToast('❌ تم إلغاء المشاركة', 'error'); }
+      } else showToast('المشاركة غير مدعومة', 'error');
+    });
+
+    document.getElementById('notifyBtn').addEventListener('click', () => showToast('🔔 الإشعارات ستُفعل قريباً!', 'info'));
+
+    document.getElementById('backBtn').onclick = () => window.location.href = 'index.html';
+  </script>
 </body>
-</html>
+      </html>
