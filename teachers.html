@@ -437,7 +437,7 @@ const batteryLevel = document.getElementById('batteryLevel');
 const urlParams = new URLSearchParams(window.location.search);
 const year = urlParams.get('year');
 const subject = urlParams.get('subject');
-if (subject && year) pageTitle.innerHTML = `👨‍🏫 مدرسون ${subject} <span class="highlight">${year}</span>`;
+if (subject && year) pageTitle.innerHTML = `مدرسون ${subject} <span class="highlight">${year}</span>`;
 
 backBtn.addEventListener('click', () => {
   vibrate(10);
