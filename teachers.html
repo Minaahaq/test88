@@ -858,12 +858,25 @@ darkToggle.addEventListener('click', toggleTheme);
 // ===== مشاركة =====
 shareBtn.addEventListener('click', async () => {
   vibrate(10);
+  // ===== مشاركة =====
+shareBtn.addEventListener('click', async () => {
+  vibrate(10);
+
   if (navigator.share) {
     try {
-await navigator.share({
-  title: 'THANAWAYA PLUS',
-  text: 'منصة تعليمية متكاملة لطلاب الثانوية العامة',
-  url: window.location.href
+      await navigator.share({
+        title: 'THANAWAYA PLUS',
+        text: 'منصة تعليمية متكاملة لطلاب الثانوية العامة',
+        url: window.location.href
+      });
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        showToast('تعذرت المشاركة، حاول مرة أخرى');
+      }
+    }
+  } else {
+    showToast('المشاركة غير مدعومة على هذا الجهاز');
+  }
 });
 
 // ===== إشعارات =====
@@ -871,6 +884,7 @@ notifyBtn.addEventListener('click', () => {
   vibrate(10);
   showToast('🔔 الإشعارات ستُفعل قريباً!');
 });
+
 </script>
 <script src="app.js"></script>
 </body>
