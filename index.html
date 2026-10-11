@@ -344,6 +344,150 @@
       pointer-events: none;
       border-radius: 24px;
     }
+
+    #splashScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #191919 0%, #08090c 72%);
+  transition: opacity .6s ease, visibility .6s ease;
+}
+
+#splashScreen.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-content {
+  position: relative;
+  z-index: 2;
+  width: 94%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: splashAppear .8s ease both;
+}
+
+.splash-glow {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(212, 160, 23, .12);
+  filter: blur(75px);
+  animation: splashGlow 3s ease-in-out infinite alternate;
+}
+
+.splash-emblem {
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(245, 215, 66, .7);
+  border-radius: 24px;
+  margin-bottom: 26px;
+  color: #f5d742;
+  font-size: 30px;
+  font-weight: 900;
+  background: linear-gradient(145deg, #222, #0b0b0b);
+  box-shadow: 0 0 35px rgba(212, 160, 23, .15);
+}
+
+#splashScreen .splash-logo {
+  font-family: Arial, sans-serif;
+  font-size: clamp(23px, 6vw, 35px);
+  font-weight: 900;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  margin-bottom: 0;
+  background: linear-gradient(135deg, #d4a017, #fff0a0, #d4a017);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 15px rgba(212, 160, 23, .2));
+  animation: gradientShift 3s ease infinite;
+}
+
+#splashScreen .splash-subtitle {
+  margin-top: 12px;
+  color: #858585;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+#splashScreen .splash-loader {
+  width: 175px;
+  height: 3px;
+  margin-top: 38px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #292929;
+}
+
+.splash-loader-bar {
+  width: 45%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d4a017, #fff0a0, #d4a017);
+  box-shadow: 0 0 12px rgba(245, 215, 66, .6);
+  animation: splashLoading 1.4s ease-in-out infinite alternate;
+}
+
+#splashScreen .splash-text {
+  margin-top: 20px;
+  color: #bcbcbc;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-align: center;
+  animation: textBlink 1.5s ease-in-out infinite;
+}
+
+.splash-footer {
+  position: absolute;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  color: #5d5d5d;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+@keyframes splashLoading {
+  from { transform: translateX(60%); }
+  to { transform: translateX(-60%); }
+}
+
+@keyframes splashAppear {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splashGlow {
+  from { transform: scale(.85); opacity: .6; }
+  to { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes textBlink {
+  0%, 100% { opacity: .5; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #splashScreen *,
+  #splashScreen {
+    animation: none !important;
+  }
+}
     /* ✨ Fallback (لو الصورة مش موجودة) */
     .year-card .year-fallback {
       position: absolute;
@@ -473,11 +617,32 @@
 
 <div id="topProgressBar"></div>
 
-<div class="splash-logo">
-  THANAWAYA <span>PLUS</span>
-</div>
-<div class="splash-subtitle">
-  YOUR FUTURE STARTS HERE
+<div id="splashScreen">
+  <div class="splash-glow"></div>
+
+  <div class="splash-content">
+    <div class="splash-emblem">T+</div>
+
+    <div class="splash-logo">
+      THANAWAYA <span>PLUS</span>
+    </div>
+
+    <div class="splash-subtitle">
+      YOUR FUTURE STARTS HERE
+    </div>
+
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+
+    <div class="splash-text">
+      جاري تجهيز تجربتك التعليمية...
+    </div>
+  </div>
+
+  <div class="splash-footer">
+    LEARN • ACHIEVE • EXCEL
+  </div>
 </div>
 
 <!-- ✨ تفعيل الوضع الليلي قبل الرسم (منع الفلاش الأبيض) -->
@@ -593,14 +758,30 @@ const progressInterval = setInterval(() => {
   topProgressBar.style.width = progress + '%';
 }, 200);
 
+let loadingFinished = false;
+
 function finishLoading() {
+  if (loadingFinished) return;
+  loadingFinished = true;
+
   clearInterval(progressInterval);
   topProgressBar.style.width = '100%';
+
   setTimeout(() => {
-    splashScreen.classList.add('hide');
+    if (splashScreen) {
+      splashScreen.classList.add('hide');
+    }
+
     topProgressBar.style.opacity = '0';
-    setTimeout(() => { topProgressBar.style.display = 'none'; }, 400);
-  }, 500);
+
+    setTimeout(() => {
+      topProgressBar.style.display = 'none';
+
+      if (splashScreen) {
+        splashScreen.remove();
+      }
+    }, 650);
+  }, 350);
 }
 
 // ===== الوقت =====
@@ -828,11 +1009,11 @@ shareBtn.addEventListener('click', async () => {
   vibrate(10);
   if (navigator.share) {
     try {
-      await navigator.share({
-        title: 'منصة THE BEST',
-        text: 'منصة تعليمية متكاملة',
-        url: window.location.href
-      });
+await navigator.share({
+  title: 'THANAWAYA PLUS',
+  text: 'منصة تعليمية متكاملة لطلاب الثانوية العامة',
+  url: window.location.href
+});
     } catch {
       showToast('❌ تم إلغاء المشاركة');
     }
