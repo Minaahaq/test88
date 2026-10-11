@@ -866,16 +866,28 @@ if (savedTheme === 'dark') {
 }
 darkToggle.addEventListener('click', toggleTheme);
 
+```javascript
 // ===== مشاركة =====
 shareBtn.addEventListener('click', async () => {
   vibrate(10);
+
   if (navigator.share) {
     try {
-await navigator.share({
-  title: 'THANAWAYA PLUS',
-  text: 'منصة تعليمية متكاملة لطلاب الثانوية العامة',
-  url: window.location.href
+      await navigator.share({
+        title: 'THANAWAYA PLUS',
+        text: 'منصة تعليمية متكاملة لطلاب الثانوية العامة',
+        url: window.location.href
+      });
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('خطأ في المشاركة:', error);
+      }
+    }
+  } else {
+    showToast('المشاركة غير مدعومة في هذا المتصفح');
+  }
 });
+
 // ===== إشعارات =====
 notifyBtn.addEventListener('click', () => {
   vibrate(10);
