@@ -508,7 +508,7 @@
 
   <div class="topbar">
     <button class="back-btn" id="backBtn">←</button>
-    <div class="brand">THE BEST</div>
+    <div class="brand">THANAWAYA</div>
     <div class="actions">
       <div class="toggle-dark" id="darkToggle"><div class="thumb"></div></div>
       <a href="https://wa.me/" target="_blank">💬</a>
@@ -589,7 +589,7 @@ const year = urlParams.get('year');
 const subject = urlParams.get('subject');
 const teacher = urlParams.get('teacher');
 if (teacher && subject && year) {
-  pageTitle.innerHTML = `📖 أبواب ${teacher} <span class="highlight">${subject}</span>`;
+  pageTitle.innerHTML = `${teacher} <span class="highlight">${subject}</span>`;
 }
 
 backBtn.addEventListener('click', () => {
@@ -871,11 +871,11 @@ shareBtn.addEventListener('click', async () => {
   vibrate(10);
   if (navigator.share) {
     try {
-      await navigator.share({ title: 'منصة THE BEST', text: 'منصة تعليمية متكاملة', url: window.location.href });
-    } catch { showToast('❌ تم إلغاء المشاركة'); }
-  } else showToast('المشاركة غير مدعومة');
+await navigator.share({
+  title: 'THANAWAYA PLUS',
+  text: 'منصة تعليمية متكاملة لطلاب الثانوية العامة',
+  url: window.location.href
 });
-
 // ===== إشعارات =====
 notifyBtn.addEventListener('click', () => {
   vibrate(10);
