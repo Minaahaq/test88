@@ -2,8 +2,10 @@
 (function () {
   "use strict";
 
-  const ua = navigator.userAgent || "";
-  const inAppCreator = /AppCreator24/i.test(ua);
+  const inAppCreator =
+    ua.includes("AppCreator24") ||
+    ua.includes("wv") ||
+    ua.includes("WebView");
 
   if (!inAppCreator) {
     document.open();
