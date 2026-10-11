@@ -2,28 +2,9 @@
 (() => {
   "use strict";
 
-  // غيّر الرابط ده لرابط موقعك الأساسي
   const ALLOWED_HOST = "test88-three.vercel.app";
 
-  // التحقق من HTTPS والدومين
-  if (
-    location.protocol !== "https:" ||
-    location.hostname !== ALLOWED_HOST
-  ) {
-    showBlockedPage();
-    return;
-  }
-
-  // محاولة اكتشاف Android WebView
-  const ua = navigator.userAgent || "";
-  const isAndroid = /Android/i.test(ua);
-  const isWebView = /\bwv\b/i.test(ua);
-
-  if (isAndroid && !isWebView) {
-    showBlockedPage();
-    return;
-  }
-
+  // عرض صفحة الخطأ
   function showBlockedPage() {
     document.open();
     document.write(`
@@ -55,7 +36,10 @@
             background: #14141e;
           }
           h2 { color: #c5a7ff; }
-          p { line-height: 1.9; color: #c7c7d3; }
+          p {
+            line-height: 1.9;
+            color: #c7c7d3;
+          }
         </style>
       </head>
       <body>
@@ -71,4 +55,27 @@
     `);
     document.close();
   }
+
+  // 1. التأكد من HTTPS والدومين
+  if (
+    location.protocol !== "https:" ||
+    location.hostname !== ALLOWED_HOST
+  ) {
+    showBlockedPage();
+    return;
+  }
+
+  // 2. فحص بيئة WebView
+  const ua = navigator.userAgent || "";
+
+  const inAppCreator =
+    ua.includes("AppCreator24") ||
+    /\bwv\b/i.test(ua) ||
+    /WebView/i.test(ua);
+
+  if (!inAppCreator) {
+    showBlockedPage();
+    return;
+  }
+
 })();
